@@ -46,64 +46,51 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Component migration structure (DEFAULT)
-daisyv1/
-├── components/          # DAISY v1 baseline components with original business logic
-├── docs/               # Original DAISY v1 documentation
-└── tests/              # Original DAISY v1 test suites
+# Storybook documentation structure
+.storybook/
+├── main.js              # Storybook configuration
+├── preview.js           # Global story parameters and decorators
+├── manager.js           # Storybook manager customization
+└── public/              # Static assets for Storybook
 
-src/
-├── components/         # Configurator-compatible migrated components
-├── hooks/             # Configurator integration hooks
-├── utils/             # Business logic transformation utilities
-└── types/             # TypeScript definitions for Configurator patterns
+stories/
+├── daisyv1/            # DAISY v1 baseline component stories
+│   ├── components/     # Individual component stories
+│   └── migration/      # Migration comparison stories
+├── configurator/       # Configurator-compatible component stories
+│   ├── components/     # Individual component stories
+│   └── patterns/       # Integration pattern examples
+└── shared/             # Shared utilities and documentation
+
+.github/
+├── workflows/
+│   ├── storybook-deploy.yml  # GitHub Actions for deployment
+│   └── storybook-test.yml    # Visual regression testing
+└── pages/              # GitHub Pages configuration
+
+docs/
+├── storybook/          # Storybook-specific documentation
+├── component-api/      # Auto-generated API documentation
+└── migration-guides/   # Component transformation guides
 
 tests/
-├── migration/         # Business logic equivalency tests
-├── integration/       # Configurator integration tests
-└── unit/             # Component unit tests
-
-docs/
-├── migration/         # Business logic transformation documentation
-├── api/              # Component API reference
-└── examples/         # Usage examples with Configurator patterns
-
-# [REMOVE IF UNUSED] Option 2: Multi-package structure (when multiple component libraries detected)
-packages/
-├── daisyv1-baseline/  # DAISY v1 components with original business logic
-├── configurator-components/  # Migrated Configurator-compatible components
-└── migration-tools/   # Business logic transformation utilities
-
-docs/
-└── [shared documentation structure]
-
-# [REMOVE IF UNUSED] Option 3: Monorepo structure (when complex component ecosystem detected)
-apps/
-├── storybook/         # Component showcase and documentation
-└── migration-validator/  # Business logic equivalency validation tool
-
-packages/
-├── baseline/          # DAISY v1 components
-├── migrated/         # Configurator components
-└── shared/           # Common utilities and types
+├── storybook/          # Storybook-specific tests
+├── visual/             # Visual regression test snapshots
+└── accessibility/      # Accessibility test results
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above. Consider component count, business logic complexity, and migration workflow requirements.]
+**Structure Decision**: Selected Storybook documentation structure with clear separation between DAISY v1 baseline and Configurator-compatible components. This structure supports migration progress tracking, side-by-side comparisons, and comprehensive documentation while maintaining the existing component library architecture.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> **No constitutional violations identified - all gates pass**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+All constitutional requirements are met by this feature:
+
+- Component Independence: Storybook showcases components as standalone entities
+- Architecture Migration Protocol: Clear documentation of DAISY v1 to Configurator transformations
+- Semantic Versioning: Migration progress tracking with version information
+- Documentation-Driven Development: Comprehensive documentation is the core purpose
+- Automated Quality Gates: Visual regression and accessibility testing integrated
