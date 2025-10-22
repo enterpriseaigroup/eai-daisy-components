@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git remote add:*)"
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(bash:*)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Read(//Users/douglaswross/Code/eai/Configurator/.specify/**)",
+      "Bash(find:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
