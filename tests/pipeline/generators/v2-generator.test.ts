@@ -21,19 +21,58 @@ const mockConfig: ExtractionConfig = {
     mode: 'parallel',
     concurrency: 4,
     continueOnError: true,
-    retry: { maxAttempts: 3, delay: 1000, backoffMultiplier: 2, retryableOperations: [] },
-    filters: { include: [], exclude: [], types: [], complexity: [], custom: [] },
+    retry: {
+      maxAttempts: 3,
+      delay: 1000,
+      backoffMultiplier: 2,
+      retryableOperations: [],
+    },
+    filters: {
+      include: [],
+      exclude: [],
+      types: [],
+      complexity: [],
+      custom: [],
+    },
   },
-  performance: { memoryLimit: 1024, timeoutPerComponent: 30000, maxBundleSizeIncrease: 120, monitoring: true },
-  validation: { strict: false, typescript: true, eslint: false, componentStructure: true, businessLogicPreservation: true },
+  performance: {
+    memoryLimit: 1024,
+    timeoutPerComponent: 30000,
+    maxBundleSizeIncrease: 120,
+    monitoring: true,
+  },
+  validation: {
+    strict: false,
+    typescript: true,
+    eslint: false,
+    componentStructure: true,
+    businessLogicPreservation: true,
+  },
   output: {
     generateDeclarations: true,
     generateDocs: false,
     generateExamples: false,
-    format: { typescript: '.tsx', indentation: 'spaces', indentationSize: 2, lineEnding: 'lf', quotes: 'single' },
-    naming: { componentFiles: 'PascalCase', interfaces: 'PascalCase', utilities: 'camelCase', constants: 'UPPER_SNAKE_CASE' },
+    format: {
+      typescript: '.tsx',
+      indentation: 'spaces',
+      indentationSize: 2,
+      lineEnding: 'lf',
+      quotes: 'single',
+    },
+    naming: {
+      componentFiles: 'PascalCase',
+      interfaces: 'PascalCase',
+      utilities: 'camelCase',
+      constants: 'UPPER_SNAKE_CASE',
+    },
   },
-  logging: { level: 'info', outputs: ['console'], format: 'detailed', timestamps: true, stackTraces: true },
+  logging: {
+    level: 'info',
+    outputs: ['console'],
+    format: 'detailed',
+    timestamps: true,
+    stackTraces: true,
+  },
 };
 
 const mockComponent: ComponentDefinition = {
@@ -55,7 +94,13 @@ const mockTransformation: TransformationResult = {
   transformed: mockComponent,
   strategy: 'direct-translation',
   transformations: [
-    { type: 'state', original: 'useState(0)', transformed: 'useConfiguratorState(0)', description: 'Transform state', pattern: 'useConfiguratorState' },
+    {
+      type: 'state',
+      original: 'useState(0)',
+      transformed: 'useConfiguratorState(0)',
+      description: 'Transform state',
+      pattern: 'useConfiguratorState',
+    },
   ],
   patternMappings: [],
   businessLogicPreserved: true,
@@ -70,12 +115,17 @@ describe('V2ComponentGenerator', () => {
     generator = new V2ComponentGenerator(mockConfig);
 
     const { FileSystemManager } = require('@/utils/filesystem');
-    FileSystemManager.prototype.createDirectory = jest.fn().mockResolvedValue(undefined);
+    FileSystemManager.prototype.createDirectory = jest
+      .fn()
+      .mockResolvedValue(undefined);
   });
 
   describe('generate', () => {
     it('should generate component files', async () => {
-      const result = await generator.generate(mockTransformation, 'source code');
+      const result = await generator.generate(
+        mockTransformation,
+        'source code'
+      );
 
       expect(result.success).toBe(true);
       expect(result.artifacts.component).toBeDefined();

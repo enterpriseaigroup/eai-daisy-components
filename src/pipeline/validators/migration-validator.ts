@@ -7,7 +7,11 @@
  * @version 1.0.0
  */
 
-import type { ComponentDefinition, ExtractionConfig, ValidationResult } from '@/types';
+import type {
+  ComponentDefinition,
+  ExtractionConfig,
+  ValidationResult,
+} from '@/types';
 import type { TransformationResult } from '../transformers/configurator-transformer';
 import type { GenerationResult } from '../generators/v2-generator';
 import { getGlobalLogger } from '@/utils/logging';
@@ -55,7 +59,12 @@ export class MigrationValidator {
     }
 
     const valid = errors.length === 0;
-    const score = this.calculateScore(transformation, generation, errors, warnings);
+    const score = this.calculateScore(
+      transformation,
+      generation,
+      errors,
+      warnings
+    );
 
     return {
       componentName: component.name,
@@ -92,6 +101,8 @@ export class MigrationValidator {
   }
 }
 
-export function createMigrationValidator(config: ExtractionConfig): MigrationValidator {
+export function createMigrationValidator(
+  config: ExtractionConfig
+): MigrationValidator {
   return new MigrationValidator(config);
 }

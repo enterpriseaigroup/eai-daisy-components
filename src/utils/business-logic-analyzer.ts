@@ -80,7 +80,11 @@ export interface StateManagementPattern {
  */
 export interface SideEffect {
   /** Effect type */
-  readonly type: 'useEffect' | 'useLayoutEffect' | 'api-call' | 'dom-manipulation';
+  readonly type:
+    | 'useEffect'
+    | 'useLayoutEffect'
+    | 'api-call'
+    | 'dom-manipulation';
 
   /** Effect description */
   readonly description: string;
@@ -287,7 +291,10 @@ export class BusinessLogicAnalyzer {
             parameters: params,
             returnType: 'unknown',
             complexity: this.assessFunctionComplexity(sourceCode, functionName),
-            externalDependencies: this.extractDependencies(sourceCode, functionName),
+            externalDependencies: this.extractDependencies(
+              sourceCode,
+              functionName
+            ),
           });
         }
       }
@@ -350,7 +357,11 @@ export class BusinessLogicAnalyzer {
 
     for (const match of effectMatches) {
       const code = match[1] || '';
-      const deps = match[2]?.split(',').map(d => d.trim()).filter(Boolean) || [];
+      const deps =
+        match[2]
+          ?.split(',')
+          .map(d => d.trim())
+          .filter(Boolean) || [];
 
       effects.push({
         type: 'useEffect',
@@ -413,7 +424,8 @@ export class BusinessLogicAnalyzer {
           inputType: 'unknown',
           outputType: 'unknown',
           logic: match[1] || '',
-          isPure: !match[1]?.includes('setState') && !match[1]?.includes('dispatch'),
+          isPure:
+            !match[1]?.includes('setState') && !match[1]?.includes('dispatch'),
         });
       }
     }
@@ -472,7 +484,9 @@ export class BusinessLogicAnalyzer {
   /**
    * Calculate complexity score
    */
-  private calculateComplexityScore(analysis: Partial<BusinessLogicAnalysis>): number {
+  private calculateComplexityScore(
+    analysis: Partial<BusinessLogicAnalysis>
+  ): number {
     let score = 0;
 
     score += (analysis.functions?.length || 0) * 5;
@@ -500,7 +514,8 @@ export class BusinessLogicAnalyzer {
         type: 'function',
         name: func.name,
         description: func.purpose,
-        critical: func.complexity === 'complex' || func.complexity === 'critical',
+        critical:
+          func.complexity === 'complex' || func.complexity === 'critical',
         notes: `Preserve ${func.name} business logic`,
       });
     });
@@ -533,7 +548,10 @@ export class BusinessLogicAnalyzer {
   /**
    * Extract function parameters
    */
-  private extractParameters(sourceCode: string, startIndex: number): ParameterDefinition[] {
+  private extractParameters(
+    sourceCode: string,
+    startIndex: number
+  ): ParameterDefinition[] {
     // Simplified parameter extraction
     return [];
   }
@@ -541,11 +559,17 @@ export class BusinessLogicAnalyzer {
   /**
    * Assess function complexity
    */
-  private assessFunctionComplexity(sourceCode: string, functionName: string): ComplexityLevel {
+  private assessFunctionComplexity(
+    sourceCode: string,
+    functionName: string
+  ): ComplexityLevel {
     const functionStart = sourceCode.indexOf(functionName);
     if (functionStart === -1) return 'simple';
 
-    const functionCode = sourceCode.substring(functionStart, functionStart + 500);
+    const functionCode = sourceCode.substring(
+      functionStart,
+      functionStart + 500
+    );
     const lines = functionCode.split('\n').length;
 
     if (lines > 50) return 'critical';
@@ -557,7 +581,10 @@ export class BusinessLogicAnalyzer {
   /**
    * Extract function dependencies
    */
-  private extractDependencies(sourceCode: string, functionName: string): string[] {
+  private extractDependencies(
+    sourceCode: string,
+    functionName: string
+  ): string[] {
     return [];
   }
 
@@ -565,7 +592,10 @@ export class BusinessLogicAnalyzer {
    * Extract business logic from code
    */
   private extractBusinessLogic(code: string): string[] {
-    return code.split(';').map(line => line.trim()).filter(Boolean);
+    return code
+      .split(';')
+      .map(line => line.trim())
+      .filter(Boolean);
   }
 
   /**

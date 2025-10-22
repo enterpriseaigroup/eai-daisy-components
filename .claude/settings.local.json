@@ -9,7 +9,9 @@
       "Bash(npx tsc:*)",
       "Bash(tree:*)",
       "Bash(npm test:*)",
-      "Bash(npm run measure:baseline:*)"
+      "Bash(npm run measure:baseline:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

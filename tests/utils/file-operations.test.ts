@@ -61,7 +61,11 @@ describe('FileOperations', () => {
       const sourceFile = join(testDir, 'Component.tsx');
       const baselineDir = join(testDir, 'baseline');
 
-      await writeFile(sourceFile, 'export const Component = () => <div>Test</div>;', 'utf-8');
+      await writeFile(
+        sourceFile,
+        'export const Component = () => <div>Test</div>;',
+        'utf-8'
+      );
 
       const destination = await fileOps.copyToBaseline(sourceFile, baselineDir);
 
@@ -75,11 +79,19 @@ describe('FileOperations', () => {
       const sourceFile = join(testDir, 'Component.tsx');
       const baselineDir = join(testDir, 'deep', 'nested', 'baseline');
 
-      await writeFile(sourceFile, 'export const Component = () => <div>Test</div>;', 'utf-8');
+      await writeFile(
+        sourceFile,
+        'export const Component = () => <div>Test</div>;',
+        'utf-8'
+      );
 
-      const destination = await fileOps.copyToBaseline(sourceFile, baselineDir, {
-        createParents: true,
-      });
+      const destination = await fileOps.copyToBaseline(
+        sourceFile,
+        baselineDir,
+        {
+          createParents: true,
+        }
+      );
 
       const content = await readFile(destination, 'utf-8');
       expect(content).toBeDefined();
@@ -91,7 +103,11 @@ describe('FileOperations', () => {
 
       await mkdir(baselineDir, { recursive: true });
       await writeFile(sourceFile, 'source content', 'utf-8');
-      await writeFile(join(baselineDir, 'Component.tsx'), 'existing content', 'utf-8');
+      await writeFile(
+        join(baselineDir, 'Component.tsx'),
+        'existing content',
+        'utf-8'
+      );
 
       await expect(
         fileOps.copyToBaseline(sourceFile, baselineDir, { overwrite: false })
@@ -104,11 +120,19 @@ describe('FileOperations', () => {
 
       await mkdir(baselineDir, { recursive: true });
       await writeFile(sourceFile, 'new content', 'utf-8');
-      await writeFile(join(baselineDir, 'Component.tsx'), 'old content', 'utf-8');
+      await writeFile(
+        join(baselineDir, 'Component.tsx'),
+        'old content',
+        'utf-8'
+      );
 
-      const destination = await fileOps.copyToBaseline(sourceFile, baselineDir, {
-        overwrite: true,
-      });
+      const destination = await fileOps.copyToBaseline(
+        sourceFile,
+        baselineDir,
+        {
+          overwrite: true,
+        }
+      );
 
       const content = await readFile(destination, 'utf-8');
       expect(content).toBe('new content');
@@ -120,9 +144,13 @@ describe('FileOperations', () => {
 
       await writeFile(sourceFile, 'content', 'utf-8');
 
-      const destination = await fileOps.copyToBaseline(sourceFile, baselineDir, {
-        transformName: (name) => name.replace('.tsx', '.baseline.tsx'),
-      });
+      const destination = await fileOps.copyToBaseline(
+        sourceFile,
+        baselineDir,
+        {
+          transformName: name => name.replace('.tsx', '.baseline.tsx'),
+        }
+      );
 
       expect(destination).toBe(join(baselineDir, 'Component.baseline.tsx'));
     });
@@ -158,7 +186,11 @@ export default TestComponent;
       `.trim();
 
       const outputDir = join(testDir, 'output');
-      const savedPath = await fileOps.saveMigratedComponent(component, code, outputDir);
+      const savedPath = await fileOps.saveMigratedComponent(
+        component,
+        code,
+        outputDir
+      );
 
       expect(savedPath).toBe(join(outputDir, 'TestComponent.tsx'));
 
@@ -185,7 +217,11 @@ export default TestComponent;
       };
 
       const outputDir = join(testDir, 'new', 'output');
-      const savedPath = await fileOps.saveMigratedComponent(component, 'code', outputDir);
+      const savedPath = await fileOps.saveMigratedComponent(
+        component,
+        'code',
+        outputDir
+      );
 
       const content = await readFile(savedPath, 'utf-8');
       expect(content).toBe('code');
@@ -250,7 +286,7 @@ export default TestComponent;
 
       const destinationDir = join(testDir, 'destination');
       const result = await fileOps.batchCopy(files, destinationDir, {
-        transformName: (name) => `transformed-${name}`,
+        transformName: name => `transformed-${name}`,
       });
 
       expect(result.successful).toBe(1);
@@ -344,7 +380,11 @@ export default TestComponent;
     it('should clean non-baseline files when preserving baseline', async () => {
       const outputDir = join(testDir, 'output');
       await mkdir(join(outputDir, 'daisyv1'), { recursive: true });
-      await writeFile(join(outputDir, 'daisyv1', 'baseline.tsx'), 'baseline', 'utf-8');
+      await writeFile(
+        join(outputDir, 'daisyv1', 'baseline.tsx'),
+        'baseline',
+        'utf-8'
+      );
       await writeFile(join(outputDir, 'migrated.tsx'), 'migrated', 'utf-8');
 
       await fileOps.cleanOutputDirectory(outputDir, { preserveBaseline: true });
@@ -494,7 +534,11 @@ export default TestComponent;
       };
 
       const outputDir = join(testDir, 'output');
-      const savedPath = await saveMigratedComponent(component, 'code', outputDir);
+      const savedPath = await saveMigratedComponent(
+        component,
+        'code',
+        outputDir
+      );
 
       expect(savedPath).toBeTruthy();
     });

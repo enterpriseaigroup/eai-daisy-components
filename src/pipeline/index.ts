@@ -3,7 +3,7 @@
  *
  * Comprehensive pipeline orchestration layer that coordinates extraction, transformation,
  * and validation of DAISY v1 components to Configurator v2 architecture.
- * 
+ *
  * Includes Phase 4: Advanced Pipeline Orchestration & CLI Interface
  *
  * @fileoverview Complete pipeline orchestration and exports
@@ -26,7 +26,10 @@ import type {
   BundleSizeImpact,
 } from '../types/index.js';
 import { ComponentExtractor, type ExtractionResult } from './extractor.js';
-import { BusinessLogicTransformer, type TransformationResult } from './transformer.js';
+import {
+  BusinessLogicTransformer,
+  type TransformationResult,
+} from './transformer.js';
 import { EquivalencyValidator, type ComparisonResult } from './validator.js';
 import { getGlobalLogger } from '../utils/logging.js';
 
@@ -116,7 +119,9 @@ export class MigrationPipeline {
    * @param options - Pipeline execution options
    * @returns Pipeline execution result
    */
-  public async execute(options: PipelineOptions): Promise<PipelineExecutionResult> {
+  public async execute(
+    options: PipelineOptions
+  ): Promise<PipelineExecutionResult> {
     const startTime = Date.now();
     this.logger.info('Starting migration pipeline execution');
 
@@ -167,7 +172,9 @@ export class MigrationPipeline {
             error as Error
           );
           failCount++;
-          results.push(this.createFailedMigrationResult(extraction, config, error as Error));
+          results.push(
+            this.createFailedMigrationResult(extraction, config, error as Error)
+          );
         }
       }
 
@@ -195,7 +202,6 @@ export class MigrationPipeline {
       });
 
       return pipelineResult;
-
     } catch (error) {
       this.logger.error('Pipeline execution failed', error as Error);
       throw error;
@@ -224,11 +230,14 @@ export class MigrationPipeline {
     try {
       // Step 1: Transform component
       const transformStart = Date.now();
-      const transformation = await this.transformer.transformComponent(component, {
-        targetVersion: '2.0.0',
-        transformAPICalls: true,
-        addConfiguratorIntegration: true,
-      });
+      const transformation = await this.transformer.transformComponent(
+        component,
+        {
+          targetVersion: '2.0.0',
+          transformAPICalls: true,
+          addConfiguratorIntegration: true,
+        }
+      );
 
       steps.push({
         name: 'transform',
@@ -249,11 +258,15 @@ export class MigrationPipeline {
 
       // Step 2: Validate equivalency (comparing against original)
       const validationStart = Date.now();
-      const comparison = await this.validator.compare(component, transformation.component, {
-        strict: config.validation.strict,
-        validateBusinessLogic: config.validation.businessLogicPreservation,
-        validateTypes: config.validation.typescript,
-      });
+      const comparison = await this.validator.compare(
+        component,
+        transformation.component,
+        {
+          strict: config.validation.strict,
+          validateBusinessLogic: config.validation.businessLogicPreservation,
+          validateTypes: config.validation.typescript,
+        }
+      );
 
       steps.push({
         name: 'validate',
@@ -271,7 +284,10 @@ export class MigrationPipeline {
 
       // Step 3: Assess quality
       const qualityStart = Date.now();
-      const quality = await this.validator.assessQuality(component, transformation.component);
+      const quality = await this.validator.assessQuality(
+        component,
+        transformation.component
+      );
 
       steps.push({
         name: 'quality-assessment',
@@ -324,14 +340,19 @@ export class MigrationPipeline {
         peakMemoryUsage: process.memoryUsage().heapUsed / 1024 / 1024,
         cpuTime: operation.duration,
         fileOperations: saveArtifacts ? this.countArtifacts(artifacts) : 0,
-        bundleSizeImpact: this.calculateBundleSizeImpact(component, transformation),
+        bundleSizeImpact: this.calculateBundleSizeImpact(
+          component,
+          transformation
+        ),
         warnings: [],
       };
 
       // Collect issues
       const issues: MigrationIssue[] = [
         ...comparison.validation.errors.map(e => this.createIssueFromError(e)),
-        ...comparison.validation.warnings.map(w => this.createIssueFromWarning(w)),
+        ...comparison.validation.warnings.map(w =>
+          this.createIssueFromWarning(w)
+        ),
         ...transformation.warnings.map(w => ({
           severity: 'warning' as const,
           category: 'component-generation' as const,
@@ -361,9 +382,11 @@ export class MigrationPipeline {
       });
 
       return result;
-
     } catch (error) {
-      this.logger.error(`Migration failed for component ${component.name}`, error as Error);
+      this.logger.error(
+        `Migration failed for component ${component.name}`,
+        error as Error
+      );
 
       const operationEnd = new Date();
       const operation: MigrationOperation = {
@@ -457,7 +480,10 @@ export class MigrationPipeline {
       await writeFile(artifact.path, artifact.content, 'utf-8');
       this.logger.debug(`Saved artifact: ${artifact.path}`);
     } catch (error) {
-      this.logger.error(`Failed to save artifact: ${artifact.path}`, error as Error);
+      this.logger.error(
+        `Failed to save artifact: ${artifact.path}`,
+        error as Error
+      );
       throw error;
     }
   }
@@ -479,7 +505,9 @@ export class MigrationPipeline {
       totalComponents: results.length,
       successful: results.filter(r => r.success).length,
       failed: results.filter(r => !r.success).length,
-      averageQuality: results.reduce((sum, r) => sum + r.quality.overallScore, 0) / results.length,
+      averageQuality:
+        results.reduce((sum, r) => sum + r.quality.overallScore, 0) /
+        results.length,
       components: results.map(r => ({
         name: r.component.name,
         success: r.success,
@@ -508,7 +536,8 @@ export class MigrationPipeline {
     const originalSize = component.metadata.performance?.bundleSize || 0;
     const migratedSize = Buffer.byteLength(transformation.code, 'utf-8');
     const sizeChange = migratedSize - originalSize;
-    const percentageChange = originalSize > 0 ? (sizeChange / originalSize) * 100 : 0;
+    const percentageChange =
+      originalSize > 0 ? (sizeChange / originalSize) * 100 : 0;
 
     return {
       originalSize,
@@ -529,15 +558,21 @@ export class MigrationPipeline {
     const recommendations: string[] = [];
 
     if (quality.businessLogicPreservation < 90) {
-      recommendations.push('Review business logic preservation - some functions may be missing');
+      recommendations.push(
+        'Review business logic preservation - some functions may be missing'
+      );
     }
 
     if (quality.typeSafety < 90) {
-      recommendations.push('Review type definitions - some props may have changed');
+      recommendations.push(
+        'Review type definitions - some props may have changed'
+      );
     }
 
     if (comparison.differences.some(d => d.severity === 'error')) {
-      recommendations.push('Address critical differences before production deployment');
+      recommendations.push(
+        'Address critical differences before production deployment'
+      );
     }
 
     if (quality.overallScore < 70) {
@@ -545,7 +580,9 @@ export class MigrationPipeline {
     }
 
     if (recommendations.length === 0) {
-      recommendations.push('Component migration successful - ready for testing');
+      recommendations.push(
+        'Component migration successful - ready for testing'
+      );
     }
 
     return recommendations;
@@ -559,8 +596,13 @@ export class MigrationPipeline {
     totalTime: number
   ): PipelinePerformanceMetrics {
     const avgTime = results.length > 0 ? totalTime / results.length : 0;
-    const peakMemory = Math.max(...results.map(r => r.performance.peakMemoryUsage));
-    const fileOps = results.reduce((sum, r) => sum + r.performance.fileOperations, 0);
+    const peakMemory = Math.max(
+      ...results.map(r => r.performance.peakMemoryUsage)
+    );
+    const fileOps = results.reduce(
+      (sum, r) => sum + r.performance.fileOperations,
+      0
+    );
 
     return {
       totalTime,
@@ -672,7 +714,11 @@ export class MigrationPipeline {
   /**
    * Create migration issue from validation error
    */
-  private createIssueFromError(error: { code: string; message: string; path: string }): MigrationIssue {
+  private createIssueFromError(error: {
+    code: string;
+    message: string;
+    path: string;
+  }): MigrationIssue {
     return {
       severity: 'error',
       category: 'validation',
@@ -684,7 +730,11 @@ export class MigrationPipeline {
   /**
    * Create migration issue from validation warning
    */
-  private createIssueFromWarning(warning: { code: string; message: string; path: string }): MigrationIssue {
+  private createIssueFromWarning(warning: {
+    code: string;
+    message: string;
+    path: string;
+  }): MigrationIssue {
     return {
       severity: 'warning',
       category: 'validation',
@@ -700,7 +750,10 @@ export class MigrationPipeline {
 
 // Re-export pipeline components
 export { ComponentExtractor, type ExtractionResult } from './extractor';
-export { BusinessLogicTransformer, type TransformationResult } from './transformer';
+export {
+  BusinessLogicTransformer,
+  type TransformationResult,
+} from './transformer';
 export { EquivalencyValidator, type ComparisonResult } from './validator';
 
 // Factory function
@@ -762,11 +815,11 @@ export async function createCLIApplication() {
 export const PHASE_4_VERSION = '4.0.0';
 export const PHASE_4_CAPABILITIES = [
   'Advanced Pipeline Orchestration',
-  'Comprehensive CLI Interface', 
+  'Comprehensive CLI Interface',
   'Configurator v2 Integration',
   'Business Logic Extraction',
   'Automated Output Generation',
   'Content Validation',
   'Progress Tracking',
-  'Error Recovery'
+  'Error Recovery',
 ] as const;

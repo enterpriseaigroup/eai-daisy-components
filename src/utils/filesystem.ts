@@ -1,9 +1,9 @@
 /**
  * File System Utilities
- * 
+ *
  * Provides comprehensive file system operations for the component extraction
  * pipeline with proper error handling, type safety, and performance optimization.
- * 
+ *
  * @fileoverview File system utilities for component scanning and management
  * @version 1.0.0
  */
@@ -28,28 +28,28 @@ import type {
 export interface FileInfo {
   /** Absolute file path */
   readonly path: string;
-  
+
   /** File name without path */
   readonly name: string;
-  
+
   /** File extension */
   readonly extension: string;
-  
+
   /** File size in bytes */
   readonly size: number;
-  
+
   /** File modification time */
   readonly modifiedAt: Date;
-  
+
   /** File creation time */
   readonly createdAt: Date;
-  
+
   /** Whether file is readable */
   readonly readable: boolean;
-  
+
   /** Whether file is writable */
   readonly writable: boolean;
-  
+
   /** File stats object */
   readonly stats: Stats;
 }
@@ -60,16 +60,16 @@ export interface FileInfo {
 export interface DirectoryScanResult {
   /** Directory path */
   readonly directory: string;
-  
+
   /** All files found */
   readonly files: FileInfo[];
-  
+
   /** Component files only */
   readonly componentFiles: FileInfo[];
-  
+
   /** Subdirectories found */
   readonly subdirectories: string[];
-  
+
   /** Scan statistics */
   readonly stats: ScanStatistics;
 }
@@ -80,16 +80,16 @@ export interface DirectoryScanResult {
 export interface ScanStatistics {
   /** Total files scanned */
   readonly totalFiles: number;
-  
+
   /** Component files found */
   readonly componentFiles: number;
-  
+
   /** Directories scanned */
   readonly directoriesScanned: number;
-  
+
   /** Scan duration in milliseconds */
   readonly duration: number;
-  
+
   /** Errors encountered */
   readonly errors: number;
 }
@@ -100,16 +100,16 @@ export interface ScanStatistics {
 export interface ComponentFileInfo extends FileInfo {
   /** Detected component type */
   readonly componentType: ComponentType;
-  
+
   /** Component name extracted from file */
   readonly componentName: string;
-  
+
   /** Whether file exports React component */
   readonly isReactComponent: boolean;
-  
+
   /** TypeScript or JavaScript */
   readonly language: 'typescript' | 'javascript';
-  
+
   /** Estimated complexity */
   readonly estimatedComplexity: 'simple' | 'moderate' | 'complex';
 }
@@ -120,16 +120,16 @@ export interface ComponentFileInfo extends FileInfo {
 export interface FileOperationOptions {
   /** Whether to create parent directories */
   readonly createParents?: boolean;
-  
+
   /** File encoding */
   readonly encoding?: BufferEncoding;
-  
+
   /** Whether to overwrite existing files */
   readonly overwrite?: boolean;
-  
+
   /** File mode permissions */
   readonly mode?: number;
-  
+
   /** Whether to preserve timestamps */
   readonly preserveTimestamps?: boolean;
 }
@@ -140,22 +140,22 @@ export interface FileOperationOptions {
 export interface ScanOptions {
   /** Include file patterns */
   readonly include?: string[];
-  
+
   /** Exclude file patterns */
   readonly exclude?: string[];
-  
+
   /** Whether to scan recursively */
   readonly recursive?: boolean;
-  
+
   /** Maximum scan depth */
   readonly maxDepth?: number;
-  
+
   /** Whether to follow symbolic links */
   readonly followSymlinks?: boolean;
-  
+
   /** Whether to include hidden files */
   readonly includeHidden?: boolean;
-  
+
   /** Component file extensions to look for */
   readonly componentExtensions?: string[];
 }
@@ -187,7 +187,7 @@ export class FileSystemManager {
 
   /**
    * Scan directory for component files
-   * 
+   *
    * @param directoryPath - Directory to scan
    * @param options - Scan options
    * @returns Scan result with found files
@@ -199,10 +199,10 @@ export class FileSystemManager {
     const startTime = Date.now();
     const resolvedPath = resolve(directoryPath);
     const scanOptions = { ...this.defaultScanOptions, ...options };
-    
+
     try {
       await this.validateDirectoryAccess(resolvedPath);
-      
+
       const globPatterns = scanOptions.include;
       const allFiles: FileInfo[] = [];
       const componentFiles: FileInfo[] = [];
@@ -225,8 +225,11 @@ export class FileSystemManager {
               const fileInfo = await this.getFileInfo(filePath);
               allFiles.push(fileInfo);
 
-              if (this.isComponentFile(fileInfo, scanOptions.componentExtensions)) {
-                const componentFileInfo = await this.analyzeComponentFile(fileInfo);
+              if (
+                this.isComponentFile(fileInfo, scanOptions.componentExtensions)
+              ) {
+                const componentFileInfo =
+                  await this.analyzeComponentFile(fileInfo);
                 componentFiles.push(componentFileInfo);
               }
             } catch (error) {
@@ -278,7 +281,7 @@ export class FileSystemManager {
 
   /**
    * Get detailed file information
-   * 
+   *
    * @param filePath - Path to file
    * @returns File information object
    */
@@ -286,18 +289,18 @@ export class FileSystemManager {
     try {
       const resolvedPath = resolve(filePath);
       const stats = await fs.stat(resolvedPath);
-      
+
       // Check file permissions
       let readable = false;
       let writable = false;
-      
+
       try {
         await fs.access(resolvedPath, constants.R_OK);
         readable = true;
       } catch {
         // File not readable
       }
-      
+
       try {
         await fs.access(resolvedPath, constants.W_OK);
         writable = true;
@@ -326,7 +329,7 @@ export class FileSystemManager {
 
   /**
    * Read file content with error handling
-   * 
+   *
    * @param filePath - Path to file
    * @param encoding - File encoding
    * @returns File content
@@ -349,7 +352,7 @@ export class FileSystemManager {
 
   /**
    * Write file content with options
-   * 
+   *
    * @param filePath - Path to file
    * @param content - File content
    * @param options - Write options
@@ -417,7 +420,7 @@ export class FileSystemManager {
 
   /**
    * Copy file with options
-   * 
+   *
    * @param sourcePath - Source file path
    * @param destinationPath - Destination file path
    * @param options - Copy options
@@ -463,7 +466,7 @@ export class FileSystemManager {
 
   /**
    * Create directory with parents
-   * 
+   *
    * @param directoryPath - Directory path to create
    * @param mode - Directory permissions
    */
@@ -484,7 +487,7 @@ export class FileSystemManager {
 
   /**
    * Check if path exists
-   * 
+   *
    * @param path - Path to check
    * @returns Whether path exists
    */
@@ -499,18 +502,21 @@ export class FileSystemManager {
 
   /**
    * Analyze component file for type and complexity
-   * 
+   *
    * @param fileInfo - File information
    * @returns Enhanced component file info
    */
-  private async analyzeComponentFile(fileInfo: FileInfo): Promise<ComponentFileInfo> {
+  private async analyzeComponentFile(
+    fileInfo: FileInfo
+  ): Promise<ComponentFileInfo> {
     try {
       const content = await this.readFile(fileInfo.path);
-      
+
       // Detect language
-      const language = fileInfo.extension.endsWith('ts') || fileInfo.extension.endsWith('tsx') 
-        ? 'typescript' 
-        : 'javascript';
+      const language =
+        fileInfo.extension.endsWith('ts') || fileInfo.extension.endsWith('tsx')
+          ? 'typescript'
+          : 'javascript';
 
       // Basic component analysis (simplified for now)
       const isReactComponent = this.detectReactComponent(content);
@@ -533,7 +539,9 @@ export class FileSystemManager {
         componentType: 'functional',
         componentName: basename(fileInfo.name, fileInfo.extension),
         isReactComponent: false,
-        language: fileInfo.extension.includes('ts') ? 'typescript' : 'javascript',
+        language: fileInfo.extension.includes('ts')
+          ? 'typescript'
+          : 'javascript',
         estimatedComplexity: 'simple',
       };
     }
@@ -541,7 +549,7 @@ export class FileSystemManager {
 
   /**
    * Detect if file contains React component
-   * 
+   *
    * @param content - File content
    * @returns Whether file contains React component
    */
@@ -561,12 +569,15 @@ export class FileSystemManager {
 
   /**
    * Detect component type from content
-   * 
+   *
    * @param content - File content
    * @returns Detected component type
    */
   private detectComponentType(content: string): ComponentType {
-    if (content.includes('React.Component') || content.includes('extends Component')) {
+    if (
+      content.includes('React.Component') ||
+      content.includes('extends Component')
+    ) {
       return 'class';
     }
     if (content.includes('useState') || content.includes('useEffect')) {
@@ -575,7 +586,10 @@ export class FileSystemManager {
     if (content.includes('withRouter') || content.includes('connect(')) {
       return 'higher-order';
     }
-    if (content.includes('function use') || /export\s+function\s+use[A-Z]/.test(content)) {
+    if (
+      content.includes('function use') ||
+      /export\s+function\s+use[A-Z]/.test(content)
+    ) {
       return 'hook';
     }
     return 'utility';
@@ -583,14 +597,16 @@ export class FileSystemManager {
 
   /**
    * Extract component name from file name and content
-   * 
+   *
    * @param fileName - File name
    * @param content - File content
    * @returns Component name
    */
   private extractComponentName(fileName: string, content: string): string {
     // Try to extract from export statements
-    const exportMatches = content.match(/export\s+(?:default\s+)?(?:const|function|class)\s+([A-Z][a-zA-Z0-9]*)/);
+    const exportMatches = content.match(
+      /export\s+(?:default\s+)?(?:const|function|class)\s+([A-Z][a-zA-Z0-9]*)/
+    );
     if (exportMatches?.[1]) {
       return exportMatches[1];
     }
@@ -602,15 +618,19 @@ export class FileSystemManager {
 
   /**
    * Estimate component complexity based on content
-   * 
+   *
    * @param content - File content
    * @returns Estimated complexity level
    */
-  private estimateComplexity(content: string): 'simple' | 'moderate' | 'complex' {
+  private estimateComplexity(
+    content: string
+  ): 'simple' | 'moderate' | 'complex' {
     const lines = content.split('\n').length;
     const hooks = (content.match(/use[A-Z][a-zA-Z]*/g) || []).length;
     const functions = (content.match(/function\s+\w+/g) || []).length;
-    const complexPatterns = (content.match(/useEffect|useReducer|useContext|async|await/g) || []).length;
+    const complexPatterns = (
+      content.match(/useEffect|useReducer|useContext|async|await/g) || []
+    ).length;
 
     if (lines > 200 || hooks > 5 || functions > 10 || complexPatterns > 5) {
       return 'complex';
@@ -623,7 +643,7 @@ export class FileSystemManager {
 
   /**
    * Check if file is a component file
-   * 
+   *
    * @param fileInfo - File information
    * @param extensions - Component file extensions
    * @returns Whether file is a component file
@@ -634,7 +654,7 @@ export class FileSystemManager {
 
   /**
    * Validate directory access
-   * 
+   *
    * @param directoryPath - Directory path
    */
   private async validateDirectoryAccess(directoryPath: string): Promise<void> {
@@ -654,11 +674,14 @@ export class FileSystemManager {
 
   /**
    * Validate file access with specific permissions
-   * 
+   *
    * @param filePath - File path
    * @param mode - Access mode
    */
-  private async validateFileAccess(filePath: string, mode: number): Promise<void> {
+  private async validateFileAccess(
+    filePath: string,
+    mode: number
+  ): Promise<void> {
     try {
       await fs.access(filePath, mode);
     } catch (error) {
@@ -684,7 +707,7 @@ export class FileSystemError extends Error {
     super(message);
     this.name = 'FileSystemError';
     this.originalError = originalError;
-    
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, FileSystemError);
     }
@@ -714,18 +737,20 @@ export function createFileSystemManager(): FileSystemManager {
 
 /**
  * Quick directory scan with default options
- * 
+ *
  * @param directoryPath - Directory to scan
  * @returns Scan result
  */
-export async function quickScan(directoryPath: string): Promise<DirectoryScanResult> {
+export async function quickScan(
+  directoryPath: string
+): Promise<DirectoryScanResult> {
   const manager = createFileSystemManager();
   return manager.scanDirectory(directoryPath);
 }
 
 /**
  * Find all component files in directory
- * 
+ *
  * @param directoryPath - Directory to search
  * @param recursive - Whether to search recursively
  * @returns Array of component file information
@@ -741,7 +766,7 @@ export async function findComponentFiles(
 
 /**
  * Check if file is a TypeScript/JavaScript component file
- * 
+ *
  * @param filePath - File path to check
  * @returns Whether file is a component file
  */
@@ -753,7 +778,7 @@ export function isComponentFile(filePath: string): boolean {
 
 /**
  * Normalize file path for cross-platform compatibility
- * 
+ *
  * @param filePath - File path to normalize
  * @returns Normalized file path
  */
@@ -763,7 +788,7 @@ export function normalizePath(filePath: string): string {
 
 /**
  * Get relative path from base to target
- * 
+ *
  * @param from - Base path
  * @param to - Target path
  * @returns Relative path

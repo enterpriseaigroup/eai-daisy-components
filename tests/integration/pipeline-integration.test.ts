@@ -4,7 +4,7 @@ import * as path from 'path';
 
 /**
  * Integration Test Suite - DAISY v1 Button Component Validation
- * 
+ *
  * This test suite validates that we have successfully created a realistic
  * DAISY v1 Button component that can serve as test data for our complete
  * pipeline system. It focuses on verifying the component files exist,
@@ -32,15 +32,18 @@ describe('DAISY v1 Button Component Integration Tests', () => {
     it('should have the complete DAISY v1 Button component structure', async () => {
       const expectedFiles = [
         'components/tier2/Button.tsx',
-        'components/tier2/Button.css', 
-        'components/tier2/index.ts'
+        'components/tier2/Button.css',
+        'components/tier2/index.ts',
       ];
 
       const basePath = path.join(__dirname, '../../daisyv1');
-      
+
       for (const file of expectedFiles) {
         const filePath = path.join(basePath, file);
-        const exists = await fs.access(filePath).then(() => true).catch(() => false);
+        const exists = await fs
+          .access(filePath)
+          .then(() => true)
+          .catch(() => false);
         expect(exists).toBe(true);
       }
     });
@@ -50,9 +53,18 @@ describe('DAISY v1 Button Component Integration Tests', () => {
       const componentsPath = path.join(daisyPath, 'components');
       const tier2Path = path.join(componentsPath, 'tier2');
 
-      const daisyExists = await fs.access(daisyPath).then(() => true).catch(() => false);
-      const componentsExists = await fs.access(componentsPath).then(() => true).catch(() => false);
-      const tier2Exists = await fs.access(tier2Path).then(() => true).catch(() => false);
+      const daisyExists = await fs
+        .access(daisyPath)
+        .then(() => true)
+        .catch(() => false);
+      const componentsExists = await fs
+        .access(componentsPath)
+        .then(() => true)
+        .catch(() => false);
+      const tier2Exists = await fs
+        .access(tier2Path)
+        .then(() => true)
+        .catch(() => false);
 
       expect(daisyExists).toBe(true);
       expect(componentsExists).toBe(true);
@@ -62,7 +74,10 @@ describe('DAISY v1 Button Component Integration Tests', () => {
 
   describe('Button Component Validation', () => {
     it('should contain all required Button component exports', async () => {
-      const buttonPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.tsx');
+      const buttonPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.tsx'
+      );
       const content = await fs.readFile(buttonPath, 'utf-8');
 
       // Core exports
@@ -77,7 +92,10 @@ describe('DAISY v1 Button Component Integration Tests', () => {
     });
 
     it('should contain DAISY v1 business logic patterns', async () => {
-      const buttonPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.tsx');
+      const buttonPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.tsx'
+      );
       const content = await fs.readFile(buttonPath, 'utf-8');
 
       // DAISY v1 patterns that need transformation
@@ -90,13 +108,16 @@ describe('DAISY v1 Button Component Integration Tests', () => {
     });
 
     it('should have complex component structure suitable for testing pipeline', async () => {
-      const buttonPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.tsx');
+      const buttonPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.tsx'
+      );
       const content = await fs.readFile(buttonPath, 'utf-8');
 
       // Should have sufficient complexity for pipeline testing
       expect(content.length).toBeGreaterThan(5000); // Substantial component
       expect(content.split('\n').length).toBeGreaterThan(300); // 300+ lines
-      
+
       // Multiple hooks and state management
       expect(content).toContain('useState');
       expect(content).toContain('useEffect');
@@ -109,9 +130,12 @@ describe('DAISY v1 Button Component Integration Tests', () => {
     });
 
     it('should be TypeScript compliant', async () => {
-      const buttonPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.tsx');
+      const buttonPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.tsx'
+      );
       const validation = await validateTypeScriptFile(buttonPath);
-      
+
       expect(validation.valid).toBe(true);
       if (!validation.valid) {
         console.log('TypeScript validation errors:', validation.errors);
@@ -122,7 +146,10 @@ describe('DAISY v1 Button Component Integration Tests', () => {
 
   describe('CSS Styles Validation', () => {
     it('should contain comprehensive DAISY v1 styling patterns', async () => {
-      const cssPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.css');
+      const cssPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.css'
+      );
       const content = await fs.readFile(cssPath, 'utf-8');
 
       // Base component styles
@@ -148,7 +175,10 @@ describe('DAISY v1 Button Component Integration Tests', () => {
     });
 
     it('should have theme support patterns', async () => {
-      const cssPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.css');
+      const cssPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.css'
+      );
       const content = await fs.readFile(cssPath, 'utf-8');
 
       // Theme patterns that need transformation
@@ -159,7 +189,10 @@ describe('DAISY v1 Button Component Integration Tests', () => {
     });
 
     it('should be substantial enough for pipeline testing', async () => {
-      const cssPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.css');
+      const cssPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.css'
+      );
       const content = await fs.readFile(cssPath, 'utf-8');
 
       // Should have significant styling complexity
@@ -174,23 +207,31 @@ describe('DAISY v1 Button Component Integration Tests', () => {
 
   describe('Component Index Validation', () => {
     it('should properly export all component elements', async () => {
-      const indexPath = path.join(__dirname, '../../daisyv1/components/tier2/index.ts');
+      const indexPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/index.ts'
+      );
       const content = await fs.readFile(indexPath, 'utf-8');
 
       // All exports
-      expect(content).toContain('export { Button, withDaisyTheme, ButtonUtils }');
+      expect(content).toContain(
+        'export { Button, withDaisyTheme, ButtonUtils }'
+      );
       expect(content).toContain('export type { ButtonProps }');
 
       // Component metadata
       expect(content).toContain('DAISY_V1_COMPONENTS');
       expect(content).toContain('tier: 2');
-      expect(content).toContain('complexity: \'high\'');
+      expect(content).toContain("complexity: 'high'");
       expect(content).toContain('businessLogic');
       expect(content).toContain('transformationChallenges');
     });
 
     it('should contain metadata suitable for pipeline processing', async () => {
-      const indexPath = path.join(__dirname, '../../daisyv1/components/tier2/index.ts');
+      const indexPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/index.ts'
+      );
       const content = await fs.readFile(indexPath, 'utf-8');
 
       // Business logic patterns for pipeline analysis
@@ -208,14 +249,20 @@ describe('DAISY v1 Button Component Integration Tests', () => {
 
   describe('Pipeline Ready Validation', () => {
     it('should be discoverable by component discovery algorithms', async () => {
-      const buttonPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.tsx');
-      const exists = await fs.access(buttonPath).then(() => true).catch(() => false);
-      
+      const buttonPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.tsx'
+      );
+      const exists = await fs
+        .access(buttonPath)
+        .then(() => true)
+        .catch(() => false);
+
       expect(exists).toBe(true);
 
       if (exists) {
         const content = await fs.readFile(buttonPath, 'utf-8');
-        
+
         // Should be recognizable as React component
         expect(content).toContain('React');
         expect(content).toContain('export');
@@ -224,7 +271,10 @@ describe('DAISY v1 Button Component Integration Tests', () => {
     });
 
     it('should contain parseable TypeScript patterns', async () => {
-      const buttonPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.tsx');
+      const buttonPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.tsx'
+      );
       const content = await fs.readFile(buttonPath, 'utf-8');
 
       // Import statements
@@ -241,7 +291,10 @@ describe('DAISY v1 Button Component Integration Tests', () => {
     });
 
     it('should contain complex business logic for analysis testing', async () => {
-      const buttonPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.tsx');
+      const buttonPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.tsx'
+      );
       const content = await fs.readFile(buttonPath, 'utf-8');
 
       // State management patterns
@@ -270,25 +323,36 @@ describe('DAISY v1 Button Component Integration Tests', () => {
       const files = [
         'daisyv1/components/tier2/Button.tsx',
         'daisyv1/components/tier2/Button.css',
-        'daisyv1/components/tier2/index.ts'
+        'daisyv1/components/tier2/index.ts',
       ];
 
       for (const file of files) {
         const filePath = path.join(__dirname, '../../', file);
         const content = await fs.readFile(filePath, 'utf-8');
-        
+
         expect(content.length).toBeGreaterThan(100); // Non-trivial content
         expect(content.trim()).not.toBe(''); // Not empty
       }
 
       // Verify the component represents realistic complexity
-      const buttonPath = path.join(__dirname, '../../daisyv1/components/tier2/Button.tsx');
+      const buttonPath = path.join(
+        __dirname,
+        '../../daisyv1/components/tier2/Button.tsx'
+      );
       const buttonContent = await fs.readFile(buttonPath, 'utf-8');
-      
+
       // Should have multiple patterns that need transformation
       const patterns = [
-        'theme', 'analytics', 'accessibility', 'loading', 'tooltip',
-        'focus', 'keyboard', 'mobile', 'state management', 'event handling'
+        'theme',
+        'analytics',
+        'accessibility',
+        'loading',
+        'tooltip',
+        'focus',
+        'keyboard',
+        'mobile',
+        'state management',
+        'event handling',
       ];
 
       let patternCount = 0;
@@ -306,16 +370,18 @@ describe('DAISY v1 Button Component Integration Tests', () => {
 /**
  * Helper function to validate TypeScript file compliance
  */
-async function validateTypeScriptFile(filePath: string): Promise<{ valid: boolean; errors: string[] }> {
+async function validateTypeScriptFile(
+  filePath: string
+): Promise<{ valid: boolean; errors: string[] }> {
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     const errors: string[] = [];
-    
+
     // Basic TypeScript compliance checks
     if (!content.includes('export')) {
       errors.push('No exports found');
     }
-    
+
     if (!content.includes('interface') && !content.includes('type ')) {
       errors.push('No type definitions found');
     }
@@ -338,12 +404,12 @@ async function validateTypeScriptFile(filePath: string): Promise<{ valid: boolea
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   } catch (error) {
     return {
       valid: false,
-      errors: [`Failed to read file: ${error}`]
+      errors: [`Failed to read file: ${error}`],
     };
   }
 }

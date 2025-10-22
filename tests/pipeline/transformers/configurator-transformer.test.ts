@@ -33,18 +33,30 @@ describe('ConfiguratorTransformer', () => {
   beforeEach(() => {
     transformer = new ConfiguratorTransformer();
 
-    const { BusinessLogicAnalyzer } = require('@/utils/business-logic-analyzer');
-    BusinessLogicAnalyzer.prototype.analyzeComponent = jest.fn().mockReturnValue({
-      functions: [],
-      stateManagement: [{ type: 'useState', name: 'count', stateType: 'number', setter: 'setCount', dependencies: [] }],
-      sideEffects: [],
-      eventHandlers: [],
-      dataTransformations: [],
-      validations: [],
-      businessRules: [],
-      complexityScore: 10,
-      preservationRequirements: [],
-    });
+    const {
+      BusinessLogicAnalyzer,
+    } = require('@/utils/business-logic-analyzer');
+    BusinessLogicAnalyzer.prototype.analyzeComponent = jest
+      .fn()
+      .mockReturnValue({
+        functions: [],
+        stateManagement: [
+          {
+            type: 'useState',
+            name: 'count',
+            stateType: 'number',
+            setter: 'setCount',
+            dependencies: [],
+          },
+        ],
+        sideEffects: [],
+        eventHandlers: [],
+        dataTransformations: [],
+        validations: [],
+        businessRules: [],
+        complexityScore: 10,
+        preservationRequirements: [],
+      });
   });
 
   describe('transform', () => {
@@ -78,77 +90,133 @@ describe('ConfiguratorTransformer', () => {
     });
 
     it('should flag manual review when needed', async () => {
-      const complexComponent = { ...mockComponent, complexity: 'critical' as const };
-      const { BusinessLogicAnalyzer } = require('@/utils/business-logic-analyzer');
-      BusinessLogicAnalyzer.prototype.analyzeComponent = jest.fn().mockReturnValue({
-        functions: [],
-        stateManagement: [],
-        sideEffects: [],
-        eventHandlers: [],
-        dataTransformations: [],
-        validations: [],
-        businessRules: [],
-        complexityScore: 100,
-        preservationRequirements: [],
-      });
+      const complexComponent = {
+        ...mockComponent,
+        complexity: 'critical' as const,
+      };
+      const {
+        BusinessLogicAnalyzer,
+      } = require('@/utils/business-logic-analyzer');
+      BusinessLogicAnalyzer.prototype.analyzeComponent = jest
+        .fn()
+        .mockReturnValue({
+          functions: [],
+          stateManagement: [],
+          sideEffects: [],
+          eventHandlers: [],
+          dataTransformations: [],
+          validations: [],
+          businessRules: [],
+          complexityScore: 100,
+          preservationRequirements: [],
+        });
 
-      const result = await transformer.transform(complexComponent, 'complex code');
+      const result = await transformer.transform(
+        complexComponent,
+        'complex code'
+      );
       expect(result.strategy).toBe('manual-review-required');
     });
 
     it('should handle errors gracefully', async () => {
-      const { BusinessLogicAnalyzer } = require('@/utils/business-logic-analyzer');
-      BusinessLogicAnalyzer.prototype.analyzeComponent = jest.fn().mockImplementation(() => {
-        throw new Error('Analysis failed');
-      });
+      const {
+        BusinessLogicAnalyzer,
+      } = require('@/utils/business-logic-analyzer');
+      BusinessLogicAnalyzer.prototype.analyzeComponent = jest
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('Analysis failed');
+        });
 
-      await expect(transformer.transform(mockComponent, 'code')).rejects.toThrow();
+      await expect(
+        transformer.transform(mockComponent, 'code')
+      ).rejects.toThrow();
     });
   });
 
   describe('transformation types', () => {
     beforeEach(() => {
-      const { BusinessLogicAnalyzer } = require('@/utils/business-logic-analyzer');
-      BusinessLogicAnalyzer.prototype.analyzeComponent = jest.fn().mockReturnValue({
-        functions: [],
-        stateManagement: [{ type: 'useState', name: 'count', stateType: 'number', setter: 'setCount', dependencies: [] }],
-        sideEffects: [{ type: 'useEffect', description: 'effect', dependencies: [], hasCleanup: false, code: '' }],
-        eventHandlers: [{ name: 'handleClick', eventType: 'click', signature: '()', businessLogic: [], stateUpdates: [] }],
-        dataTransformations: [],
-        validations: [{ name: 'validate', field: 'email', rules: [], errorMessages: {} }],
-        businessRules: [],
-        complexityScore: 20,
-        preservationRequirements: [],
-      });
+      const {
+        BusinessLogicAnalyzer,
+      } = require('@/utils/business-logic-analyzer');
+      BusinessLogicAnalyzer.prototype.analyzeComponent = jest
+        .fn()
+        .mockReturnValue({
+          functions: [],
+          stateManagement: [
+            {
+              type: 'useState',
+              name: 'count',
+              stateType: 'number',
+              setter: 'setCount',
+              dependencies: [],
+            },
+          ],
+          sideEffects: [
+            {
+              type: 'useEffect',
+              description: 'effect',
+              dependencies: [],
+              hasCleanup: false,
+              code: '',
+            },
+          ],
+          eventHandlers: [
+            {
+              name: 'handleClick',
+              eventType: 'click',
+              signature: '()',
+              businessLogic: [],
+              stateUpdates: [],
+            },
+          ],
+          dataTransformations: [],
+          validations: [
+            { name: 'validate', field: 'email', rules: [], errorMessages: {} },
+          ],
+          businessRules: [],
+          complexityScore: 20,
+          preservationRequirements: [],
+        });
     });
 
     it('should transform props', async () => {
       const result = await transformer.transform(mockComponent, '');
-      const propTransforms = result.transformations.filter(t => t.type === 'prop');
+      const propTransforms = result.transformations.filter(
+        t => t.type === 'prop'
+      );
       expect(propTransforms.length).toBeGreaterThan(0);
     });
 
     it('should transform hooks', async () => {
       const result = await transformer.transform(mockComponent, '');
-      const hookTransforms = result.transformations.filter(t => t.type === 'state');
+      const hookTransforms = result.transformations.filter(
+        t => t.type === 'state'
+      );
       expect(hookTransforms.length).toBeGreaterThan(0);
     });
 
     it('should transform event handlers', async () => {
       const result = await transformer.transform(mockComponent, '');
-      const handlerTransforms = result.transformations.filter(t => t.type === 'handler');
+      const handlerTransforms = result.transformations.filter(
+        t => t.type === 'handler'
+      );
       expect(handlerTransforms.length).toBeGreaterThan(0);
     });
 
     it('should transform side effects', async () => {
       const result = await transformer.transform(mockComponent, '');
-      const effectTransforms = result.transformations.filter(t => t.type === 'effect');
+      const effectTransforms = result.transformations.filter(
+        t => t.type === 'effect'
+      );
       expect(effectTransforms.length).toBeGreaterThan(0);
     });
 
     it('should transform validations', async () => {
       const result = await transformer.transform(mockComponent, '');
-      const validationTransforms = result.transformations.filter(t => t.type === 'validation');
+      const validationTransforms = result.transformations.filter(
+        t => t.type === 'validation'
+      );
       expect(validationTransforms.length).toBeGreaterThan(0);
     });
   });
@@ -161,18 +229,22 @@ describe('Utility Functions', () => {
   });
 
   it('should transform via helper function', async () => {
-    const { BusinessLogicAnalyzer } = require('@/utils/business-logic-analyzer');
-    BusinessLogicAnalyzer.prototype.analyzeComponent = jest.fn().mockReturnValue({
-      functions: [],
-      stateManagement: [],
-      sideEffects: [],
-      eventHandlers: [],
-      dataTransformations: [],
-      validations: [],
-      businessRules: [],
-      complexityScore: 5,
-      preservationRequirements: [],
-    });
+    const {
+      BusinessLogicAnalyzer,
+    } = require('@/utils/business-logic-analyzer');
+    BusinessLogicAnalyzer.prototype.analyzeComponent = jest
+      .fn()
+      .mockReturnValue({
+        functions: [],
+        stateManagement: [],
+        sideEffects: [],
+        eventHandlers: [],
+        dataTransformations: [],
+        validations: [],
+        businessRules: [],
+        complexityScore: 5,
+        preservationRequirements: [],
+      });
 
     const result = await transformToConfigurator(mockComponent, 'code');
     expect(result).toBeDefined();

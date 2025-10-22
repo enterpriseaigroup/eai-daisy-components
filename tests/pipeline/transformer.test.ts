@@ -129,9 +129,12 @@ describe('BusinessLogicTransformer', () => {
       const result = await transformer.transformComponent(sampleComponent);
 
       expect(result.strategy).toBeDefined();
-      expect(['direct-translation', 'pattern-mapping', 'hybrid-approach', 'manual-review-required']).toContain(
-        result.strategy
-      );
+      expect([
+        'direct-translation',
+        'pattern-mapping',
+        'hybrid-approach',
+        'manual-review-required',
+      ]).toContain(result.strategy);
     });
 
     it('should handle component with no props', async () => {
@@ -166,7 +169,10 @@ describe('BusinessLogicTransformer', () => {
         addConfiguratorIntegration: true,
       };
 
-      const result = await transformer.transformComponent(sampleComponent, options);
+      const result = await transformer.transformComponent(
+        sampleComponent,
+        options
+      );
 
       expect(result.success).toBe(true);
       expect(result.code).toContain('Configurator');
@@ -177,10 +183,15 @@ describe('BusinessLogicTransformer', () => {
         addConfiguratorIntegration: true,
       };
 
-      const result = await transformer.transformComponent(sampleComponent, options);
+      const result = await transformer.transformComponent(
+        sampleComponent,
+        options
+      );
 
       expect(result.code).toContain('Configurator');
-      expect(result.transformations.some(t => t.type === 'structure')).toBe(true);
+      expect(result.transformations.some(t => t.type === 'structure')).toBe(
+        true
+      );
     });
 
     it('should track transformations applied', async () => {
@@ -218,7 +229,8 @@ describe('BusinessLogicTransformer', () => {
           },
           {
             name: 'processResults',
-            signature: 'const processResults = async (results: Result[]): Promise<void>',
+            signature:
+              'const processResults = async (results: Result[]): Promise<void>',
             purpose: 'Process API results',
             parameters: [
               {
@@ -252,9 +264,9 @@ describe('BusinessLogicTransformer', () => {
       const result = await transformer.transformComponent(sampleComponent);
 
       expect(result.component.metadata.lastModified).toBeInstanceOf(Date);
-      expect(result.component.metadata.lastModified.getTime()).toBeGreaterThanOrEqual(
-        sampleComponent.metadata.lastModified.getTime()
-      );
+      expect(
+        result.component.metadata.lastModified.getTime()
+      ).toBeGreaterThanOrEqual(sampleComponent.metadata.lastModified.getTime());
     });
   });
 
@@ -338,7 +350,9 @@ describe('BusinessLogicTransformer', () => {
       const result = await transformer.transformComponent(sampleComponent);
 
       const lines = result.code.split('\n');
-      const hasIndentation = lines.some(line => line.startsWith('  ') && line.trim().length > 0);
+      const hasIndentation = lines.some(
+        line => line.startsWith('  ') && line.trim().length > 0
+      );
       expect(hasIndentation).toBe(true);
     });
   });
@@ -378,16 +392,22 @@ describe('BusinessLogicTransformer', () => {
         ],
       };
 
-      const result = await transformer.transformComponent(componentWithDaisyImports);
+      const result = await transformer.transformComponent(
+        componentWithDaisyImports
+      );
 
-      const importTransformations = result.transformations.filter(t => t.type === 'api');
+      const importTransformations = result.transformations.filter(
+        t => t.type === 'api'
+      );
       expect(importTransformations.length).toBeGreaterThan(0);
     });
 
     it('should record hook transformations', async () => {
       const result = await transformer.transformComponent(sampleComponent);
 
-      const hookTransformations = result.transformations.filter(t => t.type === 'hook');
+      const hookTransformations = result.transformations.filter(
+        t => t.type === 'hook'
+      );
       expect(hookTransformations.length).toBeGreaterThan(0);
     });
   });

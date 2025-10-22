@@ -94,7 +94,12 @@ export interface ComparisonResult {
  */
 export interface Difference {
   /** Difference category */
-  readonly category: 'props' | 'business-logic' | 'dependencies' | 'patterns' | 'structure';
+  readonly category:
+    | 'props'
+    | 'business-logic'
+    | 'dependencies'
+    | 'patterns'
+    | 'structure';
 
   /** Difference severity */
   readonly severity: 'info' | 'warning' | 'error' | 'critical';
@@ -163,7 +168,13 @@ export class EquivalencyValidator {
 
       // Validate business logic preservation
       if (validateBusinessLogic) {
-        this.validateBusinessLogic(baseline, migrated, errors, warnings, strict);
+        this.validateBusinessLogic(
+          baseline,
+          migrated,
+          errors,
+          warnings,
+          strict
+        );
       }
 
       // Validate component structure
@@ -201,16 +212,21 @@ export class EquivalencyValidator {
       });
 
       return result;
-
     } catch (error) {
-      this.logger.error(`Validation failed for ${baseline.name}`, error as Error);
+      this.logger.error(
+        `Validation failed for ${baseline.name}`,
+        error as Error
+      );
 
       return {
         valid: false,
         errors: [
           {
             code: 'VALIDATION_ERROR',
-            message: error instanceof Error ? error.message : 'Unknown validation error',
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Unknown validation error',
             path: baseline.name,
             value: undefined,
           },
@@ -234,18 +250,27 @@ export class EquivalencyValidator {
     migrated: ComponentDefinition,
     options: ValidationOptions = {}
   ): Promise<ComparisonResult> {
-    this.logger.info(`Comparing baseline and migrated versions of ${baseline.name}`);
+    this.logger.info(
+      `Comparing baseline and migrated versions of ${baseline.name}`
+    );
 
     const validation = await this.validate(baseline, migrated, options);
     const differences = this.findDifferences(baseline, migrated);
 
     // Calculate individual scores
-    const businessLogicScore = this.calculateBusinessLogicScore(baseline, migrated);
+    const businessLogicScore = this.calculateBusinessLogicScore(
+      baseline,
+      migrated
+    );
     const typeSafetyScore = this.calculateTypeSafetyScore(baseline, migrated);
     const structureScore = this.calculateStructureScore(baseline, migrated);
     const performanceScore = this.calculatePerformanceScore(baseline, migrated);
 
-    const equivalent = validation.valid && differences.filter(d => d.severity === 'critical' || d.severity === 'error').length === 0;
+    const equivalent =
+      validation.valid &&
+      differences.filter(
+        d => d.severity === 'critical' || d.severity === 'error'
+      ).length === 0;
 
     return {
       equivalent,
@@ -272,7 +297,14 @@ export class EquivalencyValidator {
     const comparison = await this.compare(baseline, migrated);
 
     const issues: QualityIssue[] = comparison.differences.map(diff => ({
-      severity: diff.severity === 'critical' ? 'critical' : diff.severity === 'error' ? 'high' : diff.severity === 'warning' ? 'medium' : 'low',
+      severity:
+        diff.severity === 'critical'
+          ? 'critical'
+          : diff.severity === 'error'
+            ? 'high'
+            : diff.severity === 'warning'
+              ? 'medium'
+              : 'low',
       category: this.mapDifferenceToQualityCategory(diff.category),
       description: diff.description,
       impact: diff.impact,
@@ -282,7 +314,8 @@ export class EquivalencyValidator {
       (comparison.businessLogicScore +
         comparison.typeSafetyScore +
         comparison.structureScore +
-        comparison.performanceScore) / 4
+        comparison.performanceScore) /
+        4
     );
 
     return {
@@ -386,8 +419,12 @@ export class EquivalencyValidator {
     warnings: ValidationWarning[],
     strict: boolean
   ): void {
-    const baselineLogic = new Map(baseline.businessLogic.map(bl => [bl.name, bl]));
-    const migratedLogic = new Map(migrated.businessLogic.map(bl => [bl.name, bl]));
+    const baselineLogic = new Map(
+      baseline.businessLogic.map(bl => [bl.name, bl])
+    );
+    const migratedLogic = new Map(
+      migrated.businessLogic.map(bl => [bl.name, bl])
+    );
 
     // Check for missing business logic
     for (const [name, baseLogic] of baselineLogic) {
@@ -445,7 +482,12 @@ export class EquivalencyValidator {
     }
 
     // Validate complexity hasn't increased dramatically
-    const complexityLevels = { simple: 1, moderate: 2, complex: 3, critical: 4 };
+    const complexityLevels = {
+      simple: 1,
+      moderate: 2,
+      complex: 3,
+      critical: 4,
+    };
     const baselineLevel = complexityLevels[baseline.complexity];
     const migratedLevel = complexityLevels[migrated.complexity];
 
@@ -502,7 +544,8 @@ export class EquivalencyValidator {
           code: 'PATTERN_REMOVED',
           message: `React pattern '${pattern}' used in baseline but not in migrated component`,
           path: `reactPatterns.${pattern}`,
-          suggestion: 'Verify pattern is replaced with equivalent functionality',
+          suggestion:
+            'Verify pattern is replaced with equivalent functionality',
         });
       }
     }
@@ -588,7 +631,9 @@ export class EquivalencyValidator {
     const baselineNames = new Set(baseline.businessLogic.map(bl => bl.name));
     const migratedNames = new Set(migrated.businessLogic.map(bl => bl.name));
 
-    const preserved = [...baselineNames].filter(name => migratedNames.has(name)).length;
+    const preserved = [...baselineNames].filter(name =>
+      migratedNames.has(name)
+    ).length;
     return Math.round((preserved / baseline.businessLogic.length) * 100);
   }
 
@@ -604,7 +649,9 @@ export class EquivalencyValidator {
     const baselineProps = new Set(baseline.props.map(p => p.name));
     const migratedProps = new Set(migrated.props.map(p => p.name));
 
-    const preserved = [...baselineProps].filter(name => migratedProps.has(name)).length;
+    const preserved = [...baselineProps].filter(name =>
+      migratedProps.has(name)
+    ).length;
     return Math.round((preserved / baseline.props.length) * 100);
   }
 
@@ -618,8 +665,15 @@ export class EquivalencyValidator {
     let score = 100;
 
     // Penalize complexity increase
-    const complexityLevels = { simple: 1, moderate: 2, complex: 3, critical: 4 };
-    const complexityDiff = complexityLevels[migrated.complexity] - complexityLevels[baseline.complexity];
+    const complexityLevels = {
+      simple: 1,
+      moderate: 2,
+      complex: 3,
+      critical: 4,
+    };
+    const complexityDiff =
+      complexityLevels[migrated.complexity] -
+      complexityLevels[baseline.complexity];
     score -= Math.max(0, complexityDiff * 10);
 
     // Penalize type changes
@@ -638,18 +692,30 @@ export class EquivalencyValidator {
     migrated: ComponentDefinition
   ): number {
     // Simple heuristic based on complexity
-    const complexityScores = { simple: 100, moderate: 85, complex: 70, critical: 50 };
+    const complexityScores = {
+      simple: 100,
+      moderate: 85,
+      complex: 70,
+      critical: 50,
+    };
     return complexityScores[migrated.complexity];
   }
 
   /**
    * Calculate maintainability score
    */
-  private calculateMaintainabilityScore(component: ComponentDefinition): number {
+  private calculateMaintainabilityScore(
+    component: ComponentDefinition
+  ): number {
     let score = 100;
 
     // Factor in complexity
-    const complexityPenalty = { simple: 0, moderate: 10, complex: 25, critical: 40 };
+    const complexityPenalty = {
+      simple: 0,
+      moderate: 10,
+      complex: 25,
+      critical: 40,
+    };
     score -= complexityPenalty[component.complexity];
 
     // Factor in documentation
@@ -688,11 +754,11 @@ export class EquivalencyValidator {
     category: Difference['category']
   ): QualityIssue['category'] {
     const mapping: Record<Difference['category'], QualityIssue['category']> = {
-      'props': 'type-safety',
+      props: 'type-safety',
       'business-logic': 'business-logic',
-      'dependencies': 'maintainability',
-      'patterns': 'maintainability',
-      'structure': 'maintainability',
+      dependencies: 'maintainability',
+      patterns: 'maintainability',
+      structure: 'maintainability',
     };
 
     return mapping[category];

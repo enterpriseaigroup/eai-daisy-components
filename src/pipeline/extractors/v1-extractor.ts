@@ -191,7 +191,10 @@ export class V1ComponentExtractor {
       }
 
       // Create baseline directory structure
-      const baselinePath = await this.createBaselineDirectory(component, tierConfig);
+      const baselinePath = await this.createBaselineDirectory(
+        component,
+        tierConfig
+      );
 
       // Extract main component file
       const componentFile = await this.extractComponentFile(
@@ -219,7 +222,9 @@ export class V1ComponentExtractor {
           );
           extractedFiles.push(...depFiles);
         } catch (error) {
-          warnings.push(`Failed to extract some dependencies: ${(error as Error).message}`);
+          warnings.push(
+            `Failed to extract some dependencies: ${(error as Error).message}`
+          );
         }
       }
 
@@ -233,7 +238,9 @@ export class V1ComponentExtractor {
           );
           extractedFiles.push(...testFiles);
         } catch (error) {
-          warnings.push(`Failed to extract test files: ${(error as Error).message}`);
+          warnings.push(
+            `Failed to extract test files: ${(error as Error).message}`
+          );
         }
       }
 
@@ -247,7 +254,9 @@ export class V1ComponentExtractor {
           );
           extractedFiles.push(...styleFiles);
         } catch (error) {
-          warnings.push(`Failed to extract style files: ${(error as Error).message}`);
+          warnings.push(
+            `Failed to extract style files: ${(error as Error).message}`
+          );
         }
       }
 
@@ -274,7 +283,10 @@ export class V1ComponentExtractor {
         duration: Date.now() - startTime,
       };
     } catch (error) {
-      this.logger.error(`Component extraction failed: ${component.name}`, error as Error);
+      this.logger.error(
+        `Component extraction failed: ${component.name}`,
+        error as Error
+      );
 
       return {
         component,
@@ -310,7 +322,9 @@ export class V1ComponentExtractor {
     }
 
     const successCount = results.filter(r => r.success).length;
-    this.logger.info(`Extraction completed: ${successCount}/${components.length} successful`);
+    this.logger.info(
+      `Extraction completed: ${successCount}/${components.length} successful`
+    );
 
     return results;
   }
@@ -650,7 +664,9 @@ must be maintained in the migrated Configurator v2 version.
  * @param config - Extraction configuration
  * @returns Extractor instance
  */
-export function createV1Extractor(config: ExtractionConfig): V1ComponentExtractor {
+export function createV1Extractor(
+  config: ExtractionConfig
+): V1ComponentExtractor {
   return new V1ComponentExtractor(config);
 }
 

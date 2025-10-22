@@ -1,10 +1,10 @@
 /**
  * Component Inventory Generator for DAISY v1 Component Extraction Pipeline
- * 
+ *
  * Generates comprehensive component inventories by combining results from
  * discovery, parsing, and dependency analysis. Creates structured reports
  * with extraction recommendations and component readiness assessments.
- * 
+ *
  * @version 1.0.0
  * @author DAISY Component Extraction Pipeline
  */
@@ -23,28 +23,28 @@ import type { DependencyAnalysisResult } from './analyzer.js';
 export interface ComponentReadiness {
   /** Component identifier */
   componentId: string;
-  
+
   /** Component name */
   name: string;
-  
+
   /** Overall readiness score (0-100) */
   readinessScore: number;
-  
+
   /** Readiness level classification */
   readinessLevel: 'ready' | 'needs-work' | 'complex' | 'high-risk';
-  
+
   /** Individual assessment criteria */
   criteria: ReadinessCriteria;
-  
+
   /** Specific blockers preventing extraction */
   blockers: string[];
-  
+
   /** Required preparation steps */
   prerequisites: string[];
-  
+
   /** Estimated extraction effort */
   effort: 'low' | 'medium' | 'high' | 'very-high';
-  
+
   /** Risk assessment */
   risk: 'low' | 'medium' | 'high' | 'critical';
 }
@@ -55,25 +55,25 @@ export interface ComponentReadiness {
 export interface ReadinessCriteria {
   /** Code quality score (0-100) */
   codeQuality: number;
-  
+
   /** Documentation completeness (0-100) */
   documentation: number;
-  
+
   /** Test coverage score (0-100) */
   testCoverage: number;
-  
+
   /** Dependency complexity (0-100, lower is better) */
   dependencyComplexity: number;
-  
+
   /** Props interface clarity (0-100) */
   propsClarity: number;
-  
+
   /** Business logic separation (0-100) */
   businessLogicSeparation: number;
-  
+
   /** React patterns compliance (0-100) */
   reactCompliance: number;
-  
+
   /** Migration compatibility (0-100) */
   migrationCompatibility: number;
 }
@@ -84,16 +84,16 @@ export interface ReadinessCriteria {
 export interface InventorySection {
   /** Section title */
   title: string;
-  
+
   /** Section description */
   description: string;
-  
+
   /** Components in this section */
   components: ComponentDefinition[];
-  
+
   /** Section-specific metrics */
   metrics: Record<string, number>;
-  
+
   /** Recommendations for this section */
   recommendations: string[];
 }
@@ -104,19 +104,19 @@ export interface InventorySection {
 export interface ComponentInventory {
   /** Inventory metadata */
   metadata: InventoryMetadata;
-  
+
   /** Executive summary */
   summary: InventorySummary;
-  
+
   /** Component readiness assessments */
   readiness: ComponentReadiness[];
-  
+
   /** Organized inventory sections */
   sections: InventorySection[];
-  
+
   /** Migration roadmap */
   roadmap: MigrationRoadmap;
-  
+
   /** Detailed analysis results */
   analysis: {
     discovery: DiscoveryResult;
@@ -131,16 +131,16 @@ export interface ComponentInventory {
 export interface InventoryMetadata {
   /** Generation timestamp */
   generatedAt: Date;
-  
+
   /** Pipeline version */
   pipelineVersion: string;
-  
+
   /** Source codebase path */
   sourceBasePath: string;
-  
+
   /** Total analysis duration */
   analysisDuration: number;
-  
+
   /** Configuration used */
   config: ExtractionConfig;
 }
@@ -151,25 +151,25 @@ export interface InventoryMetadata {
 export interface InventorySummary {
   /** Total components found */
   totalComponents: number;
-  
+
   /** Components by readiness level */
   componentsByReadiness: Record<ComponentReadiness['readinessLevel'], number>;
-  
+
   /** Components by type */
   componentsByType: Record<string, number>;
-  
+
   /** Components by complexity */
   componentsByComplexity: Record<string, number>;
-  
+
   /** Average readiness score */
   averageReadiness: number;
-  
+
   /** Estimated total migration effort */
   totalEstimatedEffort: string;
-  
+
   /** High-level recommendations */
   keyRecommendations: string[];
-  
+
   /** Critical risks identified */
   criticalRisks: string[];
 }
@@ -180,25 +180,25 @@ export interface InventorySummary {
 export interface MigrationPhase {
   /** Phase number */
   phase: number;
-  
+
   /** Phase name */
   name: string;
-  
+
   /** Phase description */
   description: string;
-  
+
   /** Components to migrate in this phase */
   components: string[];
-  
+
   /** Phase dependencies */
   dependencies: string[];
-  
+
   /** Estimated duration */
   estimatedDuration: string;
-  
+
   /** Success criteria */
   successCriteria: string[];
-  
+
   /** Risk mitigation strategies */
   riskMitigation: string[];
 }
@@ -209,20 +209,20 @@ export interface MigrationPhase {
 export interface MigrationRoadmap {
   /** Recommended approach */
   approach: 'big-bang' | 'incremental' | 'hybrid';
-  
+
   /** Migration phases */
   phases: MigrationPhase[];
-  
+
   /** Overall timeline estimate */
   timelineEstimate: string;
-  
+
   /** Resource requirements */
   resourceRequirements: {
     developers: number;
     duration: string;
     skills: string[];
   };
-  
+
   /** Success metrics */
   successMetrics: string[];
 }
@@ -233,25 +233,25 @@ export interface MigrationRoadmap {
 export interface InventoryConfig {
   /** Output directory for reports */
   outputDir: string;
-  
+
   /** Generate detailed reports */
   includeDetailedReports: boolean;
-  
+
   /** Include source code snippets */
   includeCodeSnippets: boolean;
-  
+
   /** Generate JSON output */
   generateJson: boolean;
-  
+
   /** Generate markdown reports */
   generateMarkdown: boolean;
-  
+
   /** Generate HTML reports */
   generateHtml: boolean;
-  
+
   /** Minimum readiness score for 'ready' classification */
   readinessThreshold: number;
-  
+
   /** Maximum components per migration phase */
   maxComponentsPerPhase: number;
 }
@@ -274,7 +274,7 @@ export class ComponentInventoryGenerator {
       generateHtml: false,
       readinessThreshold: 75,
       maxComponentsPerPhase: 10,
-      ...config
+      ...config,
     };
   }
 
@@ -293,16 +293,27 @@ export class ComponentInventoryGenerator {
       const startTime = Date.now();
 
       // Step 1: Assess component readiness
-      const readiness = this.assessComponentReadiness(discovery, parsing, dependencies);
+      const readiness = this.assessComponentReadiness(
+        discovery,
+        parsing,
+        dependencies
+      );
 
       // Step 2: Create inventory sections
-      const sections = this.createInventorySections(discovery.components, readiness);
+      const sections = this.createInventorySections(
+        discovery.components,
+        readiness
+      );
 
       // Step 3: Generate migration roadmap
       const roadmap = this.generateMigrationRoadmap(readiness, dependencies);
 
       // Step 4: Create executive summary
-      const summary = this.createExecutiveSummary(discovery, readiness, dependencies);
+      const summary = this.createExecutiveSummary(
+        discovery,
+        readiness,
+        dependencies
+      );
 
       // Step 5: Compile complete inventory
       const inventory: ComponentInventory = {
@@ -311,7 +322,7 @@ export class ComponentInventoryGenerator {
           pipelineVersion: '1.0.0',
           sourceBasePath: extractionConfig.sourcePath,
           analysisDuration: Date.now() - startTime,
-          config: extractionConfig
+          config: extractionConfig,
         },
         summary,
         readiness,
@@ -320,15 +331,17 @@ export class ComponentInventoryGenerator {
         analysis: {
           discovery,
           parsing,
-          dependencies
-        }
+          dependencies,
+        },
       };
 
       this.logger.info('Component inventory generated successfully');
       return inventory;
-
     } catch (error) {
-      this.logger.error('Failed to generate inventory:', error instanceof Error ? error : undefined);
+      this.logger.error(
+        'Failed to generate inventory:',
+        error instanceof Error ? error : undefined
+      );
       throw error;
     }
   }
@@ -359,9 +372,11 @@ export class ComponentInventoryGenerator {
       }
 
       this.logger.info('Inventory export completed');
-
     } catch (error) {
-      this.logger.error('Failed to export inventory:', error instanceof Error ? error : undefined);
+      this.logger.error(
+        'Failed to export inventory:',
+        error instanceof Error ? error : undefined
+      );
       throw error;
     }
   }
@@ -376,13 +391,23 @@ export class ComponentInventoryGenerator {
   ): ComponentReadiness[] {
     return discovery.components.map(component => {
       const parseResult = parsing.get(component.sourcePath);
-      const componentDeps = dependencies.dependencies.filter(d => d.source === component.sourcePath);
+      const componentDeps = dependencies.dependencies.filter(
+        d => d.source === component.sourcePath
+      );
 
-      const criteria = this.calculateReadinessCriteria(component, parseResult, componentDeps);
+      const criteria = this.calculateReadinessCriteria(
+        component,
+        parseResult,
+        componentDeps
+      );
       const readinessScore = this.calculateOverallReadiness(criteria);
       const readinessLevel = this.classifyReadinessLevel(readinessScore);
 
-      const blockers = this.identifyBlockers(component, parseResult, componentDeps);
+      const blockers = this.identifyBlockers(
+        component,
+        parseResult,
+        componentDeps
+      );
       const prerequisites = this.generatePrerequisites(blockers, criteria);
 
       return {
@@ -394,7 +419,7 @@ export class ComponentInventoryGenerator {
         blockers,
         prerequisites,
         effort: this.estimateEffort(component, parseResult, componentDeps),
-        risk: this.assessRisk(component, parseResult, componentDeps)
+        risk: this.assessRisk(component, parseResult, componentDeps),
       };
     });
   }
@@ -409,8 +434,9 @@ export class ComponentInventoryGenerator {
     _dependencies: any[] = []
   ): ReadinessCriteria {
     // Code quality based on complexity and parsing success
-    const codeQuality = parseResult?.success ? 
-      Math.max(0, 100 - (parseResult.complexity.cyclomaticComplexity * 5)) : 50;
+    const codeQuality = parseResult?.success
+      ? Math.max(0, 100 - parseResult.complexity.cyclomaticComplexity * 5)
+      : 50;
 
     // Documentation score (simplified)
     const documentation = component.metadata.documentation ? 80 : 20;
@@ -419,14 +445,20 @@ export class ComponentInventoryGenerator {
     const testCoverage = component.metadata.testing?.coverage || 0;
 
     // Dependency complexity (lower complexity = higher score)
-    const dependencyComplexity = Math.max(0, 100 - (component.dependencies.length * 10));
+    const dependencyComplexity = Math.max(
+      0,
+      100 - component.dependencies.length * 10
+    );
 
     // Props clarity based on prop definitions
-    const propsClarity = component.props.length > 0 ? 
-      Math.min(100, component.props.length * 20) : 80;
+    const propsClarity =
+      component.props.length > 0
+        ? Math.min(100, component.props.length * 20)
+        : 80;
 
     // Business logic separation
-    const businessLogicSeparation = component.businessLogic.length > 0 ? 70 : 90;
+    const businessLogicSeparation =
+      component.businessLogic.length > 0 ? 70 : 90;
 
     // React patterns compliance
     const reactCompliance = component.reactPatterns.length > 0 ? 85 : 60;
@@ -442,7 +474,7 @@ export class ComponentInventoryGenerator {
       propsClarity,
       businessLogicSeparation,
       reactCompliance,
-      migrationCompatibility
+      migrationCompatibility,
     };
   }
 
@@ -451,20 +483,20 @@ export class ComponentInventoryGenerator {
    */
   private calculateOverallReadiness(criteria: ReadinessCriteria): number {
     const weights = {
-      codeQuality: 0.20,
-      documentation: 0.10,
+      codeQuality: 0.2,
+      documentation: 0.1,
       testCoverage: 0.15,
-      dependencyComplexity: 0.20,
-      propsClarity: 0.10,
-      businessLogicSeparation: 0.10,
-      reactCompliance: 0.10,
-      migrationCompatibility: 0.05
+      dependencyComplexity: 0.2,
+      propsClarity: 0.1,
+      businessLogicSeparation: 0.1,
+      reactCompliance: 0.1,
+      migrationCompatibility: 0.05,
     };
 
     return Math.round(
       Object.entries(criteria).reduce((total, [key, value]) => {
         const weight = weights[key as keyof ReadinessCriteria] || 0;
-        return total + (value * weight);
+        return total + value * weight;
       }, 0)
     );
   }
@@ -472,7 +504,9 @@ export class ComponentInventoryGenerator {
   /**
    * Classify readiness level based on score
    */
-  private classifyReadinessLevel(score: number): ComponentReadiness['readinessLevel'] {
+  private classifyReadinessLevel(
+    score: number
+  ): ComponentReadiness['readinessLevel'] {
     if (score >= this.config.readinessThreshold) return 'ready';
     if (score >= 60) return 'needs-work';
     if (score >= 40) return 'complex';
@@ -542,7 +576,10 @@ export class ComponentInventoryGenerator {
   /**
    * Generate prerequisites for component extraction
    */
-  private generatePrerequisites(blockers: string[], criteria: ReadinessCriteria): string[] {
+  private generatePrerequisites(
+    blockers: string[],
+    criteria: ReadinessCriteria
+  ): string[] {
     const prerequisites: string[] = [];
 
     if (blockers.length > 0) {
@@ -597,7 +634,10 @@ export class ComponentInventoryGenerator {
 
     // Parse complexity impact
     if (parseResult?.complexity.cyclomaticComplexity) {
-      effort += Math.min(2, Math.floor(parseResult.complexity.cyclomaticComplexity / 10));
+      effort += Math.min(
+        2,
+        Math.floor(parseResult.complexity.cyclomaticComplexity / 10)
+      );
     }
 
     // Convert to effort level
@@ -629,10 +669,14 @@ export class ComponentInventoryGenerator {
     if (parseResult && !parseResult.success) risk += 2;
 
     // High cyclomatic complexity
-    if (parseResult && parseResult.complexity.cyclomaticComplexity > 20) risk += 3;
+    if (parseResult && parseResult.complexity.cyclomaticComplexity > 20)
+      risk += 3;
 
     // Missing tests increase risk
-    if (!component.metadata.testing?.coverage || component.metadata.testing.coverage < 30) {
+    if (
+      !component.metadata.testing?.coverage ||
+      component.metadata.testing.coverage < 30
+    ) {
       risk += 2;
     }
 
@@ -661,14 +705,22 @@ export class ComponentInventoryGenerator {
       );
 
       sections.push({
-        title: this.getReadinessTitle(level as ComponentReadiness['readinessLevel']),
-        description: this.getReadinessDescription(level as ComponentReadiness['readinessLevel']),
+        title: this.getReadinessTitle(
+          level as ComponentReadiness['readinessLevel']
+        ),
+        description: this.getReadinessDescription(
+          level as ComponentReadiness['readinessLevel']
+        ),
         components: sectionComponents,
         metrics: {
           count: sectionComponents.length,
-          averageScore: readinessItems.reduce((sum, r) => sum + r.readinessScore, 0) / readinessItems.length
+          averageScore:
+            readinessItems.reduce((sum, r) => sum + r.readinessScore, 0) /
+            readinessItems.length,
         },
-        recommendations: this.getReadinessRecommendations(level as ComponentReadiness['readinessLevel'])
+        recommendations: this.getReadinessRecommendations(
+          level as ComponentReadiness['readinessLevel']
+        ),
       });
     });
 
@@ -678,24 +730,32 @@ export class ComponentInventoryGenerator {
   /**
    * Group array by key function
    */
-  private groupBy<T, K extends string | number>(array: T[], keyFn: (item: T) => K): Record<K, T[]> {
-    return array.reduce((groups, item) => {
-      const key = keyFn(item);
-      groups[key] = groups[key] || [];
-      groups[key].push(item);
-      return groups;
-    }, {} as Record<K, T[]>);
+  private groupBy<T, K extends string | number>(
+    array: T[],
+    keyFn: (item: T) => K
+  ): Record<K, T[]> {
+    return array.reduce(
+      (groups, item) => {
+        const key = keyFn(item);
+        groups[key] = groups[key] || [];
+        groups[key].push(item);
+        return groups;
+      },
+      {} as Record<K, T[]>
+    );
   }
 
   /**
    * Get title for readiness level
    */
-  private getReadinessTitle(level: ComponentReadiness['readinessLevel']): string {
+  private getReadinessTitle(
+    level: ComponentReadiness['readinessLevel']
+  ): string {
     const titles = {
       ready: 'Ready for Extraction',
       'needs-work': 'Needs Preparation',
       complex: 'Complex Components',
-      'high-risk': 'High-Risk Components'
+      'high-risk': 'High-Risk Components',
     };
     return titles[level];
   }
@@ -703,12 +763,17 @@ export class ComponentInventoryGenerator {
   /**
    * Get description for readiness level
    */
-  private getReadinessDescription(level: ComponentReadiness['readinessLevel']): string {
+  private getReadinessDescription(
+    level: ComponentReadiness['readinessLevel']
+  ): string {
     const descriptions = {
-      ready: 'Components that are well-structured and ready for immediate extraction',
-      'needs-work': 'Components that require some preparation before extraction',
-      complex: 'Components with significant complexity that need careful planning',
-      'high-risk': 'Components that pose significant extraction challenges'
+      ready:
+        'Components that are well-structured and ready for immediate extraction',
+      'needs-work':
+        'Components that require some preparation before extraction',
+      complex:
+        'Components with significant complexity that need careful planning',
+      'high-risk': 'Components that pose significant extraction challenges',
     };
     return descriptions[level];
   }
@@ -716,28 +781,30 @@ export class ComponentInventoryGenerator {
   /**
    * Get recommendations for readiness level
    */
-  private getReadinessRecommendations(level: ComponentReadiness['readinessLevel']): string[] {
+  private getReadinessRecommendations(
+    level: ComponentReadiness['readinessLevel']
+  ): string[] {
     const recommendations = {
       ready: [
         'Extract these components first to establish baseline',
         'Use as reference examples for other components',
-        'Validate extraction process with these components'
+        'Validate extraction process with these components',
       ],
       'needs-work': [
         'Focus on improving test coverage',
         'Add missing documentation',
-        'Simplify prop interfaces'
+        'Simplify prop interfaces',
       ],
       complex: [
         'Break down into smaller components',
         'Separate business logic from presentation',
-        'Consider refactoring before extraction'
+        'Consider refactoring before extraction',
       ],
       'high-risk': [
         'Requires significant refactoring',
         'Consider complete rewrite in target framework',
-        'Extensive testing required before migration'
-      ]
+        'Extensive testing required before migration',
+      ],
     };
     return recommendations[level];
   }
@@ -751,7 +818,9 @@ export class ComponentInventoryGenerator {
     _dependencies: DependencyAnalysisResult
   ): MigrationRoadmap {
     // Sort components by readiness for phased approach
-    const sortedComponents = readiness.sort((a, b) => b.readinessScore - a.readinessScore);
+    const sortedComponents = readiness.sort(
+      (a, b) => b.readinessScore - a.readinessScore
+    );
 
     const phases: MigrationPhase[] = [];
     let currentPhase = 1;
@@ -760,7 +829,9 @@ export class ComponentInventoryGenerator {
     sortedComponents.forEach(component => {
       if (currentPhaseComponents.length >= this.config.maxComponentsPerPhase) {
         // Create phase
-        phases.push(this.createMigrationPhase(currentPhase, currentPhaseComponents));
+        phases.push(
+          this.createMigrationPhase(currentPhase, currentPhaseComponents)
+        );
         currentPhase++;
         currentPhaseComponents = [];
       }
@@ -769,7 +840,9 @@ export class ComponentInventoryGenerator {
 
     // Add remaining components to final phase
     if (currentPhaseComponents.length > 0) {
-      phases.push(this.createMigrationPhase(currentPhase, currentPhaseComponents));
+      phases.push(
+        this.createMigrationPhase(currentPhase, currentPhaseComponents)
+      );
     }
 
     return {
@@ -779,21 +852,24 @@ export class ComponentInventoryGenerator {
       resourceRequirements: {
         developers: Math.ceil(readiness.length / 20),
         duration: this.estimateOverallTimeline(phases),
-        skills: ['React', 'TypeScript', 'Component Architecture', 'Testing']
+        skills: ['React', 'TypeScript', 'Component Architecture', 'Testing'],
       },
       successMetrics: [
         'All components successfully migrated',
         'No functionality regression',
         'Performance maintained or improved',
-        'Test coverage maintained'
-      ]
+        'Test coverage maintained',
+      ],
     };
   }
 
   /**
    * Create a migration phase
    */
-  private createMigrationPhase(phase: number, components: string[]): MigrationPhase {
+  private createMigrationPhase(
+    phase: number,
+    components: string[]
+  ): MigrationPhase {
     return {
       phase,
       name: `Phase ${phase}: ${this.getPhaseName(phase)}`,
@@ -804,13 +880,13 @@ export class ComponentInventoryGenerator {
       successCriteria: [
         'All phase components migrated successfully',
         'Integration tests passing',
-        'Performance benchmarks met'
+        'Performance benchmarks met',
       ],
       riskMitigation: [
         'Thorough testing before deployment',
         'Rollback plan prepared',
-        'Monitoring in place'
-      ]
+        'Monitoring in place',
+      ],
     };
   }
 
@@ -827,7 +903,8 @@ export class ComponentInventoryGenerator {
    * Get phase description
    */
   private getPhaseDescription(phase: number): string {
-    if (phase === 1) return 'Extract ready components to establish migration foundation';
+    if (phase === 1)
+      return 'Extract ready components to establish migration foundation';
     if (phase === 2) return 'Migrate core functionality components';
     return 'Handle complex and high-risk components';
   }
@@ -838,7 +915,7 @@ export class ComponentInventoryGenerator {
   private estimatePhaseDuration(componentCount: number): string {
     const weeksPerComponent = 0.5; // Average 2-3 days per component
     const totalWeeks = Math.ceil(componentCount * weeksPerComponent);
-    
+
     if (totalWeeks <= 1) return '1 week';
     if (totalWeeks <= 4) return `${totalWeeks} weeks`;
     return `${Math.ceil(totalWeeks / 4)} months`;
@@ -852,7 +929,7 @@ export class ComponentInventoryGenerator {
     const totalPhases = phases.length;
     const averagePhaseWeeks = 3;
     const totalWeeks = Math.ceil(totalPhases * averagePhaseWeeks * 0.8); // 20% overlap
-    
+
     if (totalWeeks <= 4) return `${totalWeeks} weeks`;
     return `${Math.ceil(totalWeeks / 4)} months`;
   }
@@ -865,39 +942,67 @@ export class ComponentInventoryGenerator {
     readiness: ComponentReadiness[],
     dependencies: DependencyAnalysisResult
   ): InventorySummary {
-    const componentsByReadiness = this.groupBy(readiness, r => r.readinessLevel);
+    const componentsByReadiness = this.groupBy(
+      readiness,
+      r => r.readinessLevel
+    );
     const componentsByType = this.groupBy(discovery.components, c => c.type);
-    const componentsByComplexity = this.groupBy(discovery.components, c => c.complexity);
+    const componentsByComplexity = this.groupBy(
+      discovery.components,
+      c => c.complexity
+    );
 
-    const averageReadiness = readiness.reduce((sum, r) => sum + r.readinessScore, 0) / readiness.length;
+    const averageReadiness =
+      readiness.reduce((sum, r) => sum + r.readinessScore, 0) /
+      readiness.length;
 
     // Calculate total effort
     const effortCounts = this.groupBy(readiness, r => r.effort);
-    const totalEffort = Object.entries(effortCounts).reduce((total, [effort, components]) => {
-      const effortMultipliers: Record<ComponentReadiness['effort'], number> = { 
-        low: 1, medium: 2, high: 4, 'very-high': 8 
-      };
-      const multiplier = effortMultipliers[effort as ComponentReadiness['effort']] || 1;
-      return total + (components.length * multiplier);
-    }, 0);
+    const totalEffort = Object.entries(effortCounts).reduce(
+      (total, [effort, components]) => {
+        const effortMultipliers: Record<ComponentReadiness['effort'], number> =
+          {
+            low: 1,
+            medium: 2,
+            high: 4,
+            'very-high': 8,
+          };
+        const multiplier =
+          effortMultipliers[effort as ComponentReadiness['effort']] || 1;
+        return total + components.length * multiplier;
+      },
+      0
+    );
 
     const totalEstimatedEffort = `${Math.ceil(totalEffort / 4)} person-months`;
 
     return {
       totalComponents: discovery.components.length,
       componentsByReadiness: Object.fromEntries(
-        Object.entries(componentsByReadiness).map(([key, value]) => [key, value.length])
+        Object.entries(componentsByReadiness).map(([key, value]) => [
+          key,
+          value.length,
+        ])
       ) as Record<ComponentReadiness['readinessLevel'], number>,
       componentsByType: Object.fromEntries(
-        Object.entries(componentsByType).map(([key, value]) => [key, value.length])
+        Object.entries(componentsByType).map(([key, value]) => [
+          key,
+          value.length,
+        ])
       ),
       componentsByComplexity: Object.fromEntries(
-        Object.entries(componentsByComplexity).map(([key, value]) => [key, value.length])
+        Object.entries(componentsByComplexity).map(([key, value]) => [
+          key,
+          value.length,
+        ])
       ),
       averageReadiness: Math.round(averageReadiness),
       totalEstimatedEffort,
-      keyRecommendations: this.generateKeyRecommendations(readiness, dependencies),
-      criticalRisks: this.identifyCriticalRisks(readiness, dependencies)
+      keyRecommendations: this.generateKeyRecommendations(
+        readiness,
+        dependencies
+      ),
+      criticalRisks: this.identifyCriticalRisks(readiness, dependencies),
     };
   }
 
@@ -911,25 +1016,41 @@ export class ComponentInventoryGenerator {
   ): string[] {
     const recommendations: string[] = [];
 
-    const readyCount = readiness.filter(r => r.readinessLevel === 'ready').length;
-    const highRiskCount = readiness.filter(r => r.readinessLevel === 'high-risk').length;
+    const readyCount = readiness.filter(
+      r => r.readinessLevel === 'ready'
+    ).length;
+    const highRiskCount = readiness.filter(
+      r => r.readinessLevel === 'high-risk'
+    ).length;
 
     if (readyCount > 0) {
-      recommendations.push(`Start with ${readyCount} ready components to establish migration process`);
+      recommendations.push(
+        `Start with ${readyCount} ready components to establish migration process`
+      );
     }
 
     if (highRiskCount > 0) {
-      recommendations.push(`${highRiskCount} high-risk components require significant refactoring`);
+      recommendations.push(
+        `${highRiskCount} high-risk components require significant refactoring`
+      );
     }
 
-    const lowTestCoverage = readiness.filter(r => r.criteria.testCoverage < 50).length;
+    const lowTestCoverage = readiness.filter(
+      r => r.criteria.testCoverage < 50
+    ).length;
     if (lowTestCoverage > readiness.length * 0.3) {
-      recommendations.push('Improve test coverage across the codebase before migration');
+      recommendations.push(
+        'Improve test coverage across the codebase before migration'
+      );
     }
 
-    const complexComponents = readiness.filter(r => r.criteria.dependencyComplexity < 50).length;
+    const complexComponents = readiness.filter(
+      r => r.criteria.dependencyComplexity < 50
+    ).length;
     if (complexComponents > 0) {
-      recommendations.push('Simplify dependency structures for easier extraction');
+      recommendations.push(
+        'Simplify dependency structures for easier extraction'
+      );
     }
 
     return recommendations;
@@ -944,21 +1065,31 @@ export class ComponentInventoryGenerator {
   ): string[] {
     const risks: string[] = [];
 
-    const criticalRiskComponents = readiness.filter(r => r.risk === 'critical').length;
+    const criticalRiskComponents = readiness.filter(
+      r => r.risk === 'critical'
+    ).length;
     if (criticalRiskComponents > 0) {
-      risks.push(`${criticalRiskComponents} components have critical extraction risks`);
+      risks.push(
+        `${criticalRiskComponents} components have critical extraction risks`
+      );
     }
 
     if (dependencies.graph.cycles.length > 0) {
-      risks.push(`${dependencies.graph.cycles.length} circular dependencies detected`);
+      risks.push(
+        `${dependencies.graph.cycles.length} circular dependencies detected`
+      );
     }
 
-    const noTestComponents = readiness.filter(r => r.criteria.testCoverage === 0).length;
+    const noTestComponents = readiness.filter(
+      r => r.criteria.testCoverage === 0
+    ).length;
     if (noTestComponents > readiness.length * 0.5) {
       risks.push('Over 50% of components lack test coverage');
     }
 
-    const undocumentedComponents = readiness.filter(r => r.criteria.documentation < 30).length;
+    const undocumentedComponents = readiness.filter(
+      r => r.criteria.documentation < 30
+    ).length;
     if (undocumentedComponents > readiness.length * 0.4) {
       risks.push('Significant portion of components lack proper documentation');
     }
@@ -1005,15 +1136,19 @@ export class ComponentInventoryGenerator {
     md.push('');
     md.push(`- **Total Components**: ${inventory.summary.totalComponents}`);
     md.push(`- **Average Readiness**: ${inventory.summary.averageReadiness}%`);
-    md.push(`- **Estimated Effort**: ${inventory.summary.totalEstimatedEffort}`);
+    md.push(
+      `- **Estimated Effort**: ${inventory.summary.totalEstimatedEffort}`
+    );
     md.push('');
 
     // Readiness Distribution
     md.push('### Component Readiness Distribution');
     md.push('');
-    Object.entries(inventory.summary.componentsByReadiness).forEach(([level, count]) => {
-      md.push(`- **${level}**: ${count} components`);
-    });
+    Object.entries(inventory.summary.componentsByReadiness).forEach(
+      ([level, count]) => {
+        md.push(`- **${level}**: ${count} components`);
+      }
+    );
     md.push('');
 
     // Key Recommendations
@@ -1066,14 +1201,20 @@ export class ComponentInventoryGenerator {
       md.push('');
       md.push(`**Count**: ${section.metrics['count']}`);
       if (section.metrics['averageScore']) {
-        md.push(`**Average Score**: ${Math.round(section.metrics['averageScore'] as number)}%`);
+        md.push(
+          `**Average Score**: ${Math.round(section.metrics['averageScore'] as number)}%`
+        );
       }
       md.push('');
 
       // Component list
       section.components.forEach(component => {
-        const readinessInfo = inventory.readiness.find(r => r.componentId === component.id);
-        const score = readinessInfo ? ` (${readinessInfo.readinessScore}%)` : '';
+        const readinessInfo = inventory.readiness.find(
+          r => r.componentId === component.id
+        );
+        const score = readinessInfo
+          ? ` (${readinessInfo.readinessScore}%)`
+          : '';
         md.push(`- **${component.name}**${score} - ${component.type}`);
       });
       md.push('');

@@ -1,0 +1,31 @@
+module.exports = {
+  root: true,
+  env: {
+    browser: true,
+    es2022: true,
+    node: true,
+  },
+  extends: [
+    'eslint:recommended',
+  ],
+  ignorePatterns: [
+    'dist',
+    'build',
+    'coverage',
+    '.eslintrc.cjs',
+    'vite.config.ts',
+    '*.js',
+    '*.cjs',
+    '.specify',
+  ],
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  },
+  rules: {
+    // Basic safety rules
+    'no-unused-vars': 'warn',
+    'no-undef': 'error',
+    'no-console': 'warn',
+  },
+};

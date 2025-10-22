@@ -1,10 +1,10 @@
 /**
  * Component Parser for DAISY v1 Component Extraction Pipeline
- * 
+ *
  * Provides AST-based parsing and analysis of React components discovered
  * by the ComponentDiscoveryEngine. Extracts detailed structural information
  * including props, methods, hooks, lifecycle methods, and composition patterns.
- * 
+ *
  * @version 1.0.0
  * @author DAISY Component Extraction Pipeline
  */
@@ -129,21 +129,26 @@ export class ComponentParser {
       extractJSDoc: true,
       analyzeComplexity: true,
       maxFileSize: 1024 * 1024, // 1MB default
-      ...config
+      ...config,
     };
   }
 
   /**
    * Parse a component file and extract detailed structure
    */
-  async parseComponent(filePath: string, _definition?: ComponentDefinition): Promise<ParseResult> {
+  async parseComponent(
+    filePath: string,
+    _definition?: ComponentDefinition
+  ): Promise<ParseResult> {
     try {
       this.logger.debug(`Parsing component: ${filePath}`);
 
       // Read and validate file
       const content = await this.readAndValidateFile(filePath);
       if (!content) {
-        return this.createErrorResult(['File could not be read or is too large']);
+        return this.createErrorResult([
+          'File could not be read or is too large',
+        ]);
       }
 
       // Parse TypeScript/JavaScript AST
@@ -154,11 +159,15 @@ export class ComponentParser {
 
       // Extract component structure
       const structure = this.extractComponentStructure(ast, content);
-      
+
       // Calculate complexity metrics
-      const complexity = this.config.analyzeComplexity 
+      const complexity = this.config.analyzeComplexity
         ? this.calculateComplexity(ast)
-        : { cyclomaticComplexity: 0, cognitiveComplexity: 0, maintainabilityIndex: 0 };
+        : {
+            cyclomaticComplexity: 0,
+            cognitiveComplexity: 0,
+            maintainabilityIndex: 0,
+          };
 
       this.logger.debug(`Successfully parsed component: ${filePath}`);
 
@@ -167,21 +176,27 @@ export class ComponentParser {
         structure,
         complexity,
         errors: [],
-        warnings: []
+        warnings: [],
       };
-
     } catch (error) {
-      this.logger.error(`Error parsing component ${filePath}:`, error instanceof Error ? error : undefined);
-      return this.createErrorResult([`Parse error: ${error instanceof Error ? error.message : 'Unknown error'}`]);
+      this.logger.error(
+        `Error parsing component ${filePath}:`,
+        error instanceof Error ? error : undefined
+      );
+      return this.createErrorResult([
+        `Parse error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      ]);
     }
   }
 
   /**
    * Parse multiple components in batch
    */
-  async parseComponents(components: ComponentDefinition[]): Promise<Map<string, ParseResult>> {
+  async parseComponents(
+    components: ComponentDefinition[]
+  ): Promise<Map<string, ParseResult>> {
     const results = new Map<string, ParseResult>();
-    
+
     this.logger.info(`Parsing ${components.length} components...`);
 
     for (const component of components) {
@@ -189,8 +204,12 @@ export class ComponentParser {
       results.set(component.sourcePath, result);
     }
 
-    const successCount = Array.from(results.values()).filter(r => r.success).length;
-    this.logger.info(`Parsed ${successCount}/${components.length} components successfully`);
+    const successCount = Array.from(results.values()).filter(
+      r => r.success
+    ).length;
+    this.logger.info(
+      `Parsed ${successCount}/${components.length} components successfully`
+    );
 
     return results;
   }
@@ -201,7 +220,7 @@ export class ComponentParser {
   private async readAndValidateFile(filePath: string): Promise<string | null> {
     try {
       const stats = await import('fs').then(fs => fs.promises.stat(filePath));
-      
+
       if (stats.size > this.config.maxFileSize) {
         this.logger.warn(`File ${filePath} is too large (${stats.size} bytes)`);
         return null;
@@ -209,7 +228,10 @@ export class ComponentParser {
 
       return await readFile(filePath, 'utf-8');
     } catch (error) {
-      this.logger.error(`Error reading file ${filePath}:`, error instanceof Error ? error : undefined);
+      this.logger.error(
+        `Error reading file ${filePath}:`,
+        error instanceof Error ? error : undefined
+      );
       return null;
     }
   }
@@ -238,11 +260,14 @@ export class ComponentParser {
         errorOnTypeScriptSyntacticAndSemanticIssues: false,
         ...(isTypeScript && {
           typescript: true,
-          parseEmptyProgram: false
-        })
+          parseEmptyProgram: false,
+        }),
       });
     } catch (error) {
-      this.logger.error(`AST parsing error for ${filePath}:`, error instanceof Error ? error : undefined);
+      this.logger.error(
+        `AST parsing error for ${filePath}:`,
+        error instanceof Error ? error : undefined
+      );
       return null;
     }
   }
@@ -250,7 +275,10 @@ export class ComponentParser {
   /**
    * Extract component structure from AST
    */
-  private extractComponentStructure(ast: TSESTree.Program, content: string): ComponentStructure {
+  private extractComponentStructure(
+    ast: TSESTree.Program,
+    content: string
+  ): ComponentStructure {
     const structure: ComponentStructure = {
       props: [],
       methods: [],
@@ -261,27 +289,27 @@ export class ComponentParser {
         hasComponentDidUpdate: false,
         hasComponentWillUnmount: false,
         hasGetDerivedStateFromProps: false,
-        hasComponentDidCatch: false
+        hasComponentDidCatch: false,
       },
       composition: {
         childComponents: [],
         renderProps: [],
         higherOrderComponents: [],
         forwardRef: false,
-        memo: false
+        memo: false,
       },
       exports: {
         default: false,
-        named: []
+        named: [],
       },
       imports: {
         external: [],
         internal: [],
-        types: []
-      }
+        types: [],
+      },
     };
 
-    this.traverseAST(ast, (node) => {
+    this.traverseAST(ast, node => {
       this.analyzeNode(node, structure, content);
     });
 
@@ -291,7 +319,10 @@ export class ComponentParser {
   /**
    * Traverse AST and call visitor for each node
    */
-  private traverseAST(node: TSESTree.Node, visitor: (node: TSESTree.Node) => void): void {
+  private traverseAST(
+    node: TSESTree.Node,
+    visitor: (node: TSESTree.Node) => void
+  ): void {
     visitor(node);
 
     // Recursively visit child nodes
@@ -311,7 +342,11 @@ export class ComponentParser {
   /**
    * Analyze individual AST node and update structure
    */
-  private analyzeNode(node: TSESTree.Node, structure: ComponentStructure, content: string): void {
+  private analyzeNode(
+    node: TSESTree.Node,
+    structure: ComponentStructure,
+    content: string
+  ): void {
     switch (node.type) {
       case 'ImportDeclaration':
         this.analyzeImport(node, structure);
@@ -346,9 +381,12 @@ export class ComponentParser {
   /**
    * Analyze import declarations
    */
-  private analyzeImport(node: TSESTree.ImportDeclaration, structure: ComponentStructure): void {
+  private analyzeImport(
+    node: TSESTree.ImportDeclaration,
+    structure: ComponentStructure
+  ): void {
     const source = node.source.value as string;
-    
+
     // Determine import type
     if (source.startsWith('.')) {
       structure.imports.internal.push(source);
@@ -365,7 +403,10 @@ export class ComponentParser {
     if (source === 'react') {
       node.specifiers?.forEach(spec => {
         if (spec.type === 'ImportSpecifier') {
-          const importName = spec.imported.name;
+          const importName =
+            spec.imported.type === 'Identifier'
+              ? spec.imported.name
+              : spec.imported.value;
           if (importName === 'forwardRef') {
             structure.composition.forwardRef = true;
           } else if (importName === 'memo') {
@@ -379,21 +420,31 @@ export class ComponentParser {
   /**
    * Analyze named exports
    */
-  private analyzeNamedExport(node: TSESTree.ExportNamedDeclaration, structure: ComponentStructure): void {
+  private analyzeNamedExport(
+    node: TSESTree.ExportNamedDeclaration,
+    structure: ComponentStructure
+  ): void {
     if (node.declaration?.type === 'VariableDeclaration') {
       node.declaration.declarations.forEach(decl => {
         if (decl.id.type === 'Identifier') {
           structure.exports.named.push(decl.id.name);
         }
       });
-    } else if (node.declaration?.type === 'FunctionDeclaration' && node.declaration.id) {
+    } else if (
+      node.declaration?.type === 'FunctionDeclaration' &&
+      node.declaration.id
+    ) {
       structure.exports.named.push(node.declaration.id.name);
     }
 
     // Handle re-exports
     node.specifiers?.forEach(spec => {
       if (spec.type === 'ExportSpecifier') {
-        structure.exports.named.push(spec.exported.name);
+        structure.exports.named.push(
+          spec.exported.type === 'Identifier'
+            ? spec.exported.name
+            : spec.exported.value
+        );
       }
     });
   }
@@ -402,7 +453,10 @@ export class ComponentParser {
    * Analyze function components and methods
    */
   private analyzeFunction(
-    node: TSESTree.FunctionDeclaration | TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression,
+    node:
+      | TSESTree.FunctionDeclaration
+      | TSESTree.ArrowFunctionExpression
+      | TSESTree.FunctionExpression,
     structure: ComponentStructure,
     _content: string
   ): void {
@@ -420,13 +474,16 @@ export class ComponentParser {
     this.extractHooksFromFunction(node, structure);
 
     // Extract method information
-    if (node.type === 'FunctionDeclaration' || (node.type === 'ArrowFunctionExpression' && name)) {
+    if (
+      node.type === 'FunctionDeclaration' ||
+      (node.type === 'ArrowFunctionExpression' && name)
+    ) {
       const method: ComponentMethod = {
         name,
         parameters: this.extractParameters(node),
         returnType: this.extractReturnType(node),
         isAsync: node.async || false,
-        visibility: this.determineVisibility(name)
+        visibility: this.determineVisibility(name),
       };
 
       if (this.config.includePrivateMethods || method.visibility === 'public') {
@@ -438,7 +495,10 @@ export class ComponentParser {
   /**
    * Analyze class components
    */
-  private analyzeClass(node: TSESTree.ClassDeclaration, structure: ComponentStructure): void {
+  private analyzeClass(
+    node: TSESTree.ClassDeclaration,
+    structure: ComponentStructure
+  ): void {
     if (!node.id) return;
 
     // Check if this extends React.Component
@@ -458,7 +518,10 @@ export class ComponentParser {
   /**
    * Analyze call expressions for hooks and HOCs
    */
-  private analyzeCallExpression(node: TSESTree.CallExpression, structure: ComponentStructure): void {
+  private analyzeCallExpression(
+    node: TSESTree.CallExpression,
+    structure: ComponentStructure
+  ): void {
     if (node.callee.type === 'Identifier') {
       const name = node.callee.name;
 
@@ -478,10 +541,13 @@ export class ComponentParser {
   /**
    * Analyze JSX elements for child components
    */
-  private analyzeJSXElement(node: TSESTree.JSXElement, structure: ComponentStructure): void {
+  private analyzeJSXElement(
+    node: TSESTree.JSXElement,
+    structure: ComponentStructure
+  ): void {
     if (node.openingElement.name.type === 'JSXIdentifier') {
       const componentName = node.openingElement.name.name;
-      
+
       // Only track custom components (start with uppercase)
       if (/^[A-Z]/.test(componentName)) {
         if (!structure.composition.childComponents.includes(componentName)) {
@@ -495,7 +561,7 @@ export class ComponentParser {
       if (attr.type === 'JSXAttribute' && attr.name.name === 'render') {
         structure.composition.renderProps.push('render');
       } else if (
-        attr.type === 'JSXAttribute' && 
+        attr.type === 'JSXAttribute' &&
         attr.name.type === 'JSXIdentifier' &&
         attr.value?.type === 'JSXExpressionContainer' &&
         attr.value.expression.type === 'ArrowFunctionExpression'
@@ -526,7 +592,10 @@ export class ComponentParser {
    * Extract props from function component parameters
    */
   private extractPropsFromFunction(
-    node: TSESTree.FunctionDeclaration | TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression,
+    node:
+      | TSESTree.FunctionDeclaration
+      | TSESTree.ArrowFunctionExpression
+      | TSESTree.FunctionExpression,
     structure: ComponentStructure
   ): void {
     const firstParam = node.params[0];
@@ -544,15 +613,21 @@ export class ComponentParser {
   /**
    * Extract props from interface declaration
    */
-  private extractPropsFromInterface(node: TSESTree.TSInterfaceDeclaration, structure: ComponentStructure): void {
+  private extractPropsFromInterface(
+    node: TSESTree.TSInterfaceDeclaration,
+    structure: ComponentStructure
+  ): void {
     node.body.body.forEach((member: TSESTree.TypeElement) => {
-      if (member.type === 'TSPropertySignature' && member.key.type === 'Identifier') {
+      if (
+        member.type === 'TSPropertySignature' &&
+        member.key.type === 'Identifier'
+      ) {
         const description = this.extractJSDocComment(member);
         const prop: ComponentProp = {
           name: member.key.name,
           type: this.extractTypeString(member.typeAnnotation),
           required: !member.optional,
-          ...(description && { description })
+          ...(description && { description }),
         };
         structure.props.push(prop);
       }
@@ -563,13 +638,19 @@ export class ComponentParser {
    * Extract hooks from function body
    */
   private extractHooksFromFunction(
-    node: TSESTree.FunctionDeclaration | TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression,
+    node:
+      | TSESTree.FunctionDeclaration
+      | TSESTree.ArrowFunctionExpression
+      | TSESTree.FunctionExpression,
     structure: ComponentStructure
   ): void {
     if (!node.body || node.body.type !== 'BlockStatement') return;
 
-    this.traverseAST(node.body, (childNode) => {
-      if (childNode.type === 'CallExpression' && childNode.callee.type === 'Identifier') {
+    this.traverseAST(node.body, childNode => {
+      if (
+        childNode.type === 'CallExpression' &&
+        childNode.callee.type === 'Identifier'
+      ) {
         const hookName = childNode.callee.name;
         if (this.isHook(hookName)) {
           const hook = this.createHookUsage(hookName, childNode);
@@ -582,7 +663,10 @@ export class ComponentParser {
   /**
    * Analyze class methods for lifecycle methods
    */
-  private analyzeClassMethod(member: TSESTree.MethodDefinition, structure: ComponentStructure): void {
+  private analyzeClassMethod(
+    member: TSESTree.MethodDefinition,
+    structure: ComponentStructure
+  ): void {
     if (member.key.type === 'Identifier') {
       const methodName = member.key.name;
 
@@ -611,7 +695,10 @@ export class ComponentParser {
       }
 
       // Add to methods list
-      if (this.config.includePrivateMethods || this.determineVisibility(methodName) === 'public') {
+      if (
+        this.config.includePrivateMethods ||
+        this.determineVisibility(methodName) === 'public'
+      ) {
         // Handle different method types
         if (member.value.type !== 'TSEmptyBodyFunctionExpression') {
           const method: ComponentMethod = {
@@ -619,7 +706,7 @@ export class ComponentParser {
             parameters: this.extractParameters(member.value),
             returnType: this.extractReturnType(member.value),
             isAsync: member.value.async || false,
-            visibility: this.determineVisibility(methodName)
+            visibility: this.determineVisibility(methodName),
           };
           structure.methods.push(method);
         }
@@ -631,7 +718,10 @@ export class ComponentParser {
    * Analyze class properties
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private analyzeClassProperty(_member: TSESTree.PropertyDefinition, _structure: ComponentStructure): void {
+  private analyzeClassProperty(
+    _member: TSESTree.PropertyDefinition,
+    _structure: ComponentStructure
+  ): void {
     // Implementation for class properties if needed
     // This could include state definitions, prop types, etc.
   }
@@ -649,7 +739,7 @@ export class ComponentParser {
     let operatorCount = 0;
     let operandCount = 0;
 
-    this.traverseAST(ast, (node) => {
+    this.traverseAST(ast, node => {
       // Cyclomatic complexity
       switch (node.type) {
         case 'IfStatement':
@@ -699,15 +789,21 @@ export class ComponentParser {
     });
 
     // Simplified maintainability index calculation
-    const halsteadVolume = (operatorCount + operandCount) * Math.log2(operatorCount + operandCount) || 1;
-    const maintainabilityIndex = Math.max(0, 
-      171 - 5.2 * Math.log(halsteadVolume) - 0.23 * cyclomaticComplexity - 16.2 * Math.log(halsteadVolume / 1000 || 1)
+    const halsteadVolume =
+      (operatorCount + operandCount) *
+        Math.log2(operatorCount + operandCount) || 1;
+    const maintainabilityIndex = Math.max(
+      0,
+      171 -
+        5.2 * Math.log(halsteadVolume) -
+        0.23 * cyclomaticComplexity -
+        16.2 * Math.log(halsteadVolume / 1000 || 1)
     );
 
     return {
       cyclomaticComplexity,
       cognitiveComplexity,
-      maintainabilityIndex: Math.round(maintainabilityIndex)
+      maintainabilityIndex: Math.round(maintainabilityIndex),
     };
   }
 
@@ -716,7 +812,10 @@ export class ComponentParser {
    */
 
   private getFunctionName(
-    node: TSESTree.FunctionDeclaration | TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression
+    node:
+      | TSESTree.FunctionDeclaration
+      | TSESTree.ArrowFunctionExpression
+      | TSESTree.FunctionExpression
   ): string | null {
     if (node.type === 'FunctionDeclaration') {
       return node.id?.name || null;
@@ -730,19 +829,27 @@ export class ComponentParser {
 
   private extendsReactComponent(node: TSESTree.ClassDeclaration): boolean {
     if (!node.superClass) return false;
-    
+
     if (node.superClass.type === 'Identifier') {
-      return node.superClass.name === 'Component' || node.superClass.name === 'PureComponent';
+      return (
+        node.superClass.name === 'Component' ||
+        node.superClass.name === 'PureComponent'
+      );
     } else if (node.superClass.type === 'MemberExpression') {
-      return node.superClass.property.type === 'Identifier' && 
-             (node.superClass.property.name === 'Component' || node.superClass.property.name === 'PureComponent');
+      return (
+        node.superClass.property.type === 'Identifier' &&
+        (node.superClass.property.name === 'Component' ||
+          node.superClass.property.name === 'PureComponent')
+      );
     }
-    
+
     return false;
   }
 
   private isHook(name: string): boolean {
-    return name.startsWith('use') && name.length > 3 && /^[A-Z]/.test(name.charAt(3));
+    return (
+      name.startsWith('use') && name.length > 3 && /^[A-Z]/.test(name.charAt(3))
+    );
   }
 
   private isHigherOrderComponent(name: string): boolean {
@@ -750,12 +857,16 @@ export class ComponentParser {
     return hocPatterns.some(pattern => name.startsWith(pattern));
   }
 
-  private createHookUsage(name: string, node: TSESTree.CallExpression): HookUsage {
+  private createHookUsage(
+    name: string,
+    node: TSESTree.CallExpression
+  ): HookUsage {
     let type: HookUsage['type'] = 'custom';
-    
+
     // Determine hook type
     if (name === 'useState') type = 'state';
-    else if (name === 'useEffect' || name === 'useLayoutEffect') type = 'effect';
+    else if (name === 'useEffect' || name === 'useLayoutEffect')
+      type = 'effect';
     else if (name === 'useContext') type = 'context';
     else if (name === 'useRef') type = 'ref';
     else if (name === 'useMemo') type = 'memo';
@@ -763,7 +874,10 @@ export class ComponentParser {
 
     // Extract dependencies for useEffect, useMemo, useCallback
     let dependencies: string[] | undefined;
-    if ((type === 'effect' || type === 'memo' || type === 'callback') && node.arguments.length > 1) {
+    if (
+      (type === 'effect' || type === 'memo' || type === 'callback') &&
+      node.arguments.length > 1
+    ) {
       const depsArg = node.arguments[1];
       if (depsArg?.type === 'ArrayExpression') {
         dependencies = depsArg.elements
@@ -774,13 +888,17 @@ export class ComponentParser {
 
     // Extract initial value for useState
     let initialValue: string | undefined;
-    if (type === 'state' && node.arguments[0] && node.arguments[0].type !== 'SpreadElement') {
+    if (
+      type === 'state' &&
+      node.arguments[0] &&
+      node.arguments[0].type !== 'SpreadElement'
+    ) {
       initialValue = this.extractLiteralValue(node.arguments[0]);
     }
 
     const hookUsage: HookUsage = {
       name,
-      type
+      type,
     };
 
     // Only add optional properties if they have values
@@ -795,32 +913,41 @@ export class ComponentParser {
   }
 
   private extractParameters(
-    node: TSESTree.FunctionDeclaration | TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression
+    node:
+      | TSESTree.FunctionDeclaration
+      | TSESTree.ArrowFunctionExpression
+      | TSESTree.FunctionExpression
   ): ComponentMethod['parameters'] {
     return node.params.map(param => {
       if (param.type === 'Identifier') {
         return {
           name: param.name,
           type: this.extractTypeString(param.typeAnnotation),
-          optional: param.optional || false
+          optional: param.optional || false,
         };
-      } else if (param.type === 'AssignmentPattern' && param.left.type === 'Identifier') {
+      } else if (
+        param.type === 'AssignmentPattern' &&
+        param.left.type === 'Identifier'
+      ) {
         return {
           name: param.left.name,
           type: this.extractTypeString(param.left.typeAnnotation),
-          optional: true
+          optional: true,
         };
       }
       return {
         name: 'unknown',
         type: 'unknown',
-        optional: false
+        optional: false,
       };
     });
   }
 
   private extractReturnType(
-    node: TSESTree.FunctionDeclaration | TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression
+    node:
+      | TSESTree.FunctionDeclaration
+      | TSESTree.ArrowFunctionExpression
+      | TSESTree.FunctionExpression
   ): string {
     if (node.returnType) {
       return this.extractTypeString(node.returnType);
@@ -828,16 +955,20 @@ export class ComponentParser {
     return 'unknown';
   }
 
-  private determineVisibility(name: string): 'public' | 'private' | 'protected' {
+  private determineVisibility(
+    name: string
+  ): 'public' | 'private' | 'protected' {
     if (name.startsWith('_')) return 'private';
     return 'public';
   }
 
-  private extractTypeString(typeAnnotation?: TSESTree.TSTypeAnnotation): string {
+  private extractTypeString(
+    typeAnnotation?: TSESTree.TSTypeAnnotation
+  ): string {
     if (!typeAnnotation || !typeAnnotation.typeAnnotation) return 'unknown';
-    
+
     const type = typeAnnotation.typeAnnotation;
-    
+
     switch (type.type) {
       case 'TSStringKeyword':
         return 'string';
@@ -853,27 +984,39 @@ export class ComponentParser {
         }
         break;
       case 'TSUnionType':
-        return type.types.map(t => this.extractTypeString({ typeAnnotation: t } as TSESTree.TSTypeAnnotation)).join(' | ');
+        return type.types
+          .map(t =>
+            this.extractTypeString({
+              typeAnnotation: t,
+            } as TSESTree.TSTypeAnnotation)
+          )
+          .join(' | ');
       case 'TSArrayType':
         return `${this.extractTypeString({ typeAnnotation: type.elementType } as TSESTree.TSTypeAnnotation)}[]`;
     }
-    
+
     return 'unknown';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private extractPropsFromTypeAnnotation(_typeAnnotation: TSESTree.TSTypeAnnotation, _structure: ComponentStructure): void {
+  private extractPropsFromTypeAnnotation(
+    _typeAnnotation: TSESTree.TSTypeAnnotation,
+    _structure: ComponentStructure
+  ): void {
     // Implementation would extract props from type annotation
     // This is a simplified version
   }
 
-  private extractPropsFromDestructuring(pattern: TSESTree.ObjectPattern, structure: ComponentStructure): void {
+  private extractPropsFromDestructuring(
+    pattern: TSESTree.ObjectPattern,
+    structure: ComponentStructure
+  ): void {
     pattern.properties.forEach(prop => {
       if (prop.type === 'Property' && prop.key.type === 'Identifier') {
         const componentProp: ComponentProp = {
           name: prop.key.name,
           type: 'unknown', // Would need type inference
-          required: true // Default assumption
+          required: true, // Default assumption
         };
         structure.props.push(componentProp);
       }
@@ -903,16 +1046,12 @@ export class ComponentParser {
       'UnaryExpression',
       'AssignmentExpression',
       'UpdateExpression',
-      'LogicalExpression'
+      'LogicalExpression',
     ].includes(node.type);
   }
 
   private isOperand(node: TSESTree.Node): boolean {
-    return [
-      'Identifier',
-      'Literal',
-      'ThisExpression'
-    ].includes(node.type);
+    return ['Identifier', 'Literal', 'ThisExpression'].includes(node.type);
   }
 
   private createErrorResult(errors: string[]): ParseResult {
@@ -921,10 +1060,10 @@ export class ComponentParser {
       complexity: {
         cyclomaticComplexity: 0,
         cognitiveComplexity: 0,
-        maintainabilityIndex: 0
+        maintainabilityIndex: 0,
       },
       errors,
-      warnings: []
+      warnings: [],
     };
   }
 }

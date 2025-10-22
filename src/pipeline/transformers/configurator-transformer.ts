@@ -13,7 +13,10 @@ import type {
   PropDefinition,
   MigrationStrategy,
 } from '@/types';
-import { BusinessLogicAnalyzer, type BusinessLogicAnalysis } from '@/utils/business-logic-analyzer';
+import {
+  BusinessLogicAnalyzer,
+  type BusinessLogicAnalysis,
+} from '@/utils/business-logic-analyzer';
 import { getGlobalLogger } from '@/utils/logging';
 import { TransformationError } from '@/utils/errors';
 
@@ -55,7 +58,13 @@ export interface TransformationResult {
  */
 export interface CodeTransformation {
   /** Transformation type */
-  readonly type: 'hook' | 'prop' | 'handler' | 'state' | 'effect' | 'validation';
+  readonly type:
+    | 'hook'
+    | 'prop'
+    | 'handler'
+    | 'state'
+    | 'effect'
+    | 'validation';
 
   /** Original code */
   readonly original: string;
@@ -145,7 +154,10 @@ export class ConfiguratorTransformer {
         transformations
       );
 
-      const warnings = this.collectWarnings(transformations, businessLogicPreserved);
+      const warnings = this.collectWarnings(
+        transformations,
+        businessLogicPreserved
+      );
       const requiresManualReview = this.requiresManualReview(
         strategy,
         transformations,
@@ -217,7 +229,9 @@ export class ConfiguratorTransformer {
     transformations.push(...this.transformHooks(analysis.stateManagement));
 
     // Transform event handlers
-    transformations.push(...this.transformEventHandlers(analysis.eventHandlers));
+    transformations.push(
+      ...this.transformEventHandlers(analysis.eventHandlers)
+    );
 
     // Transform side effects
     transformations.push(...this.transformSideEffects(analysis.sideEffects));
@@ -244,7 +258,9 @@ export class ConfiguratorTransformer {
   /**
    * Transform React hooks to Configurator patterns
    */
-  private transformHooks(stateManagement: BusinessLogicAnalysis['stateManagement']): CodeTransformation[] {
+  private transformHooks(
+    stateManagement: BusinessLogicAnalysis['stateManagement']
+  ): CodeTransformation[] {
     return stateManagement.map(state => ({
       type: 'state' as const,
       original: `const [${state.name}, ${state.setter}] = ${state.type}(${state.initialValue})`,
@@ -257,7 +273,9 @@ export class ConfiguratorTransformer {
   /**
    * Transform event handlers
    */
-  private transformEventHandlers(handlers: BusinessLogicAnalysis['eventHandlers']): CodeTransformation[] {
+  private transformEventHandlers(
+    handlers: BusinessLogicAnalysis['eventHandlers']
+  ): CodeTransformation[] {
     return handlers.map(handler => ({
       type: 'handler' as const,
       original: `const ${handler.name} = ${handler.signature}`,
@@ -270,7 +288,9 @@ export class ConfiguratorTransformer {
   /**
    * Transform side effects
    */
-  private transformSideEffects(effects: BusinessLogicAnalysis['sideEffects']): CodeTransformation[] {
+  private transformSideEffects(
+    effects: BusinessLogicAnalysis['sideEffects']
+  ): CodeTransformation[] {
     return effects.map((effect, index) => ({
       type: 'effect' as const,
       original: `useEffect(() => { ${effect.code} }, [${effect.dependencies.join(', ')}])`,
@@ -283,7 +303,9 @@ export class ConfiguratorTransformer {
   /**
    * Transform validation logic
    */
-  private transformValidations(validations: BusinessLogicAnalysis['validations']): CodeTransformation[] {
+  private transformValidations(
+    validations: BusinessLogicAnalysis['validations']
+  ): CodeTransformation[] {
     return validations.map(validation => ({
       type: 'validation' as const,
       original: `validate${validation.name}`,
@@ -299,12 +321,12 @@ export class ConfiguratorTransformer {
   private transformType(type: string): string {
     // Map DAISY v1 types to Configurator types
     const typeMap: Record<string, string> = {
-      'string': 'ConfigString',
-      'number': 'ConfigNumber',
-      'boolean': 'ConfigBoolean',
-      'Date': 'ConfigDateTime',
-      'function': 'ConfigCallback',
-      'object': 'ConfigObject',
+      string: 'ConfigString',
+      number: 'ConfigNumber',
+      boolean: 'ConfigBoolean',
+      Date: 'ConfigDateTime',
+      function: 'ConfigCallback',
+      object: 'ConfigObject',
     };
 
     return typeMap[type] || type;
@@ -324,7 +346,8 @@ export class ConfiguratorTransformer {
       mappings.push({
         v1Pattern: 'useState',
         v2Pattern: 'useConfiguratorState',
-        rationale: 'Configurator provides optimized state management with automatic memoization',
+        rationale:
+          'Configurator provides optimized state management with automatic memoization',
         example: 'const count = useConfiguratorState(0);',
       });
     }
@@ -334,7 +357,8 @@ export class ConfiguratorTransformer {
       mappings.push({
         v1Pattern: 'useEffect',
         v2Pattern: 'useConfiguratorEffect',
-        rationale: 'Configurator effects integrate with the configuration lifecycle',
+        rationale:
+          'Configurator effects integrate with the configuration lifecycle',
         example: 'useConfiguratorEffect(() => { /* effect */ }, [deps]);',
       });
     }
@@ -347,7 +371,7 @@ export class ConfiguratorTransformer {
    */
   private createTransformedComponent(
     component: ComponentDefinition,
-    transformations: CodeTransformation[]
+    _transformations: CodeTransformation[] // TODO: Use transformations to update component metadata
   ): ComponentDefinition {
     return {
       ...component,
@@ -367,11 +391,13 @@ export class ConfiguratorTransformer {
     transformations: CodeTransformation[]
   ): boolean {
     // Check if all critical business logic has transformations
-    const criticalRequirements = analysis.preservationRequirements.filter(r => r.critical);
+    const criticalRequirements = analysis.preservationRequirements.filter(
+      r => r.critical
+    );
 
     for (const requirement of criticalRequirements) {
-      const hasTransformation = transformations.some(
-        t => t.description.includes(requirement.name)
+      const hasTransformation = transformations.some(t =>
+        t.description.includes(requirement.name)
       );
 
       if (!hasTransformation) {
@@ -395,7 +421,7 @@ export class ConfiguratorTransformer {
       warnings.push('Business logic preservation could not be fully verified');
     }
 
-    if (transformations.length === 0) {
+    if (_transformations.length === 0) {
       warnings.push('No transformations were applied');
     }
 

@@ -7,8 +7,19 @@
  * @fileoverview Component extraction tests
  */
 
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
-import { ComponentExtractor, createExtractor, extractComponent } from '@/pipeline/extractor';
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from '@jest/globals';
+import {
+  ComponentExtractor,
+  createExtractor,
+  extractComponent,
+} from '@/pipeline/extractor';
 import type { ExtractionResult, ExtractorOptions } from '@/pipeline/extractor';
 import { writeFile, mkdir, rm } from 'fs/promises';
 import { join } from 'path';
@@ -267,7 +278,11 @@ module.exports = {};
       `;
 
       await writeFile(join(testDir, 'Component.tsx'), componentCode, 'utf-8');
-      await writeFile(join(testDir, 'Component.test.tsx'), testFileCode, 'utf-8');
+      await writeFile(
+        join(testDir, 'Component.test.tsx'),
+        testFileCode,
+        'utf-8'
+      );
       await writeFile(join(testDir, 'config.js'), configFile, 'utf-8');
 
       const results = await extractor.extractFromDirectory(testDir);
@@ -341,7 +356,9 @@ export const Component = () => <div>Component</div>;
       expect(result.component.metadata.createdAt).toBeTruthy();
       expect(result.component.metadata.createdAt.constructor.name).toBe('Date');
       expect(result.component.metadata.lastModified).toBeTruthy();
-      expect(result.component.metadata.lastModified.constructor.name).toBe('Date');
+      expect(result.component.metadata.lastModified.constructor.name).toBe(
+        'Date'
+      );
     });
 
     it('should generate unique component IDs', async () => {

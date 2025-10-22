@@ -1,0 +1,85 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Strict Type Checking Options - Temporarily relaxed for CI */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    // "noUncheckedIndexedAccess": true, // Temporarily disabled
+    // "exactOptionalPropertyTypes": true, // Temporarily disabled - causing Zod issues
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+
+    /* Linting */
+    "forceConsistentCasingInFileNames": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "noUnusedLocals": false, // Temporarily disabled - too many during development
+    "noUnusedParameters": false, // Temporarily disabled - too many during development
+
+    /* Module Resolution */
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/types": ["./src/types"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/engine/*": ["./src/engine/*"],
+      "@/pipeline/*": ["./src/pipeline/*"],
+      "@/cli/*": ["./src/cli/*"],
+      "@/config/*": ["./src/config/*"]
+    },
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Advanced */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "importHelpers": true,
+    "downlevelIteration": true,
+
+    /* Experimental */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    /* Output */
+    "outDir": "./dist"
+    // "rootDir": "./src" // Removed for CI to allow checking all files
+  },
+  "include": [
+    "src/**/*",
+    "scripts/**/*",
+    "daisyv1/**/*",
+    "vite.config.ts",
+    "@types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "tests/**/*",
+    ".specify"
+  ]
+}

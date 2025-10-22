@@ -308,13 +308,7 @@ export class RepositoryConfigManager {
     return {
       repositoryPath: resolve(repositoryPath),
       sourceDirectory: 'src',
-      componentDirectories: [
-        'components',
-        'modules',
-        'ui',
-        'common',
-        'shared',
-      ],
+      componentDirectories: ['components', 'modules', 'ui', 'common', 'shared'],
       readOnly: true,
       metadata: {
         name: 'DAISY v1',
@@ -366,7 +360,9 @@ export function getDefaultRepositoryPath(): string {
  * @param repositoryPath - Path to validate
  * @returns Whether path is valid
  */
-export async function validateRepositoryPath(repositoryPath: string): Promise<boolean> {
+export async function validateRepositoryPath(
+  repositoryPath: string
+): Promise<boolean> {
   try {
     const stats = await fs.stat(repositoryPath);
     if (!stats.isDirectory()) {

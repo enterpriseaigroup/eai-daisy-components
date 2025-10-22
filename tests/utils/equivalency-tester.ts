@@ -59,12 +59,19 @@ export class EquivalencyTester {
     const differences: Difference[] = [];
 
     const propsMatch = this.compareProps(v1Component, v2Component, differences);
-    const behaviorMatch = this.compareBehavior(v1Component, v2Component, differences);
+    const behaviorMatch = this.compareBehavior(
+      v1Component,
+      v2Component,
+      differences
+    );
     const renderMatch = true;
     const stateMatch = true;
     const performanceAcceptable = true;
 
-    const equivalent = differences.filter(d => d.severity === 'critical' || d.severity === 'high').length === 0;
+    const equivalent =
+      differences.filter(
+        d => d.severity === 'critical' || d.severity === 'high'
+      ).length === 0;
     const score = this.calculateScore(differences);
 
     return {
@@ -147,7 +154,9 @@ export class EquivalencyTester {
   }
 }
 
-export function createEquivalencyTester(config?: EquivalencyTestConfig): EquivalencyTester {
+export function createEquivalencyTester(
+  config?: EquivalencyTestConfig
+): EquivalencyTester {
   return new EquivalencyTester(config);
 }
 

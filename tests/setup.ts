@@ -56,10 +56,13 @@ afterEach(() => {
 
 // Custom matchers for better testing experience
 expect.extend({
-  toBeTypeOf(received: unknown, expectedType: string): jest.CustomMatcherResult {
+  toBeTypeOf(
+    received: unknown,
+    expectedType: string
+  ): jest.CustomMatcherResult {
     const actualType = typeof received;
     const pass = actualType === expectedType;
-    
+
     return {
       message: (): string =>
         `expected ${received} to be of type ${expectedType}, but got ${actualType}`,
@@ -97,10 +100,7 @@ export const createMockFunction = <T extends (...args: any[]) => any>(
   return jest.fn().mockReturnValue(returnValue);
 };
 
-export const createMockPromise = <T>(
-  resolveValue?: T,
-  rejectValue?: Error
-) => {
+export const createMockPromise = <T>(resolveValue?: T, rejectValue?: Error) => {
   if (rejectValue) {
     return Promise.reject(rejectValue);
   }

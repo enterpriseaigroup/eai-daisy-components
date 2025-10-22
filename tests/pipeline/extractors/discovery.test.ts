@@ -159,7 +159,7 @@ describe('ComponentDiscoveryService', () => {
     });
 
     it('should apply filters to results', async () => {
-      const filtered Service = new ComponentDiscoveryService({
+      const filteredService = new ComponentDiscoveryService({
         extractionConfig: mockExtractionConfig,
         filters: {
           types: ['functional'],
@@ -187,10 +187,14 @@ describe('ComponentDiscoveryService', () => {
     it('should handle discovery errors', async () => {
       const { createDiscoveryEngine } = require('@/engine/discovery');
       createDiscoveryEngine.mockReturnValue({
-        discoverComponents: jest.fn().mockRejectedValue(new Error('Discovery failed')),
+        discoverComponents: jest
+          .fn()
+          .mockRejectedValue(new Error('Discovery failed')),
       });
 
-      await expect(service.discoverComponents()).rejects.toThrow(FileSystemError);
+      await expect(service.discoverComponents()).rejects.toThrow(
+        FileSystemError
+      );
     });
 
     it('should cache results when enabled', async () => {
@@ -357,7 +361,8 @@ describe('ComponentDiscoveryService', () => {
     });
 
     it('should return empty array for non-matching directory', async () => {
-      const results = await service.discoverComponentsInDirectory('/nonexistent');
+      const results =
+        await service.discoverComponentsInDirectory('/nonexistent');
       expect(results).toHaveLength(0);
     });
   });
@@ -473,7 +478,10 @@ describe('Utility Functions', () => {
         }),
       });
 
-      const results = await discoverComponentsByType(mockExtractionConfig, 'functional');
+      const results = await discoverComponentsByType(
+        mockExtractionConfig,
+        'functional'
+      );
       expect(results.length).toBeGreaterThanOrEqual(0);
     });
   });
@@ -493,7 +501,10 @@ describe('Utility Functions', () => {
         }),
       });
 
-      const results = await discoverComponentsByComplexity(mockExtractionConfig, 'simple');
+      const results = await discoverComponentsByComplexity(
+        mockExtractionConfig,
+        'simple'
+      );
       expect(results.length).toBeGreaterThanOrEqual(0);
     });
   });

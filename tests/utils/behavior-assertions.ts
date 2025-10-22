@@ -81,7 +81,9 @@ export class BehaviorAssertions {
     v1Component: ComponentDefinition,
     v2Component: ComponentDefinition
   ): boolean {
-    return v1Component.businessLogic.length === v2Component.businessLogic.length;
+    return (
+      v1Component.businessLogic.length === v2Component.businessLogic.length
+    );
   }
 
   private compareProps(

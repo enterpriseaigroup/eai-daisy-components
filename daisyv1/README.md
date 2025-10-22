@@ -1,6 +1,7 @@
 # DAISY v1 Baseline Components
 
 This directory contains complete copies of DAISY v1 components including:
+
 - Visual implementation
 - Business logic
 - Component usage patterns
@@ -32,6 +33,7 @@ daisyv1/
 ## Purpose
 
 Per Constitution Principle II (Architecture Migration Protocol), this directory:
+
 1. Preserves complete DAISY v1 functionality as reference baseline
 2. Enables functional equivalency testing (SC-003)
 3. Documents business logic transformation requirements (FR-002)
@@ -39,18 +41,21 @@ Per Constitution Principle II (Architecture Migration Protocol), this directory:
 ## Component Tiers
 
 ### Tier 1 (Simple) - Target: 30 min/component
+
 - Basic UI components with minimal business logic
 - No external dependencies beyond React
 - Simple prop interfaces
 - Examples: Button, Input, Label, Icon
 
 ### Tier 2 (Moderate) - Target: 2 hours/component
+
 - Components with moderate business logic
 - May have 1-2 external dependencies
 - State management requirements
 - Examples: Form, Modal, Card, Dropdown
 
 ### Tier 3 (Complex) - Target: 1 day/component
+
 - Complex components with significant business logic
 - Multiple external dependencies
 - Complex state and data management
@@ -58,11 +63,11 @@ Per Constitution Principle II (Architecture Migration Protocol), this directory:
 
 ## Migration Status
 
-| Tier | Total Components | Migrated | In Progress | Remaining |
-|------|------------------|----------|-------------|-----------|
-| Tier 1 | 0 | 0 | 0 | 0 |
-| Tier 2 | 0 | 0 | 0 | 0 |
-| Tier 3 | 0 | 0 | 0 | 0 |
+| Tier   | Total Components | Migrated | In Progress | Remaining |
+| ------ | ---------------- | -------- | ----------- | --------- |
+| Tier 1 | 0                | 0        | 0           | 0         |
+| Tier 2 | 0                | 0        | 0           | 0         |
+| Tier 3 | 0                | 0        | 0           | 0         |
 
 ## Usage
 

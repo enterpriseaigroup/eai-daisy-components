@@ -1,18 +1,15 @@
 /**
  * CLI Foundation
- * 
+ *
  * Provides command-line interface for the component extraction pipeline
  * using commander.js with integration to logging and error handling systems.
- * 
+ *
  * @fileoverview CLI foundation with command structure and argument parsing
  * @version 1.0.0
  */
 
 import { Command } from 'commander';
-import type {
-  ExtractionConfig,
-  LogLevel,
-} from '@/types';
+import type { ExtractionConfig, LogLevel } from '@/types';
 import { ConfigurationManager } from '@/utils/config';
 import { FileSystemManager } from '@/utils/filesystem';
 import { Logger, createSimpleLogger } from '@/utils/logging';
@@ -30,34 +27,34 @@ import { join } from 'path';
 export interface CLIOptions {
   /** Configuration file path */
   config?: string;
-  
+
   /** Source directory */
   source?: string;
-  
+
   /** Output directory */
   output?: string;
-  
+
   /** Log level */
   logLevel?: LogLevel;
-  
+
   /** Dry run mode */
   dryRun?: boolean;
-  
+
   /** Verbose output */
   verbose?: boolean;
-  
+
   /** Quiet mode */
   quiet?: boolean;
-  
+
   /** Force overwrite */
   force?: boolean;
-  
+
   /** Parallel processing */
   parallel?: number;
-  
+
   /** Component pattern */
   pattern?: string;
-  
+
   /** Output format for reports */
   format?: 'table' | 'json' | 'csv';
 }
@@ -128,9 +125,9 @@ class SimpleSpinner {
   private interval?: NodeJS.Timeout | undefined;
   private frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   private frameIndex = 0;
-  
+
   constructor(private text: string) {}
-  
+
   start(): void {
     process.stdout.write(`${this.frames[0]} ${this.text}`);
     this.interval = setInterval(() => {
@@ -138,17 +135,17 @@ class SimpleSpinner {
       process.stdout.write(`\r${this.frames[this.frameIndex]} ${this.text}`);
     }, 80);
   }
-  
+
   succeed(message?: string): void {
     this.stop();
     console.log(`${styles.green('✓')} ${message || this.text}`);
   }
-  
+
   fail(message?: string): void {
     this.stop();
     console.log(`${styles.red('✗')} ${message || this.text}`);
   }
-  
+
   stop(): void {
     if (this.interval) {
       clearInterval(this.interval);
@@ -165,12 +162,12 @@ class SimpleSpinner {
  * Show confirmation prompt
  */
 async function confirmAction(message: string): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const rl = require('readline').createInterface({
       input: process.stdin,
       output: process.stdout,
     });
-    
+
     rl.question(`${message} (y/N): `, (answer: string) => {
       rl.close();
       resolve(['y', 'yes'].includes(answer.toLowerCase()));
@@ -190,7 +187,8 @@ async function confirmAction(message: string): Promise<boolean> {
  */
 const extractCommand: CLICommand = {
   name: 'extract',
-  description: 'Extract and migrate components from DAISY v1 to Configurator v2',
+  description:
+    'Extract and migrate components from DAISY v1 to Configurator v2',
   options: [
     {
       flags: '-s, --source <path>',
@@ -215,7 +213,7 @@ const extractCommand: CLICommand = {
   ],
   handler: async (context: CommandContext): Promise<void> => {
     const { options, logger, config } = context;
-    
+
     const sourceDir = options.source || config.sourcePath;
     const outputDir = options.output || config.outputPath;
 
@@ -239,12 +237,11 @@ const extractCommand: CLICommand = {
     }
 
     const spinner = new SimpleSpinner('Processing components...');
-    
+
     try {
       spinner.start();
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate work
       spinner.succeed('Component extraction completed');
-      
     } catch (error) {
       spinner.fail('Component extraction failed');
       throw error;
@@ -275,9 +272,9 @@ const scanCommand: CLICommand = {
   ],
   handler: async (context: CommandContext): Promise<void> => {
     const { options, config } = context;
-    
+
     const sourceDir = options.source || config.sourcePath;
-    
+
     if (!sourceDir) {
       throw new PipelineError(
         'Source directory must be specified',
@@ -288,21 +285,27 @@ const scanCommand: CLICommand = {
     }
 
     const spinner = new SimpleSpinner('Scanning components...');
-    
+
     try {
       spinner.start();
-      
+
       // For now, simulate finding components
       const componentCount = Math.floor(Math.random() * 10) + 1;
-      
+
       spinner.succeed(`Found ${componentCount} components`);
-      
+
       // Simple output for demo
       if (options.format === 'json') {
-        console.log(JSON.stringify({ 
-          scanned: componentCount, 
-          directory: sourceDir 
-        }, null, 2));
+        console.log(
+          JSON.stringify(
+            {
+              scanned: componentCount,
+              directory: sourceDir,
+            },
+            null,
+            2
+          )
+        );
       } else if (options.format === 'csv') {
         console.log('Component,Status,Issues');
         for (let i = 0; i < componentCount; i++) {
@@ -316,7 +319,6 @@ const scanCommand: CLICommand = {
         console.log(`Components found: ${componentCount}`);
         console.log('─'.repeat(40));
       }
-      
     } catch (error) {
       spinner.fail('Component scan failed');
       throw error;
@@ -347,20 +349,21 @@ const initCommand: CLICommand = {
   ],
   handler: async (context: CommandContext): Promise<void> => {
     const { options, logger } = context;
-    
+
     const configPath = options.config || './daisy-extract.config.json';
     logger.info('Initializing configuration', { configPath });
-    
+
     const spinner = new SimpleSpinner('Creating configuration file...');
-    
+
     try {
       spinner.start();
       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate work
       spinner.succeed(`Configuration created at ${configPath}`);
-      
+
       console.log(styles.green(`\n✓ Configuration initialized successfully!`));
-      console.log(`\nEdit ${styles.cyan(configPath)} to customize your extraction settings.`);
-      
+      console.log(
+        `\nEdit ${styles.cyan(configPath)} to customize your extraction settings.`
+      );
     } catch (error) {
       spinner.fail('Configuration initialization failed');
       throw error;
@@ -377,7 +380,7 @@ const initCommand: CLICommand = {
  */
 export class CLIBuilder {
   private readonly program: Command;
-  
+
   constructor() {
     this.program = new Command();
     this.setupBaseCommand();
@@ -395,7 +398,11 @@ export class CLIBuilder {
       .option('-c, --config <path>', 'Configuration file path')
       .option('-v, --verbose', 'Enable verbose output')
       .option('-q, --quiet', 'Suppress output except errors')
-      .option('--log-level <level>', 'Set log level (debug, info, warn, error)', 'info');
+      .option(
+        '--log-level <level>',
+        'Set log level (debug, info, warn, error)',
+        'info'
+      );
   }
 
   /**
@@ -413,52 +420,67 @@ export class CLIBuilder {
   public addCommand(commandDef: CLICommand): this {
     const command = this.program.command(commandDef.name);
     command.description(commandDef.description);
-    
+
     // Add options
     commandDef.options.forEach(option => {
-      command.option(option.flags, option.description, option.defaultValue);
+      const { flags, description, defaultValue } = option;
+      if (defaultValue !== undefined) {
+        command.option(
+          flags,
+          description,
+          defaultValue as string | boolean | string[]
+        );
+      } else {
+        command.option(flags, description);
+      }
     });
-    
+
     // Add examples to help (using bracket notation for strict TypeScript)
     if (commandDef.examples) {
       const exampleText = commandDef.examples.map(ex => `  ${ex}`).join('\n');
       (command as any)['addHelpText']('after', `\nExamples:\n${exampleText}`);
     }
-    
+
     // Set action handler
     command.action(async (...args) => {
       const options = args[args.length - 1].opts();
       const globalOptions = this.program.opts();
-      
+
       const mergedOptions: CLIOptions = {
         ...globalOptions,
         ...options,
       };
-      
+
       await this.executeCommand(commandDef, mergedOptions);
     });
-    
+
     return this;
   }
 
   /**
    * Execute command with context
    */
-  private async executeCommand(commandDef: CLICommand, options: CLIOptions): Promise<void> {
+  private async executeCommand(
+    commandDef: CLICommand,
+    options: CLIOptions
+  ): Promise<void> {
     try {
       // Create context
       const context = await this.createCommandContext(options);
-      
+
       // Execute command
       await commandDef.handler(context);
-      
     } catch (error) {
       if (error instanceof PipelineError) {
         console.error(styles.red('\n' + error.getUserReport()));
       } else {
-        console.error(styles.red(`\nCommand failed: ${error instanceof Error ? error.message : String(error)}`));
+        console.error(
+          styles.red(
+            `\nCommand failed: ${error instanceof Error ? error.message : String(error)}`
+          )
+        );
       }
-      
+
       process.exit(1);
     }
   }
@@ -466,17 +488,19 @@ export class CLIBuilder {
   /**
    * Create command execution context
    */
-  private async createCommandContext(options: CLIOptions): Promise<CommandContext> {
+  private async createCommandContext(
+    options: CLIOptions
+  ): Promise<CommandContext> {
     const configManager = new ConfigurationManager();
     const config = options.config
       ? await configManager.loadFromFile(options.config)
       : configManager.createMinimal(process.cwd(), './output');
-    
+
     const logLevel = (options.logLevel as LogLevel) || config.logging.level;
     const logger = createSimpleLogger('cli', logLevel);
-    
+
     const fileManager = new FileSystemManager();
-    
+
     return {
       options,
       logger,

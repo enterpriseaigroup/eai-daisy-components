@@ -21,19 +21,58 @@ const mockConfig: ExtractionConfig = {
     mode: 'parallel',
     concurrency: 4,
     continueOnError: true,
-    retry: { maxAttempts: 3, delay: 1000, backoffMultiplier: 2, retryableOperations: [] },
-    filters: { include: [], exclude: [], types: [], complexity: [], custom: [] },
+    retry: {
+      maxAttempts: 3,
+      delay: 1000,
+      backoffMultiplier: 2,
+      retryableOperations: [],
+    },
+    filters: {
+      include: [],
+      exclude: [],
+      types: [],
+      complexity: [],
+      custom: [],
+    },
   },
-  performance: { memoryLimit: 1024, timeoutPerComponent: 30000, maxBundleSizeIncrease: 120, monitoring: true },
-  validation: { strict: false, typescript: true, eslint: false, componentStructure: true, businessLogicPreservation: true },
+  performance: {
+    memoryLimit: 1024,
+    timeoutPerComponent: 30000,
+    maxBundleSizeIncrease: 120,
+    monitoring: true,
+  },
+  validation: {
+    strict: false,
+    typescript: true,
+    eslint: false,
+    componentStructure: true,
+    businessLogicPreservation: true,
+  },
   output: {
     generateDeclarations: true,
     generateDocs: false,
     generateExamples: false,
-    format: { typescript: '.tsx', indentation: 'spaces', indentationSize: 2, lineEnding: 'lf', quotes: 'single' },
-    naming: { componentFiles: 'PascalCase', interfaces: 'PascalCase', utilities: 'camelCase', constants: 'UPPER_SNAKE_CASE' },
+    format: {
+      typescript: '.tsx',
+      indentation: 'spaces',
+      indentationSize: 2,
+      lineEnding: 'lf',
+      quotes: 'single',
+    },
+    naming: {
+      componentFiles: 'PascalCase',
+      interfaces: 'PascalCase',
+      utilities: 'camelCase',
+      constants: 'UPPER_SNAKE_CASE',
+    },
   },
-  logging: { level: 'info', outputs: ['console'], format: 'detailed', timestamps: true, stackTraces: true },
+  logging: {
+    level: 'info',
+    outputs: ['console'],
+    format: 'detailed',
+    timestamps: true,
+    stackTraces: true,
+  },
 };
 
 const mockComponent: ComponentDefinition = {
@@ -57,11 +96,19 @@ describe('V1ComponentExtractor', () => {
     extractor = new V1ComponentExtractor(mockConfig);
 
     const { FileSystemManager } = require('@/utils/filesystem');
-    FileSystemManager.prototype.readFile = jest.fn().mockResolvedValue('component code');
-    FileSystemManager.prototype.writeFile = jest.fn().mockResolvedValue(undefined);
-    FileSystemManager.prototype.createDirectory = jest.fn().mockResolvedValue(undefined);
+    FileSystemManager.prototype.readFile = jest
+      .fn()
+      .mockResolvedValue('component code');
+    FileSystemManager.prototype.writeFile = jest
+      .fn()
+      .mockResolvedValue(undefined);
+    FileSystemManager.prototype.createDirectory = jest
+      .fn()
+      .mockResolvedValue(undefined);
     FileSystemManager.prototype.exists = jest.fn().mockResolvedValue(false);
-    FileSystemManager.prototype.copyFile = jest.fn().mockResolvedValue(undefined);
+    FileSystemManager.prototype.copyFile = jest
+      .fn()
+      .mockResolvedValue(undefined);
   });
 
   describe('extractComponent', () => {
@@ -77,7 +124,10 @@ describe('V1ComponentExtractor', () => {
     });
 
     it('should extract to tier2 for moderate components', async () => {
-      const moderateComp = { ...mockComponent, complexity: 'moderate' as const };
+      const moderateComp = {
+        ...mockComponent,
+        complexity: 'moderate' as const,
+      };
       const result = await extractor.extractComponent(moderateComp);
       expect(result.baselinePath).toContain('tier2-moderate');
     });
@@ -89,14 +139,19 @@ describe('V1ComponentExtractor', () => {
     });
 
     it('should extract to tier4 for critical components', async () => {
-      const criticalComp = { ...mockComponent, complexity: 'critical' as const };
+      const criticalComp = {
+        ...mockComponent,
+        complexity: 'critical' as const,
+      };
       const result = await extractor.extractComponent(criticalComp);
       expect(result.baselinePath).toContain('tier4-critical');
     });
 
     it('should handle extraction errors', async () => {
       const { FileSystemManager } = require('@/utils/filesystem');
-      FileSystemManager.prototype.readFile = jest.fn().mockRejectedValue(new Error('Read failed'));
+      FileSystemManager.prototype.readFile = jest
+        .fn()
+        .mockRejectedValue(new Error('Read failed'));
 
       const result = await extractor.extractComponent(mockComponent);
       expect(result.success).toBe(false);
@@ -106,13 +161,15 @@ describe('V1ComponentExtractor', () => {
     it('should extract dependencies when requested', async () => {
       const compWithDeps = {
         ...mockComponent,
-        dependencies: [{
-          name: 'Helper',
-          type: 'internal' as const,
-          importPath: './helper',
-          source: 'components/helper.ts',
-          critical: false,
-        }],
+        dependencies: [
+          {
+            name: 'Helper',
+            type: 'internal' as const,
+            importPath: './helper',
+            source: 'components/helper.ts',
+            critical: false,
+          },
+        ],
       };
 
       const { FileSystemManager } = require('@/utils/filesystem');
@@ -127,7 +184,8 @@ describe('V1ComponentExtractor', () => {
 
     it('should extract tests when requested', async () => {
       const { FileSystemManager } = require('@/utils/filesystem');
-      FileSystemManager.prototype.exists = jest.fn()
+      FileSystemManager.prototype.exists = jest
+        .fn()
         .mockResolvedValueOnce(true) // Test file exists
         .mockResolvedValue(false);
 
@@ -161,7 +219,8 @@ describe('V1ComponentExtractor', () => {
 
     it('should report success count', async () => {
       const { FileSystemManager } = require('@/utils/filesystem');
-      FileSystemManager.prototype.readFile = jest.fn()
+      FileSystemManager.prototype.readFile = jest
+        .fn()
         .mockResolvedValueOnce('code')
         .mockRejectedValueOnce(new Error('fail'));
 
@@ -180,8 +239,12 @@ describe('Utility Functions', () => {
   beforeEach(() => {
     const { FileSystemManager } = require('@/utils/filesystem');
     FileSystemManager.prototype.readFile = jest.fn().mockResolvedValue('code');
-    FileSystemManager.prototype.writeFile = jest.fn().mockResolvedValue(undefined);
-    FileSystemManager.prototype.createDirectory = jest.fn().mockResolvedValue(undefined);
+    FileSystemManager.prototype.writeFile = jest
+      .fn()
+      .mockResolvedValue(undefined);
+    FileSystemManager.prototype.createDirectory = jest
+      .fn()
+      .mockResolvedValue(undefined);
     FileSystemManager.prototype.exists = jest.fn().mockResolvedValue(false);
   });
 

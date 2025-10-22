@@ -145,8 +145,8 @@ export type {
 // ============================================================================
 
 export * from './validation';
+export type { ValidationEngine } from './validation';
 export {
-  ValidationEngine,
   createValidationEngine,
   validateComponentDefinition,
   validateExtractionConfig,
@@ -164,6 +164,9 @@ export {
  * Should be called once at application startup.
  */
 export function initializeUtilities(): void {
+  // Import logging functions directly to avoid circular dependency
+  const { initializeLogging, getGlobalLogger } = require('./logging');
+
   // Initialize logging with default config
   initializeLogging();
 
@@ -179,6 +182,9 @@ export function initializeUtilities(): void {
  * Should be called before application exit.
  */
 export async function shutdownUtilities(): Promise<void> {
+  // Import logging functions directly to avoid circular dependency
+  const { getGlobalLogger, shutdownLogging } = require('./logging');
+
   const logger = getGlobalLogger('utilities');
   logger.info('Shutting down utilities');
 
@@ -402,10 +408,7 @@ export function uniqueArray<T>(array: T[]): T[] {
  * @param keyFn - Function to extract grouping key
  * @returns Map of grouped items
  */
-export function groupBy<T, K>(
-  array: T[],
-  keyFn: (item: T) => K
-): Map<K, T[]> {
+export function groupBy<T, K>(array: T[], keyFn: (item: T) => K): Map<K, T[]> {
   const map = new Map<K, T[]>();
 
   for (const item of array) {

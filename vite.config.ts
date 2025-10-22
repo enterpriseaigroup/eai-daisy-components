@@ -5,7 +5,7 @@ import { resolve } from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  
+
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
@@ -21,7 +21,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     minify: 'terser',
-    
+
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/index.ts'),
@@ -88,18 +88,6 @@ export default defineConfig({
 
   // Optimization for development
   optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      '@elevenlabs/ui',
-      'zod',
-    ],
-  },
-
-  // Test configuration (if using Vitest instead of Jest)
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./tests/setup.ts'],
+    include: ['react', 'react-dom', '@elevenlabs/ui', 'zod'],
   },
 });

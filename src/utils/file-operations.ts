@@ -12,7 +12,11 @@
 import { readFile, writeFile, copyFile, mkdir, rm, stat } from 'fs/promises';
 import { resolve, join, dirname, basename, extname } from 'path';
 import type { ComponentDefinition, GeneratedFile } from '@/types';
-import { FileSystemManager, type FileInfo, type DirectoryScanResult } from './filesystem';
+import {
+  FileSystemManager,
+  type FileInfo,
+  type DirectoryScanResult,
+} from './filesystem';
 import { getGlobalLogger } from './logging';
 
 // ============================================================================
@@ -147,9 +151,11 @@ export class FileOperations {
 
       this.logger.info(`Successfully copied to baseline: ${destination}`);
       return destination;
-
     } catch (error) {
-      this.logger.error(`Failed to copy to baseline: ${sourcePath}`, error as Error);
+      this.logger.error(
+        `Failed to copy to baseline: ${sourcePath}`,
+        error as Error
+      );
       throw error;
     }
   }
@@ -178,9 +184,11 @@ export class FileOperations {
 
       this.logger.info(`Successfully saved migrated component: ${outputPath}`);
       return outputPath;
-
     } catch (error) {
-      this.logger.error(`Failed to save migrated component: ${component.name}`, error as Error);
+      this.logger.error(
+        `Failed to save migrated component: ${component.name}`,
+        error as Error
+      );
       throw error;
     }
   }
@@ -198,7 +206,9 @@ export class FileOperations {
     destinationDir: string,
     options: CopyOptions = {}
   ): Promise<BatchOperationResult> {
-    this.logger.info(`Batch copying ${files.length} files to ${destinationDir}`);
+    this.logger.info(
+      `Batch copying ${files.length} files to ${destinationDir}`
+    );
 
     const startTime = Date.now();
     const results: FileOperationResult[] = [];
@@ -222,7 +232,6 @@ export class FileOperations {
           duration: Date.now() - fileStart,
         });
         successCount++;
-
       } catch (error) {
         results.push({
           path: file,
@@ -266,11 +275,7 @@ export class FileOperations {
   ): Promise<string> {
     this.logger.info(`Creating backup of ${sourcePath}`);
 
-    const {
-      backupDir,
-      includeTimestamp = true,
-      suffix = '.bak',
-    } = options;
+    const { backupDir, includeTimestamp = true, suffix = '.bak' } = options;
 
     const resolvedSource = resolve(sourcePath);
     const baseName = basename(sourcePath, extname(sourcePath));
@@ -292,9 +297,11 @@ export class FileOperations {
 
       this.logger.info(`Backup created: ${backupPath}`);
       return backupPath;
-
     } catch (error) {
-      this.logger.error(`Failed to create backup: ${sourcePath}`, error as Error);
+      this.logger.error(
+        `Failed to create backup: ${sourcePath}`,
+        error as Error
+      );
       throw error;
     }
   }
@@ -316,13 +323,17 @@ export class FileOperations {
         await writeFile(artifact.path, artifact.content, 'utf-8');
         savedPaths.push(artifact.path);
         this.logger.debug(`Saved artifact: ${artifact.path}`);
-
       } catch (error) {
-        this.logger.error(`Failed to save artifact: ${artifact.path}`, error as Error);
+        this.logger.error(
+          `Failed to save artifact: ${artifact.path}`,
+          error as Error
+        );
       }
     }
 
-    this.logger.info(`Successfully saved ${savedPaths.length}/${artifacts.length} artifacts`);
+    this.logger.info(
+      `Successfully saved ${savedPaths.length}/${artifacts.length} artifacts`
+    );
     return savedPaths;
   }
 
@@ -363,9 +374,11 @@ export class FileOperations {
         await rm(outputDir, { recursive: true, force: true });
         this.logger.info(`Removed entire output directory: ${outputDir}`);
       }
-
     } catch (error) {
-      this.logger.error(`Failed to clean output directory: ${outputDir}`, error as Error);
+      this.logger.error(
+        `Failed to clean output directory: ${outputDir}`,
+        error as Error
+      );
       throw error;
     }
   }
@@ -382,7 +395,10 @@ export class FileOperations {
       try {
         await this.fileSystem.createDirectory(path);
       } catch (error) {
-        this.logger.error(`Failed to create directory: ${path}`, error as Error);
+        this.logger.error(
+          `Failed to create directory: ${path}`,
+          error as Error
+        );
         throw error;
       }
     }
@@ -445,7 +461,10 @@ export class FileOperations {
     try {
       return await this.fileSystem.readFile(filePath);
     } catch (error) {
-      this.logger.error(`Failed to read component source: ${filePath}`, error as Error);
+      this.logger.error(
+        `Failed to read component source: ${filePath}`,
+        error as Error
+      );
       throw error;
     }
   }
@@ -463,7 +482,9 @@ export class FileOperations {
   ): Promise<string[]> {
     this.logger.debug(`Finding component files in ${directory}`);
 
-    const scanResult = await this.fileSystem.scanDirectory(directory, { recursive });
+    const scanResult = await this.fileSystem.scanDirectory(directory, {
+      recursive,
+    });
     const componentPaths = scanResult.componentFiles.map(f => f.path);
 
     this.logger.debug(`Found ${componentPaths.length} component files`);

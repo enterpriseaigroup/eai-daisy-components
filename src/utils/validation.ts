@@ -1,10 +1,10 @@
 /**
  * Validation Utilities
- * 
+ *
  * Comprehensive validation system for component structure, dependencies,
  * and business logic preservation. Provides type-safe validation with
  * detailed error reporting and recovery suggestions.
- * 
+ *
  * @fileoverview Component and pipeline validation utilities
  * @version 1.0.0
  */
@@ -36,31 +36,31 @@ export type ValidationSeverity = 'error' | 'warning' | 'info';
 export interface ValidationIssue {
   /** Unique issue identifier */
   readonly id: string;
-  
+
   /** Issue severity level */
   readonly severity: ValidationSeverity;
-  
+
   /** Human-readable issue description */
   readonly message: string;
-  
+
   /** File path where issue was found */
   readonly filePath?: string;
-  
+
   /** Line number where issue occurs */
   readonly line?: number;
-  
+
   /** Column number where issue occurs */
   readonly column?: number;
-  
+
   /** Suggested fix or resolution */
   readonly suggestion?: string;
-  
+
   /** Related issues or dependencies */
   readonly relatedIssues?: string[];
-  
+
   /** Validation rule that triggered this issue */
   readonly rule: string;
-  
+
   /** Additional context data */
   readonly context?: Record<string, unknown>;
 }
@@ -71,22 +71,22 @@ export interface ValidationIssue {
 export interface ValidationRule {
   /** Rule identifier */
   readonly id: string;
-  
+
   /** Rule name for display */
   readonly name: string;
-  
+
   /** Rule description */
   readonly description: string;
-  
+
   /** Rule severity */
   readonly severity: ValidationSeverity;
-  
+
   /** Whether rule is enabled by default */
   readonly enabled: boolean;
-  
+
   /** Rule categories */
   readonly categories: string[];
-  
+
   /** Validation function */
   readonly validate: (
     component: ComponentDefinition,
@@ -100,19 +100,19 @@ export interface ValidationRule {
 export interface ValidationContext {
   /** Pipeline configuration */
   readonly config: ExtractionConfig;
-  
+
   /** Logger instance */
   readonly logger: Logger;
-  
+
   /** All components being validated */
   readonly allComponents: ComponentDefinition[];
-  
+
   /** File system root path */
   readonly rootPath: string;
-  
+
   /** Validation-specific options */
   readonly options: ValidationConfig;
-  
+
   /** Shared validation cache */
   readonly cache: Map<string, unknown>;
 }
@@ -123,24 +123,24 @@ export interface ValidationContext {
 export interface ComponentValidationResult {
   /** Component being validated */
   readonly component: ComponentDefinition;
-  
+
   /** All validation issues found */
   readonly issues: ValidationIssue[];
-  
+
   /** Whether validation passed */
   readonly isValid: boolean;
-  
+
   /** Error count by severity */
   readonly errorCount: number;
   readonly warningCount: number;
   readonly infoCount: number;
-  
+
   /** Total validation time */
   readonly duration: number;
-  
+
   /** Applied rules */
   readonly appliedRules: string[];
-  
+
   /** Skipped rules with reasons */
   readonly skippedRules: Array<{ rule: string; reason: string }>;
 }
@@ -163,21 +163,22 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
       const namePattern = /^[A-Z][a-zA-Z0-9]*$/;
-      
+
       if (!namePattern.test(component.name)) {
         issues.push({
           id: `${component.id}-invalid-name`,
           severity: 'error',
           message: `Component name '${component.name}' must start with uppercase letter and contain only alphanumeric characters`,
           filePath: component.sourcePath,
-          suggestion: 'Rename component to follow PascalCase convention (e.g., MyComponent)',
+          suggestion:
+            'Rename component to follow PascalCase convention (e.g., MyComponent)',
           rule: 'component-name-valid',
-          context: { componentName: component.name }
+          context: { componentName: component.name },
         });
       }
-      
+
       return issues;
-    }
+    },
   },
 
   {
@@ -187,24 +188,28 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     severity: 'error',
     enabled: true,
     categories: ['structure', 'filesystem'],
-    async validate(component: ComponentDefinition, context: ValidationContext): Promise<ValidationIssue[]> {
+    async validate(
+      component: ComponentDefinition,
+      context: ValidationContext
+    ): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
       const fullPath = resolve(context.rootPath, component.sourcePath);
-      
+
       if (!existsSync(fullPath)) {
         issues.push({
           id: `${component.id}-file-missing`,
           severity: 'error',
           message: `Component file does not exist: ${component.sourcePath}`,
           filePath: component.sourcePath,
-          suggestion: 'Check if file path is correct or if file was moved/deleted',
+          suggestion:
+            'Check if file path is correct or if file was moved/deleted',
           rule: 'component-file-exists',
-          context: { fullPath, relativePath: component.sourcePath }
+          context: { fullPath, relativePath: component.sourcePath },
         });
       }
-      
+
       return issues;
-    }
+    },
   },
 
   {
@@ -216,21 +221,22 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     categories: ['structure', 'business-logic'],
     async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
-      
+
       if (!component.businessLogic || component.businessLogic.length === 0) {
         issues.push({
           id: `${component.id}-no-business-logic`,
           severity: 'warning',
           message: `Component '${component.name}' has no documented business logic`,
           filePath: component.sourcePath,
-          suggestion: 'Review component for business logic and document methods',
+          suggestion:
+            'Review component for business logic and document methods',
           rule: 'component-has-business-logic',
-          context: { businessLogicCount: 0 }
+          context: { businessLogicCount: 0 },
         });
       }
-      
+
       return issues;
-    }
+    },
   },
 
   {
@@ -242,8 +248,14 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     categories: ['structure', 'type'],
     async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
-      const validTypes: ComponentType[] = ['functional', 'class', 'higher-order', 'hook', 'utility'];
-      
+      const validTypes: ComponentType[] = [
+        'functional',
+        'class',
+        'higher-order',
+        'hook',
+        'utility',
+      ];
+
       if (!validTypes.includes(component.type)) {
         issues.push({
           id: `${component.id}-invalid-type`,
@@ -252,13 +264,13 @@ export const STRUCTURE_RULES: ValidationRule[] = [
           filePath: component.sourcePath,
           suggestion: `Use one of: ${validTypes.join(', ')}`,
           rule: 'component-type-valid',
-          context: { componentType: component.type, validTypes }
+          context: { componentType: component.type, validTypes },
         });
       }
-      
+
       return issues;
-    }
-  }
+    },
+  },
 ];
 
 /**
@@ -274,12 +286,19 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
     categories: ['dependencies', 'imports'],
     async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
-      
+
       for (const dep of component.dependencies) {
         if (dep.type === 'component' && dep.importPath.startsWith('./')) {
-          const depPath = resolve(dirname(component.sourcePath), dep.importPath);
-          
-          if (!existsSync(depPath) && !existsSync(`${depPath}.ts`) && !existsSync(`${depPath}.tsx`)) {
+          const depPath = resolve(
+            dirname(component.sourcePath),
+            dep.importPath
+          );
+
+          if (
+            !existsSync(depPath) &&
+            !existsSync(`${depPath}.ts`) &&
+            !existsSync(`${depPath}.tsx`)
+          ) {
             issues.push({
               id: `${component.id}-unresolvable-dep-${dep.name}`,
               severity: 'error',
@@ -287,14 +306,14 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
               filePath: component.sourcePath,
               suggestion: 'Check if dependency path is correct and file exists',
               rule: 'dependencies-resolvable',
-              context: { dependency: dep, resolvedPath: depPath }
+              context: { dependency: dep, resolvedPath: depPath },
             });
           }
         }
       }
-      
+
       return issues;
-    }
+    },
   },
 
   {
@@ -304,48 +323,63 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
     severity: 'error',
     enabled: true,
     categories: ['dependencies', 'circular'],
-    async validate(component: ComponentDefinition, context: ValidationContext): Promise<ValidationIssue[]> {
+    async validate(
+      component: ComponentDefinition,
+      context: ValidationContext
+    ): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
       const visited = new Set<string>();
       const recursionStack = new Set<string>();
-      
-      const findCircularDeps = (currentId: string, path: string[]): string[] | null => {
+
+      const findCircularDeps = (
+        currentId: string,
+        path: string[]
+      ): string[] | null => {
         if (recursionStack.has(currentId)) {
           const circleStart = path.indexOf(currentId);
           return path.slice(circleStart);
         }
-        
+
         if (visited.has(currentId)) {
           return null;
         }
-        
+
         visited.add(currentId);
         recursionStack.add(currentId);
-        
-        const currentComponent = context.allComponents.find(c => c.id === currentId);
+
+        const currentComponent = context.allComponents.find(
+          c => c.id === currentId
+        );
         if (!currentComponent) return null;
-        
+
         for (const dep of currentComponent.dependencies) {
           if (dep.type === 'component') {
-            const depComponent = context.allComponents.find(c => c.name === dep.name);
+            const depComponent = context.allComponents.find(
+              c => c.name === dep.name
+            );
             if (depComponent) {
-              const cycle = findCircularDeps(depComponent.id, [...path, currentId]);
+              const cycle = findCircularDeps(depComponent.id, [
+                ...path,
+                currentId,
+              ]);
               if (cycle) return cycle;
             }
           }
         }
-        
+
         recursionStack.delete(currentId);
         return null;
       };
-      
+
       const cycle = findCircularDeps(component.id, []);
       if (cycle) {
-        const cyclePath = cycle.map(id => {
-          const comp = context.allComponents.find(c => c.id === id);
-          return comp?.name || id;
-        }).join(' → ');
-        
+        const cyclePath = cycle
+          .map(id => {
+            const comp = context.allComponents.find(c => c.id === id);
+            return comp?.name || id;
+          })
+          .join(' → ');
+
         issues.push({
           id: `${component.id}-circular-dependency`,
           severity: 'error',
@@ -353,13 +387,13 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
           filePath: component.sourcePath,
           suggestion: 'Refactor components to break circular dependency chain',
           rule: 'no-circular-dependencies',
-          context: { cycle, cyclePath }
+          context: { cycle, cyclePath },
         });
       }
-      
+
       return issues;
-    }
-  }
+    },
+  },
 ];
 
 /**
@@ -375,21 +409,22 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
     categories: ['business-logic', 'documentation'],
     async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
-      
+
       if (!component.businessLogic || component.businessLogic.length === 0) {
         issues.push({
           id: `${component.id}-no-business-logic`,
           severity: 'warning',
           message: `Component '${component.name}' has no documented business logic`,
           filePath: component.sourcePath,
-          suggestion: 'Review component for business logic and document methods',
+          suggestion:
+            'Review component for business logic and document methods',
           rule: 'preserve-business-logic',
-          context: { businessLogicCount: 0 }
+          context: { businessLogicCount: 0 },
         });
       }
-      
+
       return issues;
-    }
+    },
   },
 
   {
@@ -401,27 +436,33 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
     categories: ['business-logic', 'react'],
     async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
-      
+
       if (component.reactPatterns && component.reactPatterns.length > 0) {
-        const complexPatterns = component.reactPatterns.filter(pattern => 
-          ['useReducer', 'custom-hook', 'render-props', 'children-as-function'].includes(pattern)
+        const complexPatterns = component.reactPatterns.filter(pattern =>
+          [
+            'useReducer',
+            'custom-hook',
+            'render-props',
+            'children-as-function',
+          ].includes(pattern)
         );
-        
+
         if (complexPatterns.length > 0) {
           issues.push({
             id: `${component.id}-complex-patterns`,
             severity: 'info',
             message: `Component uses complex React patterns: ${complexPatterns.join(', ')}`,
             filePath: component.sourcePath,
-            suggestion: 'Review patterns to ensure they are preserved during migration',
+            suggestion:
+              'Review patterns to ensure they are preserved during migration',
             rule: 'preserve-react-patterns',
-            context: { complexPatterns }
+            context: { complexPatterns },
           });
         }
       }
-      
+
       return issues;
-    }
+    },
   },
 
   {
@@ -433,22 +474,26 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
     categories: ['business-logic', 'complexity'],
     async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
-      
-      if (component.complexity === 'complex' || component.complexity === 'critical') {
+
+      if (
+        component.complexity === 'complex' ||
+        component.complexity === 'critical'
+      ) {
         issues.push({
           id: `${component.id}-high-complexity`,
           severity: component.complexity === 'critical' ? 'error' : 'warning',
           message: `Component has ${component.complexity} complexity and requires careful migration`,
           filePath: component.sourcePath,
-          suggestion: 'Plan migration carefully, consider breaking into smaller components',
+          suggestion:
+            'Plan migration carefully, consider breaking into smaller components',
           rule: 'complexity-assessment',
-          context: { complexity: component.complexity }
+          context: { complexity: component.complexity },
         });
       }
-      
+
       return issues;
-    }
-  }
+    },
+  },
 ];
 
 // ============================================================================
@@ -474,7 +519,7 @@ export class ComponentValidator {
     const allRules = [
       ...STRUCTURE_RULES,
       ...DEPENDENCY_RULES,
-      ...BUSINESS_LOGIC_RULES
+      ...BUSINESS_LOGIC_RULES,
     ];
 
     allRules.forEach(rule => {
@@ -486,7 +531,7 @@ export class ComponentValidator {
     this.context.logger.debug('Loaded validation rules', {
       totalRules: allRules.length,
       enabledRules: this.rules.size,
-      disabledRules: allRules.length - this.rules.size
+      disabledRules: allRules.length - this.rules.size,
     });
   }
 
@@ -495,28 +540,33 @@ export class ComponentValidator {
    */
   private shouldEnableRule(rule: ValidationRule): boolean {
     const config = this.context.options;
-    
+
     // Check if strict mode disables non-error rules
     if (config.strict && rule.severity !== 'error') {
       return false;
     }
-    
+
     // Check category-specific configuration
     if (rule.categories.includes('structure') && !config.componentStructure) {
       return false;
     }
-    
-    if (rule.categories.includes('business-logic') && !config.businessLogicPreservation) {
+
+    if (
+      rule.categories.includes('business-logic') &&
+      !config.businessLogicPreservation
+    ) {
       return false;
     }
-    
+
     return rule.enabled;
   }
 
   /**
    * Validate single component
    */
-  public async validateComponent(component: ComponentDefinition): Promise<ComponentValidationResult> {
+  public async validateComponent(
+    component: ComponentDefinition
+  ): Promise<ComponentValidationResult> {
     const startTime = Date.now();
     const issues: ValidationIssue[] = [];
     const appliedRules: string[] = [];
@@ -525,7 +575,7 @@ export class ComponentValidator {
     this.context.logger.debug('Validating component', {
       componentId: component.id,
       componentName: component.name,
-      rulesCount: this.rules.size
+      rulesCount: this.rules.size,
     });
 
     for (const [ruleId, rule] of this.rules) {
@@ -533,22 +583,22 @@ export class ComponentValidator {
         const ruleIssues = await rule.validate(component, this.context);
         issues.push(...ruleIssues);
         appliedRules.push(ruleId);
-        
+
         this.context.logger.debug('Applied validation rule', {
           ruleId,
           componentId: component.id,
-          issuesFound: ruleIssues.length
+          issuesFound: ruleIssues.length,
         });
       } catch (error) {
         skippedRules.push({
           rule: ruleId,
-          reason: error instanceof Error ? error.message : 'Unknown error'
+          reason: error instanceof Error ? error.message : 'Unknown error',
         });
-        
+
         this.context.logger.warn('Skipped validation rule due to error', {
           ruleId,
           componentId: component.id,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     }
@@ -567,7 +617,7 @@ export class ComponentValidator {
       infoCount,
       duration,
       appliedRules,
-      skippedRules
+      skippedRules,
     };
 
     this.context.logger.info('Component validation completed', {
@@ -577,7 +627,7 @@ export class ComponentValidator {
       errorCount,
       warningCount,
       infoCount,
-      duration: `${duration}ms`
+      duration: `${duration}ms`,
     });
 
     return result;
@@ -586,12 +636,14 @@ export class ComponentValidator {
   /**
    * Validate multiple components
    */
-  public async validateComponents(components: ComponentDefinition[]): Promise<ComponentValidationResult[]> {
+  public async validateComponents(
+    components: ComponentDefinition[]
+  ): Promise<ComponentValidationResult[]> {
     const results: ComponentValidationResult[] = [];
-    
+
     this.context.logger.info('Starting batch component validation', {
       componentCount: components.length,
-      enabledRules: this.rules.size
+      enabledRules: this.rules.size,
     });
 
     for (const component of components) {
@@ -601,31 +653,33 @@ export class ComponentValidator {
       } catch (error) {
         const errorResult: ComponentValidationResult = {
           component,
-          issues: [{
-            id: `${component.id}-validation-error`,
-            severity: 'error',
-            message: `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
-            filePath: component.sourcePath,
-            rule: 'validation-error',
-            context: { error: String(error) }
-          }],
+          issues: [
+            {
+              id: `${component.id}-validation-error`,
+              severity: 'error',
+              message: `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
+              filePath: component.sourcePath,
+              rule: 'validation-error',
+              context: { error: String(error) },
+            },
+          ],
           isValid: false,
           errorCount: 1,
           warningCount: 0,
           infoCount: 0,
           duration: 0,
           appliedRules: [],
-          skippedRules: []
+          skippedRules: [],
         };
-        
+
         results.push(errorResult);
-        
+
         this.context.logger.error(
           'Component validation failed',
           error as Error,
           {
             componentId: component.id,
-            componentName: component.name
+            componentName: component.name,
           }
         );
       }
@@ -633,13 +687,13 @@ export class ComponentValidator {
 
     const totalIssues = results.reduce((sum, r) => sum + r.issues.length, 0);
     const validComponents = results.filter(r => r.isValid).length;
-    
+
     this.context.logger.info('Batch validation completed', {
       totalComponents: components.length,
       validComponents,
       invalidComponents: components.length - validComponents,
       totalIssues,
-      totalDuration: `${results.reduce((sum, r) => sum + r.duration, 0)}ms`
+      totalDuration: `${results.reduce((sum, r) => sum + r.duration, 0)}ms`,
     });
 
     return results;
@@ -653,7 +707,7 @@ export class ComponentValidator {
       this.rules.set(rule.id, rule);
       this.context.logger.debug('Added custom validation rule', {
         ruleId: rule.id,
-        ruleName: rule.name
+        ruleName: rule.name,
       });
     }
   }
@@ -696,23 +750,25 @@ export function createValidationContext(
     allComponents,
     rootPath,
     options: config.validation,
-    cache: new Map()
+    cache: new Map(),
   };
 }
 
 /**
  * Format validation results for display
  */
-export function formatValidationResults(results: ComponentValidationResult[]): string {
+export function formatValidationResults(
+  results: ComponentValidationResult[]
+): string {
   const lines: string[] = [];
-  
+
   // Summary
   const totalComponents = results.length;
   const validComponents = results.filter(r => r.isValid).length;
   const totalIssues = results.reduce((sum, r) => sum + r.issues.length, 0);
   const totalErrors = results.reduce((sum, r) => sum + r.errorCount, 0);
   const totalWarnings = results.reduce((sum, r) => sum + r.warningCount, 0);
-  
+
   lines.push('='.repeat(60));
   lines.push('VALIDATION RESULTS SUMMARY');
   lines.push('='.repeat(60));
@@ -722,16 +778,22 @@ export function formatValidationResults(results: ComponentValidationResult[]): s
   lines.push(`Total issues: ${totalIssues}`);
   lines.push(`Errors: ${totalErrors}, Warnings: ${totalWarnings}`);
   lines.push('');
-  
+
   // Details for components with issues
   results.forEach(result => {
     if (result.issues.length > 0) {
-      lines.push(`Component: ${result.component.name} (${result.component.sourcePath})`);
+      lines.push(
+        `Component: ${result.component.name} (${result.component.sourcePath})`
+      );
       lines.push('-'.repeat(40));
-      
+
       result.issues.forEach(issue => {
-        const prefix = issue.severity === 'error' ? '❌' : 
-                     issue.severity === 'warning' ? '⚠️' : 'ℹ️';
+        const prefix =
+          issue.severity === 'error'
+            ? '❌'
+            : issue.severity === 'warning'
+              ? '⚠️'
+              : 'ℹ️';
         lines.push(`${prefix} ${issue.message}`);
         if (issue.suggestion) {
           lines.push(`   💡 ${issue.suggestion}`);
@@ -740,7 +802,7 @@ export function formatValidationResults(results: ComponentValidationResult[]): s
       lines.push('');
     }
   });
-  
+
   return lines.join('\n');
 }
 
@@ -754,14 +816,14 @@ export function validateExtractionConfig(config: unknown): ExtractionConfig {
     if (!config || typeof config !== 'object') {
       throw new ValidationError('Configuration must be an object');
     }
-    
+
     return config as ExtractionConfig;
   } catch (error) {
     throw new ValidationError(
       'Invalid extraction configuration',
-      { 
+      {
         operation: 'config-validation',
-        data: { configType: typeof config }
+        data: { configType: typeof config },
       },
       error as Error
     );
@@ -784,7 +846,9 @@ export async function isValidComponentFile(filePath: string): Promise<boolean> {
 
     // Basic checks for component patterns
     const hasExport = /export\s+(default\s+)?/.test(content);
-    const hasComponent = /function\s+\w+|class\s+\w+|const\s+\w+\s*=/.test(content);
+    const hasComponent = /function\s+\w+|class\s+\w+|const\s+\w+\s*=/.test(
+      content
+    );
 
     return hasExport && hasComponent;
   } catch {
@@ -804,7 +868,9 @@ export type ValidationEngine = ComponentValidator;
 /**
  * Create a validation engine (alias for creating validator)
  */
-export function createValidationEngine(context: ValidationContext): ValidationEngine {
+export function createValidationEngine(
+  context: ValidationContext
+): ValidationEngine {
   return new ComponentValidator(context);
 }
 
@@ -840,7 +906,7 @@ export async function validateMigrationResult(
       message: 'Transformed code is empty',
       filePath: component.sourcePath,
       rule: 'migration-validation',
-      suggestion: 'Check transformation process for errors'
+      suggestion: 'Check transformation process for errors',
     });
   }
 

@@ -2,11 +2,11 @@
 
 /**
  * CLI Entry Point
- * 
+ *
  * Main entry point for the component extraction CLI tool.
  * Provides command-line interface for component scanning, extraction,
  * and migration operations.
- * 
+ *
  * @fileoverview CLI entry point with error handling
  * @version 1.0.0
  */
@@ -29,7 +29,7 @@ async function main(): Promise<void> {
 }
 
 // Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', error => {
   console.error('Uncaught Exception:', error);
   process.exit(1);
 });
@@ -41,7 +41,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Run main function
 if (require.main === module) {
-  main().catch((error) => {
+  main().catch(error => {
     console.error('Fatal error:', error);
     process.exit(1);
   });

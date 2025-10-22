@@ -1,17 +1,14 @@
 /**
  * Error Handling Framework
- * 
+ *
  * Provides comprehensive error handling with custom error types, recovery
  * strategies, and user-friendly error messages for the component extraction pipeline.
- * 
+ *
  * @fileoverview Error handling framework with custom error types and recovery
  * @version 1.0.0
  */
 
-import type {
-  SourceLocation,
-  ComponentDefinition,
-} from '@/types';
+import type { SourceLocation, ComponentDefinition } from '@/types';
 
 // ============================================================================
 // ERROR TYPES AND INTERFACES
@@ -25,9 +22,9 @@ export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
 /**
  * Error categories for classification
  */
-export type ErrorCategory = 
+export type ErrorCategory =
   | 'configuration'
-  | 'file-system' 
+  | 'file-system'
   | 'parsing'
   | 'validation'
   | 'transformation'
@@ -46,22 +43,22 @@ export type ErrorCategory =
 export interface ErrorContext {
   /** Component being processed when error occurred */
   readonly component?: ComponentDefinition;
-  
+
   /** File path where error occurred */
   readonly filePath?: string;
-  
+
   /** Source code location */
   readonly location?: SourceLocation;
-  
+
   /** Operation being performed */
   readonly operation?: string;
-  
+
   /** Additional context data */
   readonly data?: Record<string, unknown>;
-  
+
   /** Stack of operations leading to error */
   readonly operationStack?: string[];
-  
+
   /** Correlation ID for tracking */
   readonly correlationId?: string;
 }
@@ -72,16 +69,19 @@ export interface ErrorContext {
 export interface ErrorRecoveryStrategy {
   /** Strategy name */
   readonly name: string;
-  
+
   /** Strategy description */
   readonly description: string;
-  
+
   /** Whether recovery can be attempted automatically */
   readonly canAutoRecover: boolean;
-  
+
   /** Recovery function */
-  readonly recover: (error: PipelineError, context: ErrorContext) => Promise<RecoveryResult>;
-  
+  readonly recover: (
+    error: PipelineError,
+    context: ErrorContext
+  ) => Promise<RecoveryResult>;
+
   /** Applicable error categories */
   readonly applicableCategories: ErrorCategory[];
 }
@@ -92,13 +92,13 @@ export interface ErrorRecoveryStrategy {
 export interface RecoveryResult {
   /** Whether recovery was successful */
   readonly success: boolean;
-  
+
   /** Recovery message */
   readonly message: string;
-  
+
   /** Recovered data if any */
   readonly data?: unknown;
-  
+
   /** Additional recovery attempts available */
   readonly alternativeStrategies?: string[];
 }
@@ -109,19 +109,19 @@ export interface RecoveryResult {
 export interface UserErrorInfo {
   /** User-friendly error title */
   readonly title: string;
-  
+
   /** Detailed explanation */
   readonly explanation: string;
-  
+
   /** Suggested actions */
   readonly suggestions: string[];
-  
+
   /** Links to documentation */
   readonly documentationLinks?: string[];
-  
+
   /** Whether this is a known issue */
   readonly isKnownIssue: boolean;
-  
+
   /** Workaround if available */
   readonly workaround?: string;
 }
@@ -159,7 +159,7 @@ export class PipelineError extends Error {
     this.errorCode = this.generateErrorCode();
     this.timestamp = new Date();
     this.userInfo = this.generateUserInfo(userInfo);
-    
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, PipelineError);
     }
@@ -202,7 +202,7 @@ export class PipelineError extends Error {
           ],
           isKnownIssue: false,
         };
-      
+
       case 'file-system':
         return {
           title: 'File System Error',
@@ -214,7 +214,7 @@ export class PipelineError extends Error {
           ],
           isKnownIssue: false,
         };
-      
+
       case 'parsing':
         return {
           title: 'Code Parsing Error',
@@ -226,7 +226,7 @@ export class PipelineError extends Error {
           ],
           isKnownIssue: false,
         };
-      
+
       default:
         return {
           title: 'Pipeline Error',
@@ -246,30 +246,30 @@ export class PipelineError extends Error {
    */
   public getDetailedMessage(): string {
     let message = `${this.userInfo.title}: ${this.message}`;
-    
+
     if (this.context.component) {
       message += `\nComponent: ${this.context.component.name}`;
     }
-    
+
     if (this.context.filePath) {
       message += `\nFile: ${this.context.filePath}`;
     }
-    
+
     if (this.context.location) {
       message += `\nLocation: Line ${this.context.location.line}, Column ${this.context.location.column}`;
     }
-    
+
     if (this.context.operation) {
       message += `\nOperation: ${this.context.operation}`;
     }
-    
+
     if (this.originalError) {
       message += `\nCaused by: ${this.originalError.message}`;
     }
-    
+
     message += `\nError Code: ${this.errorCode}`;
     message += `\nTimestamp: ${this.timestamp.toISOString()}`;
-    
+
     return message;
   }
 
@@ -279,7 +279,7 @@ export class PipelineError extends Error {
   public getUserReport(): string {
     let report = `${this.userInfo.title}\n\n`;
     report += `${this.userInfo.explanation}\n\n`;
-    
+
     if (this.userInfo.suggestions.length > 0) {
       report += 'Suggested Actions:\n';
       this.userInfo.suggestions.forEach((suggestion, index) => {
@@ -287,11 +287,11 @@ export class PipelineError extends Error {
       });
       report += '\n';
     }
-    
+
     if (this.userInfo.workaround) {
       report += `Workaround: ${this.userInfo.workaround}\n\n`;
     }
-    
+
     if (this.userInfo.documentationLinks?.length) {
       report += 'Documentation:\n';
       this.userInfo.documentationLinks.forEach(link => {
@@ -299,9 +299,9 @@ export class PipelineError extends Error {
       });
       report += '\n';
     }
-    
+
     report += `Error Code: ${this.errorCode} (for support reference)`;
-    
+
     return report;
   }
 }
@@ -329,9 +329,7 @@ export class ConfigurationError extends PipelineError {
           'Validate JSON syntax if using config file',
           'Ensure all paths are absolute and accessible',
         ],
-        documentationLinks: [
-          'https://docs.example.com/configuration',
-        ],
+        documentationLinks: ['https://docs.example.com/configuration'],
       },
       originalError
     );
@@ -392,9 +390,7 @@ export class ParsingError extends PipelineError {
           'Verify component follows expected patterns',
           'Check for missing imports or dependencies',
         ],
-        documentationLinks: [
-          'https://docs.example.com/component-patterns',
-        ],
+        documentationLinks: ['https://docs.example.com/component-patterns'],
       },
       originalError
     );
@@ -549,9 +545,12 @@ export class RetryStrategy implements ErrorRecoveryStrategy {
     private readonly maxDelay: number = 10000
   ) {}
 
-  public async recover(_error: PipelineError, context: ErrorContext): Promise<RecoveryResult> {
+  public async recover(
+    _error: PipelineError,
+    context: ErrorContext
+  ): Promise<RecoveryResult> {
     const attempt = (context.data?.['attempt'] as number) || 1;
-    
+
     if (attempt >= this.maxAttempts) {
       return {
         success: false,
@@ -589,7 +588,10 @@ export class FallbackStrategy implements ErrorRecoveryStrategy {
     'business-logic',
   ];
 
-  public async recover(error: PipelineError, _context: ErrorContext): Promise<RecoveryResult> {
+  public async recover(
+    error: PipelineError,
+    _context: ErrorContext
+  ): Promise<RecoveryResult> {
     return {
       success: true,
       message: 'Using fallback implementation - manual review may be required',
@@ -613,7 +615,10 @@ export class SkipStrategy implements ErrorRecoveryStrategy {
     'generation',
   ];
 
-  public async recover(error: PipelineError, _context: ErrorContext): Promise<RecoveryResult> {
+  public async recover(
+    error: PipelineError,
+    _context: ErrorContext
+  ): Promise<RecoveryResult> {
     if (error.severity === 'critical') {
       return {
         success: false,
@@ -624,7 +629,8 @@ export class SkipStrategy implements ErrorRecoveryStrategy {
 
     return {
       success: true,
-      message: 'Skipping failed operation and continuing with remaining components',
+      message:
+        'Skipping failed operation and continuing with remaining components',
       data: {
         skipped: true,
         reason: error.message,
@@ -667,9 +673,10 @@ export class ErrorHandler {
     context: ErrorContext = {}
   ): Promise<RecoveryResult | null> {
     // Convert to PipelineError if needed
-    const pipelineError = error instanceof PipelineError 
-      ? error 
-      : this.convertToPipelineError(error, context);
+    const pipelineError =
+      error instanceof PipelineError
+        ? error
+        : this.convertToPipelineError(error, context);
 
     // Add to error history
     this.addToHistory(pipelineError);
@@ -686,7 +693,10 @@ export class ErrorHandler {
             return result;
           }
         } catch (recoveryError) {
-          console.warn(`Recovery strategy ${strategy.name} failed:`, recoveryError);
+          console.warn(
+            `Recovery strategy ${strategy.name} failed:`,
+            recoveryError
+          );
         }
       }
     }
@@ -720,8 +730,10 @@ export class ErrorHandler {
     const errorsBySeverity: Record<string, number> = {};
 
     for (const error of this.errorHistory) {
-      errorsByCategory[error.category] = (errorsByCategory[error.category] || 0) + 1;
-      errorsBySeverity[error.severity] = (errorsBySeverity[error.severity] || 0) + 1;
+      errorsByCategory[error.category] =
+        (errorsByCategory[error.category] || 0) + 1;
+      errorsBySeverity[error.severity] =
+        (errorsBySeverity[error.severity] || 0) + 1;
     }
 
     return {
@@ -755,10 +767,16 @@ export class ErrorHandler {
     } else if (error.message.includes('timeout')) {
       category = 'timeout';
       severity = 'medium';
-    } else if (error.message.includes('memory') || error.message.includes('heap')) {
+    } else if (
+      error.message.includes('memory') ||
+      error.message.includes('heap')
+    ) {
       category = 'memory';
       severity = 'critical';
-    } else if (error.message.includes('parse') || error.message.includes('syntax')) {
+    } else if (
+      error.message.includes('parse') ||
+      error.message.includes('syntax')
+    ) {
       category = 'parsing';
       severity = 'high';
     }
@@ -776,9 +794,13 @@ export class ErrorHandler {
   /**
    * Get applicable recovery strategies for error
    */
-  private getApplicableStrategies(error: PipelineError): ErrorRecoveryStrategy[] {
+  private getApplicableStrategies(
+    error: PipelineError
+  ): ErrorRecoveryStrategy[] {
     return Array.from(this.strategies.values())
-      .filter(strategy => strategy.applicableCategories.includes(error.category))
+      .filter(strategy =>
+        strategy.applicableCategories.includes(error.category)
+      )
       .sort((a, b) => {
         // Prioritize auto-recoverable strategies
         if (a.canAutoRecover && !b.canAutoRecover) return -1;
@@ -792,7 +814,7 @@ export class ErrorHandler {
    */
   private addToHistory(error: PipelineError): void {
     this.errorHistory.push(error);
-    
+
     if (this.errorHistory.length > this.maxHistorySize) {
       this.errorHistory.shift();
     }
@@ -822,15 +844,22 @@ export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
     try {
       return await fn(...args);
     } catch (error) {
-      const recoveryResult = await errorHandler.handleError(error as Error, context);
-      
+      const recoveryResult = await errorHandler.handleError(
+        error as Error,
+        context
+      );
+
       if (recoveryResult?.success) {
         // Retry the operation if recovery suggests it
-        if (recoveryResult.data && typeof recoveryResult.data === 'object' && 'attempt' in recoveryResult.data) {
+        if (
+          recoveryResult.data &&
+          typeof recoveryResult.data === 'object' &&
+          'attempt' in recoveryResult.data
+        ) {
           return fn(...args);
         }
       }
-      
+
       // Re-throw if no recovery or recovery failed
       throw error;
     }
@@ -872,16 +901,22 @@ let globalErrorHandler: ErrorHandler | null = null;
  */
 export function initializeErrorHandling(): void {
   globalErrorHandler = createErrorHandler();
-  
+
   // Set up global error handlers
-  process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', globalErrorHandler?.getUserReport(error));
+  process.on('uncaughtException', error => {
+    console.error(
+      'Uncaught Exception:',
+      globalErrorHandler?.getUserReport(error)
+    );
     process.exit(1);
   });
 
-  process.on('unhandledRejection', (reason) => {
+  process.on('unhandledRejection', reason => {
     const error = reason instanceof Error ? reason : new Error(String(reason));
-    console.error('Unhandled Rejection:', globalErrorHandler?.getUserReport(error));
+    console.error(
+      'Unhandled Rejection:',
+      globalErrorHandler?.getUserReport(error)
+    );
   });
 }
 

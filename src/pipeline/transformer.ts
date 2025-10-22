@@ -12,9 +12,9 @@
 import type {
   ComponentDefinition,
   BusinessLogicDefinition,
-  PropDefinition,
-  ComponentDependency,
-  ReactPattern,
+  // PropDefinition, // TODO: Use for component prop transformation
+  // ComponentDependency, // TODO: Use for dependency analysis
+  // ReactPattern, // TODO: Use for pattern transformation
   MigrationStrategy,
 } from '@/types';
 import { getGlobalLogger } from '@/utils/logging';
@@ -150,8 +150,8 @@ export class BusinessLogicTransformer {
     this.logger.info(`Transforming component ${component.name}`);
 
     const {
-      targetVersion = '2.0.0',
-      preservePatterns = true,
+      // targetVersion = '2.0.0', // TODO: Use for version-specific transformations
+      // preservePatterns = true, // TODO: Use for pattern preservation logic
       transformAPICalls = true,
       addConfiguratorIntegration = true,
       customRules = [],
@@ -180,7 +180,12 @@ export class BusinessLogicTransformer {
       this.transformProps(component, context, transformations);
 
       // Transform business logic
-      this.transformBusinessLogic(component, context, transformations, transformAPICalls);
+      this.transformBusinessLogic(
+        component,
+        context,
+        transformations,
+        transformAPICalls
+      );
 
       // Transform React patterns
       this.transformReactPatterns(component, context, transformations);
@@ -222,16 +227,21 @@ export class BusinessLogicTransformer {
         warnings,
         success: true,
       };
-
     } catch (error) {
-      this.logger.error(`Failed to transform component ${component.name}`, error as Error);
+      this.logger.error(
+        `Failed to transform component ${component.name}`,
+        error as Error
+      );
 
       return {
         component,
         code: '',
         strategy: 'manual-review-required',
         transformations,
-        warnings: [...warnings, error instanceof Error ? error.message : 'Unknown error'],
+        warnings: [
+          ...warnings,
+          error instanceof Error ? error.message : 'Unknown error',
+        ],
         success: false,
       };
     }
@@ -249,11 +259,16 @@ export class BusinessLogicTransformer {
       return 'manual-review-required';
     }
 
-    if (component.reactPatterns.length > 3 || component.businessLogic.length > 5) {
+    if (
+      component.reactPatterns.length > 3 ||
+      component.businessLogic.length > 5
+    ) {
       return 'hybrid-approach';
     }
 
-    if (component.dependencies.some(d => d.type === 'external' && !d.critical)) {
+    if (
+      component.dependencies.some(d => d.type === 'external' && !d.critical)
+    ) {
       return 'pattern-mapping';
     }
 
@@ -321,7 +336,9 @@ export class BusinessLogicTransformer {
 
     for (const prop of component.props) {
       const optional = prop.required ? '' : '?';
-      const description = prop.description ? `  /** ${prop.description} */\n` : '';
+      const description = prop.description
+        ? `  /** ${prop.description} */\n`
+        : '';
 
       propsLines.push(`${description}  ${prop.name}${optional}: ${prop.type};`);
 
@@ -369,7 +386,10 @@ export class BusinessLogicTransformer {
     transformAPICalls: boolean
   ): void {
     for (const logic of component.businessLogic) {
-      const transformedLogic = this.transformLogicFunction(logic, transformAPICalls);
+      const transformedLogic = this.transformLogicFunction(
+        logic,
+        transformAPICalls
+      );
 
       context.helpers.push(transformedLogic);
 
@@ -387,8 +407,13 @@ export class BusinessLogicTransformer {
   /**
    * Transform individual business logic function
    */
-  private transformLogicFunction(logic: BusinessLogicDefinition, transformAPICalls: boolean): string {
-    const params = logic.parameters.map(p => `${p.name}${p.optional ? '?' : ''}: ${p.type}`).join(', ');
+  private transformLogicFunction(
+    logic: BusinessLogicDefinition,
+    transformAPICalls: boolean
+  ): string {
+    const params = logic.parameters
+      .map(p => `${p.name}${p.optional ? '?' : ''}: ${p.type}`)
+      .join(', ');
     const signature = `const ${logic.name} = (${params}): ${logic.returnType} => {`;
 
     const functionBody = [
@@ -398,11 +423,17 @@ export class BusinessLogicTransformer {
     ];
 
     if (transformAPICalls && logic.externalDependencies.length > 0) {
-      functionBody.push(`  // External dependencies: ${logic.externalDependencies.join(', ')}`);
-      functionBody.push(`  // Note: API calls stubbed for Configurator compatibility`);
+      functionBody.push(
+        `  // External dependencies: ${logic.externalDependencies.join(', ')}`
+      );
+      functionBody.push(
+        `  // Note: API calls stubbed for Configurator compatibility`
+      );
     }
 
-    functionBody.push(`  throw new Error('Business logic not yet implemented');`);
+    functionBody.push(
+      `  throw new Error('Business logic not yet implemented');`
+    );
     functionBody.push('};');
 
     return functionBody.join('\n');
@@ -420,7 +451,9 @@ export class BusinessLogicTransformer {
 
     // Add hooks based on detected patterns
     if (patterns.includes('useState')) {
-      context.componentBody.push('  // State management preserved from DAISY v1');
+      context.componentBody.push(
+        '  // State management preserved from DAISY v1'
+      );
       transformations.push({
         type: 'hook',
         from: 'useState',
@@ -454,7 +487,7 @@ export class BusinessLogicTransformer {
    * Add Configurator-specific integration code
    */
   private addConfiguratorIntegration(
-    component: ComponentDefinition,
+    _component: ComponentDefinition, // TODO: Use component metadata for integration
     context: CodeGenContext,
     transformations: AppliedTransformation[]
   ): void {
@@ -504,7 +537,10 @@ export class BusinessLogicTransformer {
   /**
    * Generate final component code
    */
-  private generateCode(component: ComponentDefinition, context: CodeGenContext): string {
+  private generateCode(
+    component: ComponentDefinition,
+    context: CodeGenContext
+  ): string {
     const parts: string[] = [];
 
     // File header
@@ -514,7 +550,9 @@ export class BusinessLogicTransformer {
     parts.push(' * Migrated from DAISY v1 to Configurator v2 architecture');
     parts.push(' * Business logic preserved with functional equivalency');
     parts.push(' *');
-    parts.push(` * @fileoverview ${component.metadata.documentation || component.name}`);
+    parts.push(
+      ` * @fileoverview ${component.metadata.documentation || component.name}`
+    );
     parts.push(' * @version 2.0.0');
     parts.push(' */');
     parts.push('');
@@ -537,8 +575,11 @@ export class BusinessLogicTransformer {
     }
 
     // Component definition
-    const propsParam = component.props.length > 0 ? `props: ${component.name}Props` : '';
-    parts.push(`const ${component.name}: FC<${component.props.length > 0 ? `${component.name}Props` : 'Record<string, never>'}> = (${propsParam}) => {`);
+    const propsParam =
+      component.props.length > 0 ? `props: ${component.name}Props` : '';
+    parts.push(
+      `const ${component.name}: FC<${component.props.length > 0 ? `${component.name}Props` : 'Record<string, never>'}> = (${propsParam}) => {`
+    );
 
     if (context.configuratorIntegration) {
       parts.push(context.configuratorIntegration);
@@ -551,7 +592,9 @@ export class BusinessLogicTransformer {
     }
 
     parts.push('  return (');
-    parts.push('    <div className={`${component.name.toLowerCase()}-component`}>');
+    parts.push(
+      '    <div className={`${component.name.toLowerCase()}-component`}>'
+    );
     parts.push(`      {/* TODO: Implement ${component.name} UI */}`);
     parts.push(`      <p>Component: ${component.name}</p>`);
     parts.push('    </div>');

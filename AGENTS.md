@@ -7,6 +7,7 @@ This document provides comprehensive guidelines for AI agents to ensure all gene
 ## Core Principles
 
 ### 1. TypeScript First
+
 - **Always generate TypeScript files** (`.ts`, `.tsx`) instead of JavaScript unless explicitly required
 - **Enable strict mode** in all TypeScript configurations
 - **Prefer explicit types** over implicit type inference for public APIs
@@ -15,6 +16,7 @@ This document provides comprehensive guidelines for AI agents to ensure all gene
 ### 2. Type Safety Requirements
 
 #### For All Generated Code
+
 ```typescript
 // ✅ GOOD: Explicit types
 interface ComponentProps {
@@ -25,13 +27,18 @@ interface ComponentProps {
 }
 
 // ❌ BAD: Implicit any
-const handleClick = (data) => { /* ... */ };
+const handleClick = data => {
+  /* ... */
+};
 
 // ✅ GOOD: Typed parameters
-const handleClick = (data: UserData): void => { /* ... */ };
+const handleClick = (data: UserData): void => {
+  /* ... */
+};
 ```
 
 #### Required TypeScript Configuration
+
 ```json
 {
   "compilerOptions": {
@@ -57,6 +64,7 @@ const handleClick = (data: UserData): void => { /* ... */ };
 ### React Components
 
 #### Always Use Typed Props
+
 ```typescript
 // ✅ GOOD: Properly typed component
 interface ButtonProps {
@@ -74,18 +82,19 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'medium',
   disabled = false,
   onClick,
-  children
+  children,
 }) => {
   // Implementation
 };
 
 // ❌ BAD: Untyped component
-export const Button = (props) => {
+export const Button = props => {
   // Implementation
 };
 ```
 
 #### Use Proper Event Types
+
 ```typescript
 // ✅ GOOD: Typed events
 const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -99,12 +108,15 @@ const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
 };
 
 // ❌ BAD: Generic or untyped events
-const handleChange = (e: any) => { /* ... */ };
+const handleChange = (e: any) => {
+  /* ... */
+};
 ```
 
 ### State Management
 
 #### Typed State
+
 ```typescript
 // ✅ GOOD: Typed state
 interface AppState {
@@ -116,7 +128,7 @@ interface AppState {
 const [state, setState] = useState<AppState>({
   user: null,
   isLoading: false,
-  errors: []
+  errors: [],
 });
 
 // ❌ BAD: Untyped state
@@ -124,6 +136,7 @@ const [state, setState] = useState({});
 ```
 
 #### Typed Context
+
 ```typescript
 // ✅ GOOD: Typed context
 interface ThemeContextType {
@@ -131,7 +144,9 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = React.createContext<ThemeContextType | undefined>(
+  undefined
+);
 
 // Custom hook with type guard
 export const useTheme = (): ThemeContextType => {
@@ -146,6 +161,7 @@ export const useTheme = (): ThemeContextType => {
 ## API and Data Handling
 
 ### Type-Safe API Calls
+
 ```typescript
 // ✅ GOOD: Typed API response
 interface ApiResponse<T> {
@@ -165,7 +181,7 @@ async function fetchUser(id: string): Promise<ApiResponse<User>> {
 
   return {
     data,
-    status: response.status
+    status: response.status,
   };
 }
 
@@ -183,6 +199,7 @@ function isValidUser(data: unknown): data is User {
 ```
 
 ### Zod for Runtime Validation
+
 ```typescript
 import { z } from 'zod';
 
@@ -191,7 +208,7 @@ const UserSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1),
   email: z.string().email(),
-  age: z.number().int().positive().optional()
+  age: z.number().int().positive().optional(),
 });
 
 // Infer TypeScript type from schema
@@ -208,6 +225,7 @@ function parseUserData(data: unknown): User {
 ### Type-Safe Markdown Generation
 
 #### Use Template Literals with Type Checking
+
 ```typescript
 interface MarkdownSection {
   title: string;
@@ -254,6 +272,7 @@ class MarkdownBuilder {
 ```
 
 #### Validate Markdown Structure
+
 ```typescript
 interface DocumentStructure {
   title: string;
@@ -294,6 +313,7 @@ function generateDocument(structure: DocumentStructure): string {
 ## File System Operations
 
 ### Type-Safe File Operations
+
 ```typescript
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -335,6 +355,7 @@ async function readJsonFile<T>(filePath: string): Promise<T> {
 ## Testing Guidelines
 
 ### Type-Safe Testing
+
 ```typescript
 import { describe, it, expect, beforeEach } from '@jest/globals';
 
@@ -352,7 +373,7 @@ describe('User Service', () => {
     testUser = {
       id: '123',
       name: 'Test User',
-      email: 'test@example.com'
+      email: 'test@example.com',
     };
   });
 
@@ -361,20 +382,21 @@ describe('User Service', () => {
 
     expect(result).toMatchObject<Partial<TestUser>>({
       name: testUser.name,
-      email: testUser.email
+      email: testUser.email,
     });
   });
 });
 ```
 
 ### Mock Types
+
 ```typescript
 // Type-safe mocks
 const mockUserService: jest.Mocked<UserService> = {
   getUser: jest.fn(),
   createUser: jest.fn(),
   updateUser: jest.fn(),
-  deleteUser: jest.fn()
+  deleteUser: jest.fn(),
 };
 
 // Type-safe mock implementations
@@ -388,6 +410,7 @@ mockUserService.getUser.mockImplementation(
 ## Configuration Files
 
 ### Package.json Scripts
+
 ```json
 {
   "scripts": {
@@ -401,25 +424,26 @@ mockUserService.getUser.mockImplementation(
 ```
 
 ### ESLint Configuration for TypeScript
+
 ```javascript
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
-    project: './tsconfig.json'
+    project: './tsconfig.json',
   },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking'
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/strict-boolean-expressions': 'error'
-  }
+    '@typescript-eslint/strict-boolean-expressions': 'error',
+  },
 };
 ```
 
@@ -428,6 +452,7 @@ module.exports = {
 ### Do's ✅
 
 1. **Always define return types for functions**
+
    ```typescript
    function calculate(a: number, b: number): number {
      return a + b;
@@ -435,6 +460,7 @@ module.exports = {
    ```
 
 2. **Use discriminated unions for complex types**
+
    ```typescript
    type Result<T> =
      | { success: true; data: T }
@@ -442,9 +468,10 @@ module.exports = {
    ```
 
 3. **Leverage const assertions**
+
    ```typescript
    const COLORS = ['red', 'green', 'blue'] as const;
-   type Color = typeof COLORS[number]; // 'red' | 'green' | 'blue'
+   type Color = (typeof COLORS)[number]; // 'red' | 'green' | 'blue'
    ```
 
 4. **Use unknown instead of any for unknown types**
@@ -459,6 +486,7 @@ module.exports = {
 ### Don'ts ❌
 
 1. **Never use `any` type**
+
    ```typescript
    // ❌ BAD
    let data: any = fetchData();
@@ -468,6 +496,7 @@ module.exports = {
    ```
 
 2. **Avoid type assertions without validation**
+
    ```typescript
    // ❌ BAD
    const user = data as User;
@@ -477,6 +506,7 @@ module.exports = {
    ```
 
 3. **Don't ignore TypeScript errors**
+
    ```typescript
    // ❌ BAD
    // @ts-ignore

@@ -1,10 +1,10 @@
 /**
  * Component Discovery Engine
- * 
+ *
  * Scans DAISY v1 codebase to identify React components and extract
  * metadata for migration analysis. Provides comprehensive component
  * discovery with pattern detection and metadata extraction.
- * 
+ *
  * @fileoverview Component discovery and metadata extraction engine
  * @version 1.0.0
  */
@@ -38,16 +38,16 @@ import { PipelineError, FileSystemError } from '@/utils/errors';
 export interface DiscoveryResult {
   /** Discovered components */
   readonly components: ComponentDefinition[];
-  
+
   /** Discovery statistics */
   readonly statistics: DiscoveryStatistics;
-  
+
   /** Discovery duration */
   readonly duration: number;
-  
+
   /** Any errors encountered during discovery */
   readonly errors: PipelineError[];
-  
+
   /** Files that were skipped */
   readonly skippedFiles: string[];
 }
@@ -58,22 +58,22 @@ export interface DiscoveryResult {
 export interface DiscoveryStatistics {
   /** Total files scanned */
   readonly filesScanned: number;
-  
+
   /** Component files found */
   readonly componentFiles: number;
-  
+
   /** Total components discovered */
   readonly componentsFound: number;
-  
+
   /** Components by type */
   readonly componentsByType: Record<ComponentType, number>;
-  
+
   /** Components by complexity */
   readonly componentsByComplexity: Record<ComplexityLevel, number>;
-  
+
   /** React patterns detected */
   readonly reactPatterns: Record<ReactPattern, number>;
-  
+
   /** Average complexity score */
   readonly averageComplexity: number;
 }
@@ -84,22 +84,22 @@ export interface DiscoveryStatistics {
 export interface DiscoveryOptions {
   /** File patterns to include */
   readonly includePatterns?: string[];
-  
+
   /** File patterns to exclude */
   readonly excludePatterns?: string[];
-  
+
   /** Maximum files to process */
   readonly maxFiles?: number;
-  
+
   /** Enable parallel processing */
   readonly parallel?: boolean;
-  
+
   /** Number of worker threads */
   readonly workers?: number;
-  
+
   /** Skip files with errors */
   readonly skipErrors?: boolean;
-  
+
   /** Extract detailed metadata */
   readonly extractMetadata?: boolean;
 }
@@ -110,16 +110,16 @@ export interface DiscoveryOptions {
 interface FileAnalysisResult {
   /** File path */
   readonly filePath: string;
-  
+
   /** Discovered components */
   readonly components: ComponentDefinition[];
-  
+
   /** Analysis errors */
   readonly errors: PipelineError[];
-  
+
   /** Whether file was skipped */
   readonly skipped: boolean;
-  
+
   /** Analysis duration */
   readonly duration: number;
 }
@@ -145,14 +145,14 @@ export class ComponentDiscoveryEngine {
     this.config = config;
     this.logger = logger;
     this.fileManager = new FileSystemManager();
-    
+
     // Set default options
     this.discoveryOptions = {
       includePatterns: options.includePatterns || [
         '**/*.tsx',
         '**/*.ts',
         '**/*.jsx',
-        '**/*.js'
+        '**/*.js',
       ],
       excludePatterns: options.excludePatterns || [
         '**/node_modules/**',
@@ -162,13 +162,13 @@ export class ComponentDiscoveryEngine {
         '**/*.spec.*',
         '**/*.d.ts',
         '**/.git/**',
-        '**/coverage/**'
+        '**/coverage/**',
       ],
       maxFiles: options.maxFiles || 10000,
       parallel: options.parallel ?? true,
       workers: options.workers || 4,
       skipErrors: options.skipErrors ?? true,
-      extractMetadata: options.extractMetadata ?? true
+      extractMetadata: options.extractMetadata ?? true,
     };
   }
 
@@ -177,53 +177,56 @@ export class ComponentDiscoveryEngine {
    */
   public async discoverComponents(): Promise<DiscoveryResult> {
     const startTime = Date.now();
-    
+
     this.logger.info('Starting component discovery', {
       sourcePath: this.config.sourcePath,
-      options: this.discoveryOptions
+      options: this.discoveryOptions,
     });
 
     try {
       // Find all candidate files
       const candidateFiles = await this.findCandidateFiles();
-      
+
       this.logger.debug('Found candidate files', {
         count: candidateFiles.length,
-        patterns: this.discoveryOptions.includePatterns
+        patterns: this.discoveryOptions.includePatterns,
       });
 
       // Analyze files for components
       const analysisResults = await this.analyzeFiles(candidateFiles);
-      
+
       // Aggregate results
-      const result = this.aggregateResults(analysisResults, Date.now() - startTime);
-      
+      const result = this.aggregateResults(
+        analysisResults,
+        Date.now() - startTime
+      );
+
       this.logger.info('Component discovery completed', {
         duration: `${result.duration}ms`,
         componentsFound: result.components.length,
         filesScanned: result.statistics.filesScanned,
-        errorsCount: result.errors.length
+        errorsCount: result.errors.length,
       });
 
       return result;
-      
     } catch (error) {
-      const pipelineError = error instanceof PipelineError 
-        ? error 
-        : new FileSystemError(
-            'Component discovery failed',
-            { operation: 'discover-components' },
-            error as Error
-          );
-      
+      const pipelineError =
+        error instanceof PipelineError
+          ? error
+          : new FileSystemError(
+              'Component discovery failed',
+              { operation: 'discover-components' },
+              error as Error
+            );
+
       this.logger.error('Component discovery failed', pipelineError);
-      
+
       return {
         components: [],
         statistics: this.createEmptyStatistics(),
         duration: Date.now() - startTime,
         errors: [pipelineError],
-        skippedFiles: []
+        skippedFiles: [],
       };
     }
   }
@@ -233,12 +236,15 @@ export class ComponentDiscoveryEngine {
    */
   private async findCandidateFiles(): Promise<string[]> {
     try {
-      const result = await this.fileManager.scanDirectory(this.config.sourcePath, {
-        include: this.discoveryOptions.includePatterns,
-        exclude: this.discoveryOptions.excludePatterns,
-        recursive: true,
-        maxDepth: 10
-      });
+      const result = await this.fileManager.scanDirectory(
+        this.config.sourcePath,
+        {
+          include: this.discoveryOptions.includePatterns,
+          exclude: this.discoveryOptions.excludePatterns,
+          recursive: true,
+          maxDepth: 10,
+        }
+      );
 
       const candidateFiles = result.files
         .map(file => file.path)
@@ -254,7 +260,9 @@ export class ComponentDiscoveryEngine {
   /**
    * Analyze files for component content
    */
-  private async analyzeFiles(filePaths: string[]): Promise<FileAnalysisResult[]> {
+  private async analyzeFiles(
+    filePaths: string[]
+  ): Promise<FileAnalysisResult[]> {
     if (this.discoveryOptions.parallel) {
       return this.analyzeFilesParallel(filePaths);
     } else {
@@ -265,50 +273,54 @@ export class ComponentDiscoveryEngine {
   /**
    * Analyze files sequentially
    */
-  private async analyzeFilesSequential(filePaths: string[]): Promise<FileAnalysisResult[]> {
+  private async analyzeFilesSequential(
+    filePaths: string[]
+  ): Promise<FileAnalysisResult[]> {
     const results: FileAnalysisResult[] = [];
-    
+
     for (const filePath of filePaths) {
       const result = await this.analyzeFile(filePath);
       results.push(result);
-      
+
       // Log progress
       if (results.length % 100 === 0) {
         this.logger.debug('Analysis progress', {
           processed: results.length,
           total: filePaths.length,
-          percentage: Math.round((results.length / filePaths.length) * 100)
+          percentage: Math.round((results.length / filePaths.length) * 100),
         });
       }
     }
-    
+
     return results;
   }
 
   /**
    * Analyze files in parallel (simplified for now)
    */
-  private async analyzeFilesParallel(filePaths: string[]): Promise<FileAnalysisResult[]> {
+  private async analyzeFilesParallel(
+    filePaths: string[]
+  ): Promise<FileAnalysisResult[]> {
     // For now, use Promise.all with limited concurrency
     const BATCH_SIZE = this.discoveryOptions.workers;
     const results: FileAnalysisResult[] = [];
-    
+
     for (let i = 0; i < filePaths.length; i += BATCH_SIZE) {
       const batch = filePaths.slice(i, i + BATCH_SIZE);
       const batchResults = await Promise.all(
         batch.map(filePath => this.analyzeFile(filePath))
       );
-      
+
       results.push(...batchResults);
-      
+
       // Log progress
       this.logger.debug('Parallel analysis progress', {
         processed: results.length,
         total: filePaths.length,
-        percentage: Math.round((results.length / filePaths.length) * 100)
+        percentage: Math.round((results.length / filePaths.length) * 100),
       });
     }
-    
+
     return results;
   }
 
@@ -317,11 +329,11 @@ export class ComponentDiscoveryEngine {
    */
   private async analyzeFile(filePath: string): Promise<FileAnalysisResult> {
     const startTime = Date.now();
-    
+
     try {
       // Read file content
       const content = await fs.readFile(filePath, 'utf-8');
-      
+
       // Quick check if file contains React components
       if (!this.isLikelyComponentFile(content)) {
         return {
@@ -329,40 +341,42 @@ export class ComponentDiscoveryEngine {
           components: [],
           errors: [],
           skipped: true,
-          duration: Date.now() - startTime
+          duration: Date.now() - startTime,
         };
       }
 
       // Extract components from file
-      const components = await this.extractComponentsFromFile(filePath, content);
-      
+      const components = await this.extractComponentsFromFile(
+        filePath,
+        content
+      );
+
       return {
         filePath,
         components,
         errors: [],
         skipped: false,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       };
-      
     } catch (error) {
       const pipelineError = new FileSystemError(
         `Failed to analyze file: ${filePath}`,
         { filePath },
         error as Error
       );
-      
+
       if (this.discoveryOptions.skipErrors) {
         this.logger.warn('Skipping file due to error', {
           filePath,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         });
-        
+
         return {
           filePath,
           components: [],
           errors: [pipelineError],
           skipped: true,
-          duration: Date.now() - startTime
+          duration: Date.now() - startTime,
         };
       } else {
         throw pipelineError;
@@ -377,25 +391,28 @@ export class ComponentDiscoveryEngine {
     // Check for React imports
     const hasReactImport = /import\s+.*React/.test(content);
     const hasJSXSyntax = /<\w+/.test(content);
-    const hasComponentExport = /export\s+(default\s+)?(function|const|class)\s+[A-Z]/.test(content);
+    const hasComponentExport =
+      /export\s+(default\s+)?(function|const|class)\s+[A-Z]/.test(content);
     const hasReactHooks = /use[A-Z]\w*\s*\(/.test(content);
-    
+
     // File is likely a component if it has React patterns
-    return hasReactImport || hasJSXSyntax || hasComponentExport || hasReactHooks;
+    return (
+      hasReactImport || hasJSXSyntax || hasComponentExport || hasReactHooks
+    );
   }
 
   /**
    * Extract components from file content
    */
   private async extractComponentsFromFile(
-    filePath: string, 
+    filePath: string,
     content: string
   ): Promise<ComponentDefinition[]> {
     const components: ComponentDefinition[] = [];
-    
+
     // Extract component names and basic info
     const componentMatches = this.findComponentDeclarations(content);
-    
+
     for (const match of componentMatches) {
       try {
         const component = await this.createComponentDefinition(
@@ -403,7 +420,7 @@ export class ComponentDiscoveryEngine {
           content,
           match
         );
-        
+
         if (component) {
           components.push(component);
         }
@@ -411,11 +428,11 @@ export class ComponentDiscoveryEngine {
         this.logger.warn('Failed to create component definition', {
           filePath,
           componentName: match.name,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     }
-    
+
     return components;
   }
 
@@ -445,7 +462,7 @@ export class ComponentDiscoveryEngine {
           name: match[1],
           type: 'functional',
           startIndex: match.index,
-          endIndex: match.index + match[0].length
+          endIndex: match.index + match[0].length,
         });
       }
     }
@@ -460,7 +477,7 @@ export class ComponentDiscoveryEngine {
           name: match[1],
           type: 'functional',
           startIndex: match.index,
-          endIndex: match.index + match[0].length
+          endIndex: match.index + match[0].length,
         });
       }
     }
@@ -475,7 +492,7 @@ export class ComponentDiscoveryEngine {
           name: match[1],
           type: 'functional',
           startIndex: match.index,
-          endIndex: match.index + match[0].length
+          endIndex: match.index + match[0].length,
         });
       }
     }
@@ -490,7 +507,7 @@ export class ComponentDiscoveryEngine {
           name: match[1],
           type: 'class',
           startIndex: match.index,
-          endIndex: match.index + match[0].length
+          endIndex: match.index + match[0].length,
         });
       }
     }
@@ -505,7 +522,7 @@ export class ComponentDiscoveryEngine {
           name: match[1],
           type: 'hook',
           startIndex: match.index,
-          endIndex: match.index + match[0].length
+          endIndex: match.index + match[0].length,
         });
       }
     }
@@ -527,16 +544,21 @@ export class ComponentDiscoveryEngine {
     }
   ): Promise<ComponentDefinition | null> {
     const componentId = `${relative(this.config.sourcePath, filePath)}:${match.name}`;
-    
+
     // Extract basic component info
     const props = this.extractProps(content, match);
     const businessLogic = this.extractBusinessLogic(content, match);
     const reactPatterns = this.detectReactPatterns(content);
     const dependencies = this.extractDependencies(content);
-    const complexity = this.assessComplexity(content, props, businessLogic, reactPatterns);
-    
+    const complexity = this.assessComplexity(
+      content,
+      props,
+      businessLogic,
+      reactPatterns
+    );
+
     // Create metadata
-    const metadata = this.discoveryOptions.extractMetadata 
+    const metadata = this.discoveryOptions.extractMetadata
       ? await this.createComponentMetadata(filePath, content, match)
       : this.createMinimalMetadata();
 
@@ -551,7 +573,7 @@ export class ComponentDiscoveryEngine {
       dependencies,
       complexity,
       migrationStatus: 'pending',
-      metadata
+      metadata,
     };
 
     return component;
@@ -561,24 +583,22 @@ export class ComponentDiscoveryEngine {
    * Extract component props from content
    */
   private extractProps(
-    content: string, 
+    content: string,
     match: { name: string; type: ComponentType }
   ): PropDefinition[] {
     const props: PropDefinition[] = [];
-    
+
     // Look for TypeScript interface definitions
     const interfacePattern = new RegExp(
       `interface\\s+${match.name}Props\\s*\\{([^}]+)\\}`,
       's'
     );
     const interfaceMatch = content.match(interfacePattern);
-    
+
     if (interfaceMatch && interfaceMatch[1]) {
       const propsContent = interfaceMatch[1];
-      const propMatches = propsContent.matchAll(
-        /(\w+)(\?)?:\s*([^;,\n]+)/g
-      );
-      
+      const propMatches = propsContent.matchAll(/(\w+)(\?)?:\s*([^;,\n]+)/g);
+
       for (const propMatch of propMatches) {
         if (propMatch[1] && propMatch[3]) {
           props.push({
@@ -586,12 +606,12 @@ export class ComponentDiscoveryEngine {
             type: propMatch[3].trim(),
             required: !propMatch[2], // No ? means required
             description: `Prop for ${match.name}`,
-            defaultValue: undefined
+            defaultValue: undefined,
           });
         }
       }
     }
-    
+
     return props;
   }
 
@@ -603,15 +623,19 @@ export class ComponentDiscoveryEngine {
     match: { name: string; type: ComponentType }
   ): BusinessLogicDefinition[] {
     const businessLogic: BusinessLogicDefinition[] = [];
-    
+
     // Find function definitions within the component
-    const functionPattern = /(?:const\s+|function\s+)(\w+)\s*[=:]?\s*\([^)]*\)\s*(?:=>)?\s*\{/g;
+    const functionPattern =
+      /(?:const\s+|function\s+)(\w+)\s*[=:]?\s*\([^)]*\)\s*(?:=>)?\s*\{/g;
     const functionMatches = content.matchAll(functionPattern);
-    
+
     for (const funcMatch of functionMatches) {
       // Skip constructor and render methods
       const functionName = funcMatch[1];
-      if (functionName && !['constructor', 'render', 'componentDidMount'].includes(functionName)) {
+      if (
+        functionName &&
+        !['constructor', 'render', 'componentDidMount'].includes(functionName)
+      ) {
         businessLogic.push({
           name: functionName,
           signature: `${functionName}()`, // Simplified signature
@@ -619,11 +643,11 @@ export class ComponentDiscoveryEngine {
           parameters: [], // Would need more sophisticated parsing
           returnType: 'unknown',
           complexity: 'simple',
-          externalDependencies: []
+          externalDependencies: [],
         });
       }
     }
-    
+
     return businessLogic;
   }
 
@@ -632,7 +656,7 @@ export class ComponentDiscoveryEngine {
    */
   private detectReactPatterns(content: string): ReactPattern[] {
     const patterns: ReactPattern[] = [];
-    
+
     // Check for hooks
     if (/useState\s*\(/.test(content)) patterns.push('useState');
     if (/useEffect\s*\(/.test(content)) patterns.push('useEffect');
@@ -640,16 +664,16 @@ export class ComponentDiscoveryEngine {
     if (/useReducer\s*\(/.test(content)) patterns.push('useReducer');
     if (/useMemo\s*\(/.test(content)) patterns.push('useMemo');
     if (/useCallback\s*\(/.test(content)) patterns.push('useCallback');
-    
+
     // Check for custom hooks
     if (/use[A-Z]\w*\s*\(/.test(content)) patterns.push('custom-hook');
-    
+
     // Check for render props
     if (/\{.*\(.*\)\s*=>/.test(content)) patterns.push('render-props');
-    
+
     // Check for children as function
     if (/children\s*\(/.test(content)) patterns.push('children-as-function');
-    
+
     return patterns;
   }
 
@@ -658,16 +682,17 @@ export class ComponentDiscoveryEngine {
    */
   private extractDependencies(content: string): ComponentDependency[] {
     const dependencies: ComponentDependency[] = [];
-    
+
     // Find import statements
-    const importPattern = /import\s+(?:\{[^}]+\}|\w+|[*]\s+as\s+\w+)\s+from\s+['"]([^'"]+)['"]/g;
+    const importPattern =
+      /import\s+(?:\{[^}]+\}|\w+|[*]\s+as\s+\w+)\s+from\s+['"]([^'"]+)['"]/g;
     const imports = content.matchAll(importPattern);
-    
+
     for (const importMatch of imports) {
       const importPath = importMatch[1];
-      
+
       if (!importPath) continue;
-      
+
       // Determine dependency type
       let type: ComponentDependency['type'];
       if (importPath.startsWith('./') || importPath.startsWith('../')) {
@@ -679,15 +704,15 @@ export class ComponentDiscoveryEngine {
       } else {
         type = 'service';
       }
-      
+
       dependencies.push({
         name: basename(importPath, extname(importPath)),
         type,
         importPath,
-        critical: importPath.includes('react')
+        critical: importPath.includes('react'),
       });
     }
-    
+
     return dependencies;
   }
 
@@ -701,20 +726,20 @@ export class ComponentDiscoveryEngine {
     reactPatterns: ReactPattern[]
   ): ComplexityLevel {
     let score = 0;
-    
+
     // Factor in props count
     score += props.length * 2;
-    
+
     // Factor in business logic
     score += businessLogic.length * 5;
-    
+
     // Factor in React patterns
     score += reactPatterns.length * 3;
-    
+
     // Factor in file length
     const lines = content.split('\n').length;
     score += Math.floor(lines / 50);
-    
+
     // Classify complexity
     if (score <= 10) return 'simple';
     if (score <= 25) return 'moderate';
@@ -731,14 +756,14 @@ export class ComponentDiscoveryEngine {
     match: { name: string; type: ComponentType }
   ): Promise<ComponentMetadata> {
     const stats = await fs.stat(filePath);
-    
+
     return {
       createdAt: stats.birthtime,
       lastModified: stats.mtime,
       author: 'Unknown',
       documentation: `Component ${match.name} from ${basename(filePath)}`,
       performance: this.createPerformanceMetadata(content),
-      testing: this.createTestingMetadata(filePath)
+      testing: this.createTestingMetadata(filePath),
     };
   }
 
@@ -752,11 +777,11 @@ export class ComponentDiscoveryEngine {
       author: 'Unknown',
       performance: {
         bundleSize: 0,
-        memoryUsage: '0KB'
+        memoryUsage: '0KB',
       },
       testing: {
-        coverage: 0
-      }
+        coverage: 0,
+      },
     };
   }
 
@@ -766,7 +791,7 @@ export class ComponentDiscoveryEngine {
   private createPerformanceMetadata(content: string): PerformanceMetadata {
     return {
       bundleSize: Buffer.from(content).length,
-      memoryUsage: '0KB'
+      memoryUsage: '0KB',
     };
   }
 
@@ -781,17 +806,17 @@ export class ComponentDiscoveryEngine {
       `${name}.test.ts`,
       `${name}.test.tsx`,
       `${name}.spec.ts`,
-      `${name}.spec.tsx`
+      `${name}.spec.tsx`,
     ];
-    
+
     const firstPattern = testPatterns[0];
     if (!firstPattern) {
       throw new Error('No test patterns found');
     }
-    
+
     return {
       coverage: 0,
-      testPath: resolve(dir, firstPattern)
+      testPath: resolve(dir, firstPattern),
     };
   }
 
@@ -805,26 +830,26 @@ export class ComponentDiscoveryEngine {
     const components: ComponentDefinition[] = [];
     const errors: PipelineError[] = [];
     const skippedFiles: string[] = [];
-    
+
     // Collect all components and errors
     for (const result of analysisResults) {
       components.push(...result.components);
       errors.push(...result.errors);
-      
+
       if (result.skipped) {
         skippedFiles.push(result.filePath);
       }
     }
-    
+
     // Calculate statistics
     const statistics = this.calculateStatistics(analysisResults, components);
-    
+
     return {
       components,
       statistics,
       duration,
       errors,
-      skippedFiles
+      skippedFiles,
     };
   }
 
@@ -840,16 +865,16 @@ export class ComponentDiscoveryEngine {
       class: 0,
       'higher-order': 0,
       hook: 0,
-      utility: 0
+      utility: 0,
     };
-    
+
     const componentsByComplexity: Record<ComplexityLevel, number> = {
       simple: 0,
       moderate: 0,
       complex: 0,
-      critical: 0
+      critical: 0,
     };
-    
+
     const reactPatterns: Record<ReactPattern, number> = {
       useState: 0,
       useEffect: 0,
@@ -859,44 +884,44 @@ export class ComponentDiscoveryEngine {
       useCallback: 0,
       'custom-hook': 0,
       'render-props': 0,
-      'children-as-function': 0
+      'children-as-function': 0,
     };
-    
+
     // Count components by type and complexity
     for (const component of components) {
       componentsByType[component.type]++;
       componentsByComplexity[component.complexity]++;
-      
+
       // Count React patterns
       for (const pattern of component.reactPatterns) {
         reactPatterns[pattern]++;
       }
     }
-    
+
     // Calculate average complexity
     const complexityScores = {
       simple: 1,
       moderate: 2,
       complex: 3,
-      critical: 4
+      critical: 4,
     };
-    
+
     const totalComplexity = components.reduce(
-      (sum, comp) => sum + complexityScores[comp.complexity], 
+      (sum, comp) => sum + complexityScores[comp.complexity],
       0
     );
-    const averageComplexity = components.length > 0 
-      ? totalComplexity / components.length 
-      : 0;
-    
+    const averageComplexity =
+      components.length > 0 ? totalComplexity / components.length : 0;
+
     return {
       filesScanned: analysisResults.length,
-      componentFiles: analysisResults.filter(r => r.components.length > 0).length,
+      componentFiles: analysisResults.filter(r => r.components.length > 0)
+        .length,
       componentsFound: components.length,
       componentsByType,
       componentsByComplexity,
       reactPatterns,
-      averageComplexity
+      averageComplexity,
     };
   }
 
@@ -913,13 +938,13 @@ export class ComponentDiscoveryEngine {
         class: 0,
         'higher-order': 0,
         hook: 0,
-        utility: 0
+        utility: 0,
       },
       componentsByComplexity: {
         simple: 0,
         moderate: 0,
         complex: 0,
-        critical: 0
+        critical: 0,
       },
       reactPatterns: {
         useState: 0,
@@ -930,9 +955,9 @@ export class ComponentDiscoveryEngine {
         useCallback: 0,
         'custom-hook': 0,
         'render-props': 0,
-        'children-as-function': 0
+        'children-as-function': 0,
       },
-      averageComplexity: 0
+      averageComplexity: 0,
     };
   }
 }
@@ -964,9 +989,9 @@ export async function discoverComponentsInFiles(
     includePatterns: filePaths,
     excludePatterns: [],
     parallel: false,
-    extractMetadata: false
+    extractMetadata: false,
   });
-  
+
   const result = await engine.discoverComponents();
   return result.components;
 }
@@ -976,12 +1001,12 @@ export async function discoverComponentsInFiles(
  */
 export function formatDiscoveryResults(result: DiscoveryResult): string {
   const lines: string[] = [];
-  
+
   lines.push('='.repeat(60));
   lines.push('COMPONENT DISCOVERY RESULTS');
   lines.push('='.repeat(60));
   lines.push('');
-  
+
   // Summary
   lines.push('📊 SUMMARY');
   lines.push(`Files Scanned: ${result.statistics.filesScanned}`);
@@ -991,35 +1016,43 @@ export function formatDiscoveryResults(result: DiscoveryResult): string {
   lines.push(`Errors: ${result.errors.length}`);
   lines.push(`Skipped Files: ${result.skippedFiles.length}`);
   lines.push('');
-  
+
   // Components by type
   lines.push('📝 COMPONENTS BY TYPE');
-  Object.entries(result.statistics.componentsByType).forEach(([type, count]) => {
-    if (count > 0) {
-      lines.push(`${type}: ${count}`);
+  Object.entries(result.statistics.componentsByType).forEach(
+    ([type, count]) => {
+      if (count > 0) {
+        lines.push(`${type}: ${count}`);
+      }
     }
-  });
+  );
   lines.push('');
-  
+
   // Components by complexity
   lines.push('⚡ COMPLEXITY DISTRIBUTION');
-  Object.entries(result.statistics.componentsByComplexity).forEach(([complexity, count]) => {
-    if (count > 0) {
-      lines.push(`${complexity}: ${count}`);
+  Object.entries(result.statistics.componentsByComplexity).forEach(
+    ([complexity, count]) => {
+      if (count > 0) {
+        lines.push(`${complexity}: ${count}`);
+      }
     }
-  });
-  lines.push(`Average Complexity: ${result.statistics.averageComplexity.toFixed(2)}`);
+  );
+  lines.push(
+    `Average Complexity: ${result.statistics.averageComplexity.toFixed(2)}`
+  );
   lines.push('');
-  
+
   // React patterns
   lines.push('⚛️ REACT PATTERNS');
-  Object.entries(result.statistics.reactPatterns).forEach(([pattern, count]) => {
-    if (count > 0) {
-      lines.push(`${pattern}: ${count}`);
+  Object.entries(result.statistics.reactPatterns).forEach(
+    ([pattern, count]) => {
+      if (count > 0) {
+        lines.push(`${pattern}: ${count}`);
+      }
     }
-  });
+  );
   lines.push('');
-  
+
   // Error summary
   if (result.errors.length > 0) {
     lines.push('❌ ERRORS');
@@ -1031,6 +1064,6 @@ export function formatDiscoveryResults(result: DiscoveryResult): string {
     }
     lines.push('');
   }
-  
+
   return lines.join('\n');
 }

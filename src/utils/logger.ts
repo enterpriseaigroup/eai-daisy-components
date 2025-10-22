@@ -64,7 +64,10 @@ export function getLogger(name: string, level?: LogLevel) {
  * @param message - Log message
  * @param context - Optional context data
  */
-export function logInfo(message: string, context?: Record<string, unknown>): void {
+export function logInfo(
+  message: string,
+  context?: Record<string, unknown>
+): void {
   const logger = getGlobalLogger('default');
   logger.info(message, context);
 }
@@ -91,7 +94,10 @@ export function logError(
  * @param message - Warning message
  * @param context - Optional context data
  */
-export function logWarning(message: string, context?: Record<string, unknown>): void {
+export function logWarning(
+  message: string,
+  context?: Record<string, unknown>
+): void {
   const logger = getGlobalLogger('default');
   logger.warn(message, context);
 }
@@ -102,7 +108,10 @@ export function logWarning(message: string, context?: Record<string, unknown>): 
  * @param message - Debug message
  * @param context - Optional context data
  */
-export function logDebug(message: string, context?: Record<string, unknown>): void {
+export function logDebug(
+  message: string,
+  context?: Record<string, unknown>
+): void {
   const logger = getGlobalLogger('default');
   logger.debug(message, context);
 }
@@ -147,7 +156,10 @@ export function createScopedLogger(
  * @param componentName - Name of component being extracted
  * @param sourcePath - Source file path
  */
-export function logExtractionStart(componentName: string, sourcePath: string): void {
+export function logExtractionStart(
+  componentName: string,
+  sourcePath: string
+): void {
   const logger = getGlobalLogger('extractor');
   logger.info(`Starting extraction: ${componentName}`, { sourcePath });
 }
@@ -167,9 +179,15 @@ export function logExtractionComplete(
   const logger = getGlobalLogger('extractor');
 
   if (success) {
-    logger.info(`Extraction completed: ${componentName}`, { duration, success });
+    logger.info(`Extraction completed: ${componentName}`, {
+      duration,
+      success,
+    });
   } else {
-    logger.error(`Extraction failed: ${componentName}`, undefined, { duration, success });
+    logger.error(`Extraction failed: ${componentName}`, undefined, {
+      duration,
+      success,
+    });
   }
 }
 

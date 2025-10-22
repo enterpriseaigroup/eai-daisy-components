@@ -1,7 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  
+
   // Module resolution
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -23,15 +23,16 @@ module.exports = {
 
   // Transform configuration
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json',
-    }],
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.test.json',
+      },
+    ],
   },
 
   // Setup files
-  setupFilesAfterEnv: [
-    '<rootDir>/tests/setup.ts',
-  ],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
 
   // Coverage configuration
   collectCoverageFrom: [
@@ -43,13 +44,7 @@ module.exports = {
     '!src/cli.ts',
   ],
 
-  coverageReporters: [
-    'text',
-    'text-summary',
-    'html',
-    'lcov',
-    'clover',
-  ],
+  coverageReporters: ['text', 'text-summary', 'html', 'lcov', 'clover'],
 
   coverageDirectory: 'coverage',
 
@@ -87,10 +82,7 @@ module.exports = {
   maxWorkers: '50%',
 
   // Module path ignore patterns
-  modulePathIgnorePatterns: [
-    '<rootDir>/dist/',
-    '<rootDir>/build/',
-  ],
+  modulePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/build/'],
 
   // Global variables
   globals: {
@@ -100,15 +92,8 @@ module.exports = {
   },
 
   // Ignore patterns
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/',
-    '/build/',
-    '/.specify/',
-  ],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', '/build/', '/.specify/'],
 
   // Transform ignore patterns
-  transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$|@elevenlabs/ui))',
-  ],
+  transformIgnorePatterns: ['node_modules/(?!(.*\\.mjs$|@elevenlabs/ui))'],
 };

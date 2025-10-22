@@ -60,7 +60,9 @@ describe('BusinessLogicAnalyzer', () => {
     it('should detect useReducer patterns', () => {
       const code = `const [state, dispatch] = useReducer(reducer, initialState);`;
       const result = analyzer.analyzeComponent(mockComponent, code);
-      expect(result.stateManagement.some(s => s.type === 'useReducer')).toBe(true);
+      expect(result.stateManagement.some(s => s.type === 'useReducer')).toBe(
+        true
+      );
     });
 
     it('should detect useEffect patterns', () => {
@@ -118,7 +120,17 @@ describe('Utility Functions', () => {
 
   it('should check if business logic is preserved', () => {
     const original = {
-      functions: [{ name: 'test', signature: 'test()', purpose: '', parameters: [], returnType: '', complexity: 'simple' as const, externalDependencies: [] }],
+      functions: [
+        {
+          name: 'test',
+          signature: 'test()',
+          purpose: '',
+          parameters: [],
+          returnType: '',
+          complexity: 'simple' as const,
+          externalDependencies: [],
+        },
+      ],
       stateManagement: [],
       sideEffects: [],
       eventHandlers: [],

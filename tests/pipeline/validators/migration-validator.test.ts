@@ -21,19 +21,58 @@ const mockConfig: ExtractionConfig = {
     mode: 'parallel',
     concurrency: 4,
     continueOnError: true,
-    retry: { maxAttempts: 3, delay: 1000, backoffMultiplier: 2, retryableOperations: [] },
-    filters: { include: [], exclude: [], types: [], complexity: [], custom: [] },
+    retry: {
+      maxAttempts: 3,
+      delay: 1000,
+      backoffMultiplier: 2,
+      retryableOperations: [],
+    },
+    filters: {
+      include: [],
+      exclude: [],
+      types: [],
+      complexity: [],
+      custom: [],
+    },
   },
-  performance: { memoryLimit: 1024, timeoutPerComponent: 30000, maxBundleSizeIncrease: 120, monitoring: true },
-  validation: { strict: false, typescript: true, eslint: false, componentStructure: true, businessLogicPreservation: true },
+  performance: {
+    memoryLimit: 1024,
+    timeoutPerComponent: 30000,
+    maxBundleSizeIncrease: 120,
+    monitoring: true,
+  },
+  validation: {
+    strict: false,
+    typescript: true,
+    eslint: false,
+    componentStructure: true,
+    businessLogicPreservation: true,
+  },
   output: {
     generateDeclarations: true,
     generateDocs: false,
     generateExamples: false,
-    format: { typescript: '.tsx', indentation: 'spaces', indentationSize: 2, lineEnding: 'lf', quotes: 'single' },
-    naming: { componentFiles: 'PascalCase', interfaces: 'PascalCase', utilities: 'camelCase', constants: 'UPPER_SNAKE_CASE' },
+    format: {
+      typescript: '.tsx',
+      indentation: 'spaces',
+      indentationSize: 2,
+      lineEnding: 'lf',
+      quotes: 'single',
+    },
+    naming: {
+      componentFiles: 'PascalCase',
+      interfaces: 'PascalCase',
+      utilities: 'camelCase',
+      constants: 'UPPER_SNAKE_CASE',
+    },
   },
-  logging: { level: 'info', outputs: ['console'], format: 'detailed', timestamps: true, stackTraces: true },
+  logging: {
+    level: 'info',
+    outputs: ['console'],
+    format: 'detailed',
+    timestamps: true,
+    stackTraces: true,
+  },
 };
 
 const mockComponent: ComponentDefinition = {
@@ -64,7 +103,13 @@ const mockTransformation: TransformationResult = {
 const mockGeneration: GenerationResult = {
   component: mockComponent,
   artifacts: {
-    component: { path: 'Test.tsx', content: '', size: 0, type: 'component', generatedAt: new Date() },
+    component: {
+      path: 'Test.tsx',
+      content: '',
+      size: 0,
+      type: 'component',
+      generatedAt: new Date(),
+    },
     types: [],
     tests: [],
     documentation: [],
@@ -85,7 +130,11 @@ describe('MigrationValidator', () => {
 
   describe('validate', () => {
     it('should validate successful migration', async () => {
-      const result = await validator.validate(mockComponent, mockTransformation, mockGeneration);
+      const result = await validator.validate(
+        mockComponent,
+        mockTransformation,
+        mockGeneration
+      );
 
       expect(result.valid).toBe(true);
       expect(result.componentName).toBe('Test');
@@ -93,33 +142,59 @@ describe('MigrationValidator', () => {
     });
 
     it('should detect business logic preservation issues', async () => {
-      const failedTransform = { ...mockTransformation, businessLogicPreserved: false };
-      const result = await validator.validate(mockComponent, failedTransform, mockGeneration);
+      const failedTransform = {
+        ...mockTransformation,
+        businessLogicPreserved: false,
+      };
+      const result = await validator.validate(
+        mockComponent,
+        failedTransform,
+        mockGeneration
+      );
 
       expect(result.valid).toBe(false);
       expect(result.errors.length).toBeGreaterThan(0);
     });
 
     it('should add warnings for manual review', async () => {
-      const reviewTransform = { ...mockTransformation, requiresManualReview: true };
-      const result = await validator.validate(mockComponent, reviewTransform, mockGeneration);
+      const reviewTransform = {
+        ...mockTransformation,
+        requiresManualReview: true,
+      };
+      const result = await validator.validate(
+        mockComponent,
+        reviewTransform,
+        mockGeneration
+      );
 
       expect(result.warnings.length).toBeGreaterThan(0);
     });
 
     it('should calculate validation score', async () => {
-      const result = await validator.validate(mockComponent, mockTransformation, mockGeneration);
+      const result = await validator.validate(
+        mockComponent,
+        mockTransformation,
+        mockGeneration
+      );
       expect(result.score).toBeGreaterThanOrEqual(0);
       expect(result.score).toBeLessThanOrEqual(100);
     });
 
     it('should mark types as safe by default', async () => {
-      const result = await validator.validate(mockComponent, mockTransformation, mockGeneration);
+      const result = await validator.validate(
+        mockComponent,
+        mockTransformation,
+        mockGeneration
+      );
       expect(result.typesSafe).toBe(true);
     });
 
     it('should mark tests as passing by default', async () => {
-      const result = await validator.validate(mockComponent, mockTransformation, mockGeneration);
+      const result = await validator.validate(
+        mockComponent,
+        mockTransformation,
+        mockGeneration
+      );
       expect(result.testsPass).toBe(true);
     });
   });
@@ -132,20 +207,38 @@ describe('MigrationValidator', () => {
         requiresManualReview: true,
       };
 
-      const result = await validator.validate(mockComponent, warnTransform, mockGeneration);
+      const result = await validator.validate(
+        mockComponent,
+        warnTransform,
+        mockGeneration
+      );
       expect(result.warnings.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should penalize score for errors', async () => {
-      const failedTransform = { ...mockTransformation, businessLogicPreserved: false };
-      const result = await validator.validate(mockComponent, failedTransform, mockGeneration);
+      const failedTransform = {
+        ...mockTransformation,
+        businessLogicPreserved: false,
+      };
+      const result = await validator.validate(
+        mockComponent,
+        failedTransform,
+        mockGeneration
+      );
 
       expect(result.score).toBeLessThan(100);
     });
 
     it('should penalize score for warnings', async () => {
-      const warnTransform = { ...mockTransformation, requiresManualReview: true };
-      const result = await validator.validate(mockComponent, warnTransform, mockGeneration);
+      const warnTransform = {
+        ...mockTransformation,
+        requiresManualReview: true,
+      };
+      const result = await validator.validate(
+        mockComponent,
+        warnTransform,
+        mockGeneration
+      );
 
       expect(result.score).toBeLessThan(100);
     });

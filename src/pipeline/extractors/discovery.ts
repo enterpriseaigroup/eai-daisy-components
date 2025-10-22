@@ -163,7 +163,9 @@ export class ComponentDiscoveryService {
    * @param criteria - Discovery criteria
    * @returns Filtered component definitions
    */
-  public async discoverComponentsBy(criteria: DiscoveryFilter): Promise<ComponentDefinition[]> {
+  public async discoverComponentsBy(
+    criteria: DiscoveryFilter
+  ): Promise<ComponentDefinition[]> {
     const result = await this.discoverComponents();
 
     return result.components.filter(component =>
@@ -206,7 +208,9 @@ export class ComponentDiscoveryService {
    *
    * @returns Component count by type
    */
-  public async getComponentCountByType(): Promise<Record<ComponentType, number>> {
+  public async getComponentCountByType(): Promise<
+    Record<ComponentType, number>
+  > {
     const result = await this.discoverComponents();
     return result.statistics.componentsByType;
   }
@@ -216,7 +220,9 @@ export class ComponentDiscoveryService {
    *
    * @returns Component count by complexity
    */
-  public async getComponentCountByComplexity(): Promise<Record<ComplexityLevel, number>> {
+  public async getComponentCountByComplexity(): Promise<
+    Record<ComplexityLevel, number>
+  > {
     const result = await this.discoverComponents();
     return result.statistics.componentsByComplexity;
   }
@@ -312,9 +318,7 @@ export class ComponentDiscoveryService {
    * Check if name matches pattern (supports wildcards)
    */
   private matchesPattern(name: string, pattern: string): boolean {
-    const regexPattern = pattern
-      .replace(/\*/g, '.*')
-      .replace(/\?/g, '.');
+    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.');
     const regex = new RegExp(`^${regexPattern}$`, 'i');
     return regex.test(name);
   }
@@ -411,7 +415,7 @@ export function createDiscoveryService(
  */
 export async function quickDiscover(): Promise<DiscoveryResult> {
   const repoConfig = getRepositoryConfig();
-  const logger = getGlobalLogger('quickDiscover');
+  // const logger = getGlobalLogger('quickDiscover'); // TODO: Use logger for progress tracking
 
   const extractionConfig: ExtractionConfig = {
     sourcePath: repoConfig.getRepositoryPath(),

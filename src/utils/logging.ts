@@ -1,9 +1,9 @@
 /**
  * Logging Infrastructure
- * 
+ *
  * Provides comprehensive logging system with multiple levels, formatters,
  * and output targets for the component extraction pipeline.
- * 
+ *
  * @fileoverview Structured logging system for pipeline operations
  * @version 1.0.0
  */
@@ -11,12 +11,7 @@
 import { writeFile, appendFile, mkdir } from 'fs/promises';
 import { join, dirname, resolve } from 'path';
 import { createWriteStream, WriteStream } from 'fs';
-import type {
-  LogLevel,
-  LogOutput,
-  LogFormat,
-  LoggingConfig,
-} from '@/types';
+import type { LogLevel, LogOutput, LogFormat, LoggingConfig } from '@/types';
 
 // ============================================================================
 // LOGGING TYPES
@@ -28,22 +23,22 @@ import type {
 export interface LogEntry {
   /** Timestamp of log entry */
   readonly timestamp: Date;
-  
+
   /** Log level */
   readonly level: LogLevel;
-  
+
   /** Log message */
   readonly message: string;
-  
+
   /** Additional context data */
   readonly context?: Record<string, unknown>;
-  
+
   /** Error object if applicable */
   readonly error?: Error;
-  
+
   /** Source location */
   readonly source?: LogSource;
-  
+
   /** Correlation ID for tracking */
   readonly correlationId?: string;
 }
@@ -54,13 +49,13 @@ export interface LogEntry {
 export interface LogSource {
   /** Source file name */
   readonly file?: string;
-  
+
   /** Function or method name */
   readonly function?: string;
-  
+
   /** Line number */
   readonly line?: number;
-  
+
   /** Component or module name */
   readonly component?: string;
 }
@@ -79,10 +74,10 @@ export interface LogFormatter {
 export interface LogOutputTarget {
   /** Write log entry */
   write(formattedEntry: string): Promise<void>;
-  
+
   /** Close output target */
   close?(): Promise<void>;
-  
+
   /** Flush pending writes */
   flush?(): Promise<void>;
 }
@@ -93,19 +88,19 @@ export interface LogOutputTarget {
 export interface LoggerConfig {
   /** Logger name/component */
   readonly name: string;
-  
+
   /** Minimum log level */
   readonly level: LogLevel;
-  
+
   /** Output targets */
   readonly outputs: LogOutputTarget[];
-  
+
   /** Log formatter */
   readonly formatter: LogFormatter;
-  
+
   /** Whether to include stack traces */
   readonly includeStackTrace: boolean;
-  
+
   /** Context to include in all logs */
   readonly context?: Record<string, unknown>;
 }
@@ -116,13 +111,13 @@ export interface LoggerConfig {
 export interface PerformanceMeasurement {
   /** Operation name */
   readonly operation: string;
-  
+
   /** Duration in milliseconds */
   readonly duration: number;
-  
+
   /** Memory usage delta in bytes */
   readonly memoryDelta?: number;
-  
+
   /** Additional metrics */
   readonly metrics?: Record<string, number>;
 }
@@ -139,18 +134,18 @@ export class SimpleFormatter implements LogFormatter {
     const timestamp = entry.timestamp.toISOString();
     const level = entry.level.toUpperCase().padEnd(5);
     let message = `[${timestamp}] ${level} ${entry.message}`;
-    
+
     if (entry.context && Object.keys(entry.context).length > 0) {
       message += ` | Context: ${JSON.stringify(entry.context)}`;
     }
-    
+
     if (entry.error) {
       message += `\nError: ${entry.error.message}`;
       if (entry.error.stack) {
         message += `\nStack: ${entry.error.stack}`;
       }
     }
-    
+
     return message;
   }
 }
@@ -162,40 +157,45 @@ export class DetailedFormatter implements LogFormatter {
   public format(entry: LogEntry): string {
     const timestamp = entry.timestamp.toISOString();
     const level = entry.level.toUpperCase().padEnd(5);
-    
+
     let message = `[${timestamp}] ${level} ${entry.message}`;
-    
+
     // Add source information
     if (entry.source) {
       const sourceInfo = [];
-      if (entry.source.component) sourceInfo.push(`component=${entry.source.component}`);
+      if (entry.source.component)
+        sourceInfo.push(`component=${entry.source.component}`);
       if (entry.source.file) sourceInfo.push(`file=${entry.source.file}`);
-      if (entry.source.function) sourceInfo.push(`function=${entry.source.function}`);
+      if (entry.source.function)
+        sourceInfo.push(`function=${entry.source.function}`);
       if (entry.source.line) sourceInfo.push(`line=${entry.source.line}`);
-      
+
       if (sourceInfo.length > 0) {
         message += ` [${sourceInfo.join(', ')}]`;
       }
     }
-    
+
     // Add correlation ID
     if (entry.correlationId) {
       message += ` [correlation=${entry.correlationId}]`;
     }
-    
+
     // Add context
     if (entry.context && Object.keys(entry.context).length > 0) {
       message += `\n  Context: ${JSON.stringify(entry.context, null, 2)}`;
     }
-    
+
     // Add error details
     if (entry.error) {
       message += `\n  Error: ${entry.error.message}`;
       if (entry.error.stack) {
-        message += `\n  Stack Trace:\n${entry.error.stack.split('\n').map(line => `    ${line}`).join('\n')}`;
+        message += `\n  Stack Trace:\n${entry.error.stack
+          .split('\n')
+          .map(line => `    ${line}`)
+          .join('\n')}`;
       }
     }
-    
+
     return message;
   }
 }
@@ -220,7 +220,7 @@ export class JsonFormatter implements LogFormatter {
         },
       }),
     };
-    
+
     return JSON.stringify(logObject);
   }
 }
@@ -235,30 +235,32 @@ export class StructuredFormatter implements LogFormatter {
       `level=${entry.level}`,
       `message="${entry.message.replace(/"/g, '\\"')}"`,
     ];
-    
+
     if (entry.correlationId) {
       fields.push(`correlation_id=${entry.correlationId}`);
     }
-    
+
     if (entry.source?.component) {
       fields.push(`component=${entry.source.component}`);
     }
-    
+
     if (entry.source?.file) {
       fields.push(`file=${entry.source.file}`);
     }
-    
+
     if (entry.context) {
       Object.entries(entry.context).forEach(([key, value]) => {
         fields.push(`${key}=${JSON.stringify(value)}`);
       });
     }
-    
+
     if (entry.error) {
       fields.push(`error_name=${entry.error.name}`);
-      fields.push(`error_message="${entry.error.message.replace(/"/g, '\\"')}"`);
+      fields.push(
+        `error_message="${entry.error.message.replace(/"/g, '\\"')}"`
+      );
     }
-    
+
     return fields.join(' ');
   }
 }
@@ -312,14 +314,14 @@ export class FileOutputTarget implements LogOutputTarget {
     try {
       // Ensure directory exists
       await mkdir(dirname(this.filePath), { recursive: true });
-      
+
       // Use write stream for better performance
       if (!this.writeStream) {
         this.writeStream = createWriteStream(this.filePath, { flags: 'a' });
       }
-      
+
       return new Promise((resolve, reject) => {
-        this.writeStream!.write(formattedEntry + '\n', (error) => {
+        this.writeStream!.write(formattedEntry + '\n', error => {
           if (error) reject(error);
           else resolve();
         });
@@ -332,7 +334,7 @@ export class FileOutputTarget implements LogOutputTarget {
 
   public async close(): Promise<void> {
     if (this.writeStream) {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         this.writeStream!.end(() => {
           this.writeStream = null;
           resolve();
@@ -343,11 +345,14 @@ export class FileOutputTarget implements LogOutputTarget {
 
   public async flush(): Promise<void> {
     if (this.writeStream) {
-      return new Promise((resolve, reject) => {
-        this.writeStream!.flush((error) => {
-          if (error) reject(error);
-          else resolve();
-        });
+      return new Promise<void>((resolve, reject) => {
+        // WriteStream doesn't have flush, but we can use the 'drain' event
+        if (this.writeStream!.writableNeedDrain) {
+          this.writeStream!.once('drain', () => resolve());
+          this.writeStream!.once('error', (error: Error) => reject(error));
+        } else {
+          resolve();
+        }
       });
     }
   }
@@ -361,13 +366,16 @@ export class JsonFileOutputTarget implements LogOutputTarget {
   private entries: string[] = [];
   private flushTimer: NodeJS.Timeout | null = null;
 
-  constructor(filePath: string, private readonly batchSize: number = 100) {
+  constructor(
+    filePath: string,
+    private readonly batchSize: number = 100
+  ) {
     this.filePath = resolve(filePath);
   }
 
   public async write(formattedEntry: string): Promise<void> {
     this.entries.push(formattedEntry);
-    
+
     if (this.entries.length >= this.batchSize) {
       await this.flush();
     } else if (!this.flushTimer) {
@@ -378,18 +386,18 @@ export class JsonFileOutputTarget implements LogOutputTarget {
 
   public async flush(): Promise<void> {
     if (this.entries.length === 0) return;
-    
+
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
       this.flushTimer = null;
     }
-    
+
     try {
       await mkdir(dirname(this.filePath), { recursive: true });
-      
+
       const content = this.entries.join('\n') + '\n';
       await appendFile(this.filePath, content);
-      
+
       this.entries = [];
     } catch (error) {
       console.error('Failed to flush JSON logs:', error);
@@ -425,7 +433,11 @@ export class Logger {
   /**
    * Log error message
    */
-  public error(message: string, error?: Error, context?: Record<string, unknown>): void {
+  public error(
+    message: string,
+    error?: Error,
+    context?: Record<string, unknown>
+  ): void {
     this.log('error', message, { error, context });
   }
 
@@ -459,31 +471,31 @@ export class Logger {
   ): Promise<T> {
     const startTime = Date.now();
     const startMemory = process.memoryUsage().heapUsed;
-    
+
     try {
       this.debug(`Starting operation: ${operation}`);
       const result = await fn();
-      
+
       const duration = Date.now() - startTime;
       const memoryDelta = process.memoryUsage().heapUsed - startMemory;
-      
+
       this.info(`Operation completed: ${operation}`, {
         duration,
         memoryDelta,
         success: true,
       });
-      
+
       return result;
     } catch (error) {
       const duration = Date.now() - startTime;
       const memoryDelta = process.memoryUsage().heapUsed - startMemory;
-      
+
       this.error(`Operation failed: ${operation}`, error as Error, {
         duration,
         memoryDelta,
         success: false,
       });
-      
+
       throw error;
     }
   }
@@ -499,7 +511,7 @@ export class Logger {
         ...additionalContext,
       },
     };
-    
+
     return new Logger(childConfig);
   }
 
@@ -537,7 +549,7 @@ export class Logger {
     const formattedEntry = this.config.formatter.format(entry);
 
     // Write to all output targets
-    this.config.outputs.forEach(async (output) => {
+    this.config.outputs.forEach(async output => {
       try {
         await output.write(formattedEntry);
       } catch (error) {
@@ -580,7 +592,10 @@ export class LoggingManager {
   /**
    * Create new logger with configuration
    */
-  private createLogger(name: string, overrides?: Partial<LoggerConfig>): Logger {
+  private createLogger(
+    name: string,
+    overrides?: Partial<LoggerConfig>
+  ): Logger {
     const formatter = this.createFormatter(this.globalConfig.format);
     const outputs = this.createOutputTargets(this.globalConfig.outputs);
 
@@ -624,11 +639,17 @@ export class LoggingManager {
         case 'console':
           return new ConsoleOutputTarget();
         case 'file':
-          return new FileOutputTarget(join(process.cwd(), 'logs', 'pipeline.log'));
+          return new FileOutputTarget(
+            join(process.cwd(), 'logs', 'pipeline.log')
+          );
         case 'json':
-          return new JsonFileOutputTarget(join(process.cwd(), 'logs', 'pipeline.json'));
+          return new JsonFileOutputTarget(
+            join(process.cwd(), 'logs', 'pipeline.json')
+          );
         case 'structured':
-          return new FileOutputTarget(join(process.cwd(), 'logs', 'pipeline.structured'));
+          return new FileOutputTarget(
+            join(process.cwd(), 'logs', 'pipeline.structured')
+          );
         default:
           return new ConsoleOutputTarget();
       }
@@ -685,7 +706,10 @@ export function createLoggingManager(config: LoggingConfig): LoggingManager {
 /**
  * Create simple logger for quick use
  */
-export function createSimpleLogger(name: string, level: LogLevel = 'info'): Logger {
+export function createSimpleLogger(
+  name: string,
+  level: LogLevel = 'info'
+): Logger {
   const config: LoggerConfig = {
     name,
     level,
@@ -738,7 +762,9 @@ let globalLoggingManager: LoggingManager | null = null;
 /**
  * Initialize global logging
  */
-export function initializeLogging(config: LoggingConfig = DEFAULT_LOGGING_CONFIG): void {
+export function initializeLogging(
+  config: LoggingConfig = DEFAULT_LOGGING_CONFIG
+): void {
   globalLoggingManager = createLoggingManager(config);
 }
 

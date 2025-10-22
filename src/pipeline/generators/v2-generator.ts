@@ -50,14 +50,28 @@ export class V2ComponentGenerator {
     sourceCode: string,
     options: GenerationOptions = {}
   ): Promise<GenerationResult> {
-    this.logger.info(`Generating V2 component: ${transformationResult.transformed.name}`);
+    this.logger.info(
+      `Generating V2 component: ${transformationResult.transformed.name}`
+    );
 
     const artifacts: GeneratedArtifacts = {
-      component: await this.generateComponentFile(transformationResult, sourceCode, options),
-      types: options.generateTypes ? await this.generateTypeFiles(transformationResult) : [],
-      tests: options.generateTests ? await this.generateTestFiles(transformationResult) : [],
-      documentation: options.generateDocs ? await this.generateDocumentation(transformationResult) : [],
-      examples: options.generateExamples ? await this.generateExamples(transformationResult) : [],
+      component: await this.generateComponentFile(
+        transformationResult,
+        sourceCode,
+        options
+      ),
+      types: options.generateTypes
+        ? await this.generateTypeFiles(transformationResult)
+        : [],
+      tests: options.generateTests
+        ? await this.generateTestFiles(transformationResult)
+        : [],
+      documentation: options.generateDocs
+        ? await this.generateDocumentation(transformationResult)
+        : [],
+      examples: options.generateExamples
+        ? await this.generateExamples(transformationResult)
+        : [],
       utilities: [],
     };
 
@@ -101,7 +115,8 @@ export class V2ComponentGenerator {
     options: GenerationOptions
   ): string {
     const { transformed, transformations } = result;
-    const doc = transformed.metadata.documentation || `${transformed.name} component`;
+    const doc =
+      transformed.metadata.documentation || `${transformed.name} component`;
 
     const propsInterface = `export interface ${transformed.name}Props {
 ${transformed.props.map(p => `  ${p.name}${p.required ? '' : '?'}: ${p.type};`).join('\n')}
@@ -116,15 +131,22 @@ ${transformed.props.map(p => `  ${p.name}${p.required ? '' : '?'}: ${p.type};`).
 import React from 'react';
 import { useConfigurator } from '@configurator/sdk';
 
-${options.includeComments ? `/**
+${
+  options.includeComments
+    ? `/**
  * Props for ${transformed.name}
- */` : ''}
+ */`
+    : ''
+}
 ${propsInterface}
 
 export const ${transformed.name}: React.FC<${transformed.name}Props> = (props) => {
   const config = useConfigurator();
 
-${transformations.filter(t => t.type === 'state').map(t => `  ${t.transformed};`).join('\n')}
+${transformations
+  .filter(t => t.type === 'state')
+  .map(t => `  ${t.transformed};`)
+  .join('\n')}
 
   return (
     <div className="${transformed.name.toLowerCase()}">
@@ -139,18 +161,24 @@ export default ${transformed.name};
 `;
   }
 
-  private async generateTypeFiles(result: TransformationResult): Promise<GeneratedFile[]> {
+  private async generateTypeFiles(
+    result: TransformationResult
+  ): Promise<GeneratedFile[]> {
     const content = `export * from './${result.transformed.name}';`;
-    return [{
-      path: 'index.ts',
-      content,
-      size: Buffer.from(content).length,
-      type: 'types',
-      generatedAt: new Date(),
-    }];
+    return [
+      {
+        path: 'index.ts',
+        content,
+        size: Buffer.from(content).length,
+        type: 'types',
+        generatedAt: new Date(),
+      },
+    ];
   }
 
-  private async generateTestFiles(result: TransformationResult): Promise<GeneratedFile[]> {
+  private async generateTestFiles(
+    result: TransformationResult
+  ): Promise<GeneratedFile[]> {
     const content = `import { render } from '@testing-library/react';
 import { ${result.transformed.name} } from './${result.transformed.name}';
 
@@ -162,16 +190,20 @@ describe('${result.transformed.name}', () => {
 });
 `;
 
-    return [{
-      path: `${result.transformed.name}.test.tsx`,
-      content,
-      size: Buffer.from(content).length,
-      type: 'test',
-      generatedAt: new Date(),
-    }];
+    return [
+      {
+        path: `${result.transformed.name}.test.tsx`,
+        content,
+        size: Buffer.from(content).length,
+        type: 'test',
+        generatedAt: new Date(),
+      },
+    ];
   }
 
-  private async generateDocumentation(result: TransformationResult): Promise<GeneratedFile[]> {
+  private async generateDocumentation(
+    result: TransformationResult
+  ): Promise<GeneratedFile[]> {
     const content = `# ${result.transformed.name}
 
 ## Props
@@ -182,31 +214,40 @@ ${result.transformed.props.map(p => `- **${p.name}** (${p.type}): ${p.descriptio
 - Business Logic Preserved: ${result.businessLogicPreserved}
 `;
 
-    return [{
-      path: 'README.md',
-      content,
-      size: Buffer.from(content).length,
-      type: 'documentation',
-      generatedAt: new Date(),
-    }];
+    return [
+      {
+        path: 'README.md',
+        content,
+        size: Buffer.from(content).length,
+        type: 'documentation',
+        generatedAt: new Date(),
+      },
+    ];
   }
 
-  private async generateExamples(result: TransformationResult): Promise<GeneratedFile[]> {
+  private async generateExamples(
+    result: TransformationResult
+  ): Promise<GeneratedFile[]> {
     const content = `import { ${result.transformed.name} } from './${result.transformed.name}';
 
 export const Example = () => <${result.transformed.name} />;
 `;
 
-    return [{
-      path: `${result.transformed.name}.examples.tsx`,
-      content,
-      size: Buffer.from(content).length,
-      type: 'example',
-      generatedAt: new Date(),
-    }];
+    return [
+      {
+        path: `${result.transformed.name}.examples.tsx`,
+        content,
+        size: Buffer.from(content).length,
+        type: 'example',
+        generatedAt: new Date(),
+      },
+    ];
   }
 
-  private async writeArtifacts(artifacts: GeneratedArtifacts, outputPath: string): Promise<void> {
+  private async writeArtifacts(
+    artifacts: GeneratedArtifacts,
+    outputPath: string
+  ): Promise<void> {
     await this.fileManager.createDirectory(outputPath);
 
     const allFiles = [
@@ -226,6 +267,8 @@ export const Example = () => <${result.transformed.name} />;
   }
 }
 
-export function createV2Generator(config: ExtractionConfig): V2ComponentGenerator {
+export function createV2Generator(
+  config: ExtractionConfig
+): V2ComponentGenerator {
   return new V2ComponentGenerator(config);
 }

@@ -7,38 +7,38 @@ import type { ComponentDefinition } from '../types/index.js';
 export interface OutputGenerationConfig {
   /** Base output directory */
   outputDirectory: string;
-  
+
   /** Preserve original directory structure */
   preserveStructure: boolean;
-  
+
   /** Generate source maps */
   generateSourceMaps: boolean;
-  
+
   /** Include transformation metadata */
   includeMetadata: boolean;
-  
+
   /** Output file naming strategy */
   namingStrategy: 'preserve' | 'kebab-case' | 'camelCase' | 'PascalCase';
-  
+
   /** Format output code */
   formatOutput: boolean;
-  
+
   /** Generate index files */
   generateIndexFiles: boolean;
-  
+
   /** Create backup of original files */
   createBackups: boolean;
-  
+
   /** Validation level */
   validationLevel: 'none' | 'basic' | 'strict' | 'comprehensive';
-  
+
   /** Compression settings */
   compression: {
     enabled: boolean;
     algorithm: 'gzip' | 'brotli' | 'deflate';
     level: number;
   };
-  
+
   /** Bundle generation options */
   bundling: {
     enabled: boolean;
@@ -52,19 +52,19 @@ export interface OutputGenerationConfig {
 export interface OutputGenerationResult {
   /** Generation success status */
   success: boolean;
-  
+
   /** Generated files information */
   generatedFiles: GeneratedFileInfo[];
-  
+
   /** Processing metrics */
   metrics: OutputGenerationMetrics;
-  
+
   /** Validation results */
   validation: ValidationResults;
-  
+
   /** Any warnings or issues */
   warnings: string[];
-  
+
   /** Generation summary */
   summary: GenerationSummary;
 }
@@ -72,60 +72,62 @@ export interface OutputGenerationResult {
 export interface GeneratedFileInfo {
   /** Source file path */
   sourcePath: string;
-  
+
   /** Generated file path */
   outputPath: string;
-  
+
   /** File type */
   type: 'component' | 'hook' | 'test' | 'story' | 'type' | 'metadata' | 'index';
-  
+
   /** File size in bytes */
   size: number;
-  
+
   /** Generation timestamp */
   timestamp: Date;
-  
+
   /** Associated source map */
   sourceMap?: string | undefined;
-  
+
   /** Content hash for integrity */
   contentHash: string;
-  
+
   /** Compression info */
-  compression?: {
-    algorithm: string;
-    originalSize: number;
-    compressedSize: number;
-    ratio: number;
-  } | undefined;
+  compression?:
+    | {
+        algorithm: string;
+        originalSize: number;
+        compressedSize: number;
+        ratio: number;
+      }
+    | undefined;
 }
 
 export interface OutputGenerationMetrics {
   /** Total files processed */
   totalFiles: number;
-  
+
   /** Successfully generated files */
   successfulFiles: number;
-  
+
   /** Failed file generations */
   failedFiles: number;
-  
+
   /** Total processing time */
   totalDuration: number;
-  
+
   /** Average file processing time */
   averageFileTime: number;
-  
+
   /** Total output size */
   totalOutputSize: number;
-  
+
   /** Memory usage statistics */
   memoryUsage: {
     peak: number;
     average: number;
     final: number;
   };
-  
+
   /** Compression statistics */
   compression?: {
     originalTotalSize: number;
@@ -138,16 +140,16 @@ export interface OutputGenerationMetrics {
 export interface ValidationResults {
   /** Overall validation status */
   passed: boolean;
-  
+
   /** Individual file validations */
   fileValidations: FileValidationResult[];
-  
+
   /** Cross-file validation results */
   crossFileValidation: CrossFileValidationResult;
-  
+
   /** Dependency validation */
   dependencyValidation: DependencyValidationResult;
-  
+
   /** Type safety validation */
   typeSafetyValidation: TypeSafetyValidationResult;
 }
@@ -155,19 +157,19 @@ export interface ValidationResults {
 export interface FileValidationResult {
   /** File path */
   filePath: string;
-  
+
   /** Validation status */
   passed: boolean;
-  
+
   /** Syntax validation */
   syntax: { valid: boolean; errors: string[] };
-  
+
   /** Type checking */
   typeChecking: { valid: boolean; errors: string[] };
-  
+
   /** Code quality metrics */
   quality: { score: number; issues: string[] };
-  
+
   /** Security checks */
   security: { passed: boolean; vulnerabilities: string[] };
 }
@@ -175,16 +177,16 @@ export interface FileValidationResult {
 export interface CrossFileValidationResult {
   /** Import/export consistency */
   importExportConsistency: boolean;
-  
+
   /** Dependency resolution */
   dependencyResolution: boolean;
-  
+
   /** Circular dependency detection */
   circularDependencies: string[];
-  
+
   /** Unused exports */
   unusedExports: string[];
-  
+
   /** Missing dependencies */
   missingDependencies: string[];
 }
@@ -192,13 +194,13 @@ export interface CrossFileValidationResult {
 export interface DependencyValidationResult {
   /** All dependencies resolved */
   allResolved: boolean;
-  
+
   /** External dependencies */
   external: { name: string; version: string; resolved: boolean }[];
-  
+
   /** Internal dependencies */
   internal: { path: string; resolved: boolean }[];
-  
+
   /** Version conflicts */
   conflicts: { dependency: string; versions: string[] }[];
 }
@@ -206,16 +208,16 @@ export interface DependencyValidationResult {
 export interface TypeSafetyValidationResult {
   /** Overall type safety score */
   score: number;
-  
+
   /** Type coverage percentage */
   coverage: number;
-  
+
   /** Type errors */
   errors: { file: string; line: number; message: string }[];
-  
+
   /** Type warnings */
   warnings: { file: string; line: number; message: string }[];
-  
+
   /** Strict mode compliance */
   strictModeCompliance: boolean;
 }
@@ -223,31 +225,31 @@ export interface TypeSafetyValidationResult {
 export interface GenerationSummary {
   /** Generation start time */
   startTime: Date;
-  
+
   /** Generation end time */
   endTime: Date;
-  
+
   /** Total components processed */
   componentsProcessed: number;
-  
+
   /** Components successfully transformed */
   componentsTransformed: number;
-  
+
   /** Components failed */
   componentsFailed: number;
-  
+
   /** Tests generated */
   testsGenerated: number;
-  
+
   /** Stories generated */
   storiesGenerated: number;
-  
+
   /** Types generated */
   typesGenerated: number;
-  
+
   /** Overall success rate */
   successRate: number;
-  
+
   /** Performance insights */
   performance: {
     bottlenecks: string[];
@@ -260,13 +262,13 @@ export interface GenerationSummary {
 export interface OutputFileFormat {
   /** File extension */
   extension: string;
-  
+
   /** Content type */
   contentType: string;
-  
+
   /** Formatter function */
   formatter: (content: string, options?: FormatOptions) => Promise<string>;
-  
+
   /** Validation function */
   validator: (content: string) => Promise<ValidationResult>;
 }
@@ -274,19 +276,19 @@ export interface OutputFileFormat {
 export interface FormatOptions {
   /** Indentation settings */
   indentation: { type: 'spaces' | 'tabs'; size: number };
-  
+
   /** Line ending style */
   lineEndings: 'lf' | 'crlf' | 'cr';
-  
+
   /** Maximum line length */
   maxLineLength: number;
-  
+
   /** Include trailing comma */
   trailingComma: boolean;
-  
+
   /** Semicolon usage */
   semicolons: boolean;
-  
+
   /** Quote style */
   quotes: 'single' | 'double';
 }
@@ -294,20 +296,20 @@ export interface FormatOptions {
 export interface ValidationResult {
   /** Validation passed */
   valid: boolean;
-  
+
   /** Error messages */
   errors: string[];
-  
+
   /** Warning messages */
   warnings: string[];
-  
+
   /** Suggestions */
   suggestions: string[];
 }
 
 /**
  * Advanced Output Generator for DAISY v1 Component Extraction Pipeline
- * 
+ *
  * Handles the final stage of component transformation by generating
  * organized, validated, and optimized output files with comprehensive
  * metadata and validation.
@@ -315,13 +317,16 @@ export interface ValidationResult {
 export class OutputGenerator {
   private readonly logger: Logger;
   private readonly formatters: Map<string, OutputFileFormat>;
-  private readonly validators: Map<string, (content: string) => Promise<ValidationResult>>;
+  private readonly validators: Map<
+    string,
+    (content: string) => Promise<ValidationResult>
+  >;
 
   constructor() {
     this.logger = createSimpleLogger('OutputGenerator');
     this.formatters = new Map();
     this.validators = new Map();
-    
+
     this.initializeFormatters();
     this.initializeValidators();
   }
@@ -334,17 +339,17 @@ export class OutputGenerator {
       component: ComponentDefinition;
       transformedCode: string;
       additionalFiles: { [key: string]: string };
-      metadata: any;
+      metadata: any; // @any-allowed: flexible metadata structure
     }>,
     config: OutputGenerationConfig
   ): Promise<OutputGenerationResult> {
     const startTime = Date.now();
-    
+
     try {
       this.logger.info('Starting advanced output generation', {
         componentsCount: transformationResults.length,
         outputDirectory: config.outputDirectory,
-        preserveStructure: config.preserveStructure
+        preserveStructure: config.preserveStructure,
       });
 
       // Prepare output environment
@@ -363,15 +368,21 @@ export class OutputGenerator {
         } catch (error) {
           this.logger.error('Failed to process component result', undefined, {
             componentName: result.component.name,
-            errorMessage: error instanceof Error ? error.message : 'Unknown error'
+            errorMessage:
+              error instanceof Error ? error.message : 'Unknown error',
           });
-          warnings.push(`Failed to process ${result.component.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          warnings.push(
+            `Failed to process ${result.component.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
         }
       }
 
       // Generate index files if requested
       if (config.generateIndexFiles) {
-        const indexFiles = await this.generateIndexFiles(generatedFiles, config);
+        const indexFiles = await this.generateIndexFiles(
+          generatedFiles,
+          config
+        );
         generatedFiles.push(...indexFiles);
       }
 
@@ -395,20 +406,19 @@ export class OutputGenerator {
         metrics,
         validation,
         warnings,
-        summary
+        summary,
       };
 
       this.logger.info('Advanced output generation completed', {
         totalFiles: generatedFiles.length,
         successRate: summary.successRate,
-        duration: metrics.totalDuration
+        duration: metrics.totalDuration,
       });
 
       return result;
-
     } catch (error) {
       this.logger.error('Output generation failed', undefined, {
-        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
       });
 
       return this.createErrorResult(startTime, error);
@@ -423,7 +433,7 @@ export class OutputGenerator {
       component: ComponentDefinition;
       transformedCode: string;
       additionalFiles: { [key: string]: string };
-      metadata: any;
+      metadata: any; // @any-allowed: flexible metadata structure
     },
     config: OutputGenerationConfig
   ): Promise<GeneratedFileInfo[]> {
@@ -445,9 +455,10 @@ export class OutputGenerator {
     // Generate additional files (tests, stories, etc.)
     for (const [fileType, content] of Object.entries(additionalFiles)) {
       if (content && content.trim()) {
-        const outputPath = outputPaths[fileType as keyof typeof outputPaths] || 
+        const outputPath =
+          outputPaths[fileType as keyof typeof outputPaths] ||
           join(dirname(outputPaths.component), `${component.name}.${fileType}`);
-        
+
         const additionalFile = await this.generateFile(
           content,
           outputPath,
@@ -460,7 +471,10 @@ export class OutputGenerator {
 
     // Generate metadata file if requested
     if (config.includeMetadata) {
-      const metadataPath = join(dirname(outputPaths.component), `${component.name}.meta.json`);
+      const metadataPath = join(
+        dirname(outputPaths.component),
+        `${component.name}.meta.json`
+      );
       const metadataFile = await this.generateFile(
         JSON.stringify(metadata, null, 2),
         metadataPath,
@@ -501,8 +515,15 @@ export class OutputGenerator {
 
     // Generate source map if requested
     let sourceMapPath: string | undefined;
-    if (config.generateSourceMaps && (type === 'component' || type === 'hook')) {
-      sourceMapPath = await this.generateSourceMap(content, formattedContent, outputPath);
+    if (
+      config.generateSourceMaps &&
+      (type === 'component' || type === 'hook')
+    ) {
+      sourceMapPath = await this.generateSourceMap(
+        content,
+        formattedContent,
+        outputPath
+      );
     }
 
     // Calculate file info
@@ -523,7 +544,7 @@ export class OutputGenerator {
       timestamp: new Date(),
       sourceMap: sourceMapPath,
       contentHash,
-      compression
+      compression,
     };
   }
 
@@ -533,28 +554,44 @@ export class OutputGenerator {
   private determineOutputPaths(
     component: ComponentDefinition,
     config: OutputGenerationConfig
-  ): { component: string; test: string; story: string; types: string; hook: string } {
-    const baseName = this.applyNamingStrategy(component.name, config.namingStrategy);
-    const baseDir = config.preserveStructure && component.sourcePath
-      ? join(config.outputDirectory, dirname(component.sourcePath))
-      : config.outputDirectory;
+  ): {
+    component: string;
+    test: string;
+    story: string;
+    types: string;
+    hook: string;
+  } {
+    const baseName = this.applyNamingStrategy(
+      component.name,
+      config.namingStrategy
+    );
+    const baseDir =
+      config.preserveStructure && component.sourcePath
+        ? join(config.outputDirectory, dirname(component.sourcePath))
+        : config.outputDirectory;
 
     return {
       component: join(baseDir, `${baseName}.tsx`),
       test: join(baseDir, `${baseName}.test.tsx`),
       story: join(baseDir, `${baseName}.stories.tsx`),
       types: join(baseDir, `${baseName}.types.ts`),
-      hook: join(baseDir, `${baseName}.hooks.ts`)
+      hook: join(baseDir, `${baseName}.hooks.ts`),
     };
   }
 
   /**
    * Apply naming strategy to component name
    */
-  private applyNamingStrategy(name: string, strategy: OutputGenerationConfig['namingStrategy']): string {
+  private applyNamingStrategy(
+    name: string,
+    strategy: OutputGenerationConfig['namingStrategy']
+  ): string {
     switch (strategy) {
       case 'kebab-case':
-        return name.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '');
+        return name
+          .replace(/([A-Z])/g, '-$1')
+          .toLowerCase()
+          .replace(/^-/, '');
       case 'camelCase':
         return name.charAt(0).toLowerCase() + name.slice(1);
       case 'PascalCase':
@@ -568,7 +605,10 @@ export class OutputGenerator {
   /**
    * Format content using appropriate formatter
    */
-  private async formatContent(content: string, extension: string): Promise<string> {
+  private async formatContent(
+    content: string,
+    extension: string
+  ): Promise<string> {
     const formatter = this.formatters.get(extension);
     if (formatter) {
       return await formatter.formatter(content);
@@ -589,7 +629,7 @@ export class OutputGenerator {
 
     this.logger.info('Validating generated output', {
       filesCount: generatedFiles.length,
-      validationLevel: config.validationLevel
+      validationLevel: config.validationLevel,
     });
 
     // Validate individual files
@@ -600,15 +640,18 @@ export class OutputGenerator {
     }
 
     // Cross-file validation
-    const crossFileValidation = await this.performCrossFileValidation(generatedFiles);
+    const crossFileValidation =
+      await this.performCrossFileValidation(generatedFiles);
 
     // Dependency validation
-    const dependencyValidation = await this.validateDependencies(generatedFiles);
+    const dependencyValidation =
+      await this.validateDependencies(generatedFiles);
 
     // Type safety validation
     const typeSafetyValidation = await this.validateTypeSafety(generatedFiles);
 
-    const passed = fileValidations.every(v => v.passed) &&
+    const passed =
+      fileValidations.every(v => v.passed) &&
       crossFileValidation.importExportConsistency &&
       crossFileValidation.dependencyResolution &&
       dependencyValidation.allResolved &&
@@ -619,7 +662,7 @@ export class OutputGenerator {
       fileValidations,
       crossFileValidation,
       dependencyValidation,
-      typeSafetyValidation
+      typeSafetyValidation,
     };
   }
 
@@ -640,11 +683,11 @@ export class OutputGenerator {
       },
       validator: async (_content: string) => {
         return { valid: true, errors: [], warnings: [], suggestions: [] };
-      }
+      },
     });
 
     this.formatters.set('.tsx', this.formatters.get('.ts')!);
-    
+
     // JSON formatter
     this.formatters.set('.json', {
       extension: '.json',
@@ -665,10 +708,10 @@ export class OutputGenerator {
             valid: false,
             errors: [error instanceof Error ? error.message : 'Invalid JSON'],
             warnings: [],
-            suggestions: []
+            suggestions: [],
           };
         }
-      }
+      },
     });
   }
 
@@ -679,31 +722,41 @@ export class OutputGenerator {
     this.validators.set('.ts', async (content: string) => {
       // Basic syntax validation
       const syntaxErrors: string[] = [];
-      
+
       // Check for common syntax issues
       if (content.includes('function(') && !content.includes('function (')) {
         syntaxErrors.push('Missing space after function keyword');
       }
-      
+
       if (content.match(/\bany\b/)) {
-        syntaxErrors.push('Usage of "any" type detected - consider specific types');
+        syntaxErrors.push(
+          'Usage of "any" type detected - consider specific types'
+        );
       }
 
       return {
         valid: syntaxErrors.length === 0,
         errors: syntaxErrors,
         warnings: [],
-        suggestions: syntaxErrors.length > 0 ? ['Consider using TypeScript strict mode'] : []
+        suggestions:
+          syntaxErrors.length > 0
+            ? ['Consider using TypeScript strict mode']
+            : [],
       };
     });
   }
 
   // Placeholder methods for future enhancement
-  private async prepareOutputEnvironment(_config: OutputGenerationConfig): Promise<void> {
+  private async prepareOutputEnvironment(
+    _config: OutputGenerationConfig
+  ): Promise<void> {
     // Implementation placeholder
   }
 
-  private async generateIndexFiles(_files: GeneratedFileInfo[], _config: OutputGenerationConfig): Promise<GeneratedFileInfo[]> {
+  private async generateIndexFiles(
+    _files: GeneratedFileInfo[],
+    _config: OutputGenerationConfig
+  ): Promise<GeneratedFileInfo[]> {
     return [];
   }
 
@@ -711,7 +764,11 @@ export class OutputGenerator {
     // Implementation placeholder
   }
 
-  private async generateSourceMap(_original: string, _transformed: string, _outputPath: string): Promise<string> {
+  private async generateSourceMap(
+    _original: string,
+    _transformed: string,
+    _outputPath: string
+  ): Promise<string> {
     // Implementation placeholder
     return '';
   }
@@ -721,7 +778,7 @@ export class OutputGenerator {
     let hash = 0;
     for (let i = 0; i < content.length; i++) {
       const char = content.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash.toString(16);
@@ -736,11 +793,14 @@ export class OutputGenerator {
       algorithm: 'gzip',
       originalSize: 1000,
       compressedSize: 600,
-      ratio: 0.6
+      ratio: 0.6,
     };
   }
 
-  private calculateMetrics(files: GeneratedFileInfo[], startTime: number): OutputGenerationMetrics {
+  private calculateMetrics(
+    files: GeneratedFileInfo[],
+    startTime: number
+  ): OutputGenerationMetrics {
     const totalDuration = Date.now() - startTime;
     const totalOutputSize = files.reduce((sum, file) => sum + file.size, 0);
 
@@ -754,8 +814,8 @@ export class OutputGenerator {
       memoryUsage: {
         peak: process.memoryUsage().heapUsed,
         average: process.memoryUsage().heapUsed,
-        final: process.memoryUsage().heapUsed
-      }
+        final: process.memoryUsage().heapUsed,
+      },
     };
   }
 
@@ -766,7 +826,8 @@ export class OutputGenerator {
     startTime: number
   ): GenerationSummary {
     const endTime = new Date();
-    const successRate = totalComponents > 0 ? (successCount / totalComponents) * 100 : 0;
+    const successRate =
+      totalComponents > 0 ? (successCount / totalComponents) * 100 : 0;
 
     return {
       startTime: new Date(startTime),
@@ -781,12 +842,15 @@ export class OutputGenerator {
       performance: {
         bottlenecks: [],
         optimizations: [],
-        recommendations: []
-      }
+        recommendations: [],
+      },
     };
   }
 
-  private createErrorResult(startTime: number, error: unknown): OutputGenerationResult {
+  private createErrorResult(
+    startTime: number,
+    error: unknown
+  ): OutputGenerationResult {
     return {
       success: false,
       generatedFiles: [],
@@ -800,8 +864,8 @@ export class OutputGenerator {
         memoryUsage: {
           peak: process.memoryUsage().heapUsed,
           average: process.memoryUsage().heapUsed,
-          final: process.memoryUsage().heapUsed
-        }
+          final: process.memoryUsage().heapUsed,
+        },
       },
       validation: this.createEmptyValidationResult(),
       warnings: [error instanceof Error ? error.message : 'Unknown error'],
@@ -818,9 +882,9 @@ export class OutputGenerator {
         performance: {
           bottlenecks: ['Output generation failure'],
           optimizations: [],
-          recommendations: ['Check error logs and fix underlying issues']
-        }
-      }
+          recommendations: ['Check error logs and fix underlying issues'],
+        },
+      },
     };
   }
 
@@ -833,21 +897,21 @@ export class OutputGenerator {
         dependencyResolution: true,
         circularDependencies: [],
         unusedExports: [],
-        missingDependencies: []
+        missingDependencies: [],
       },
       dependencyValidation: {
         allResolved: true,
         external: [],
         internal: [],
-        conflicts: []
+        conflicts: [],
       },
       typeSafetyValidation: {
         score: 100,
         coverage: 100,
         errors: [],
         warnings: [],
-        strictModeCompliance: true
-      }
+        strictModeCompliance: true,
+      },
     };
   }
 
@@ -862,39 +926,45 @@ export class OutputGenerator {
       syntax: { valid: true, errors: [] },
       typeChecking: { valid: true, errors: [] },
       quality: { score: 90, issues: [] },
-      security: { passed: true, vulnerabilities: [] }
+      security: { passed: true, vulnerabilities: [] },
     };
   }
 
-  private async performCrossFileValidation(_files: GeneratedFileInfo[]): Promise<CrossFileValidationResult> {
+  private async performCrossFileValidation(
+    _files: GeneratedFileInfo[]
+  ): Promise<CrossFileValidationResult> {
     // Implementation placeholder
     return {
       importExportConsistency: true,
       dependencyResolution: true,
       circularDependencies: [],
       unusedExports: [],
-      missingDependencies: []
+      missingDependencies: [],
     };
   }
 
-  private async validateDependencies(_files: GeneratedFileInfo[]): Promise<DependencyValidationResult> {
+  private async validateDependencies(
+    _files: GeneratedFileInfo[]
+  ): Promise<DependencyValidationResult> {
     // Implementation placeholder
     return {
       allResolved: true,
       external: [],
       internal: [],
-      conflicts: []
+      conflicts: [],
     };
   }
 
-  private async validateTypeSafety(_files: GeneratedFileInfo[]): Promise<TypeSafetyValidationResult> {
+  private async validateTypeSafety(
+    _files: GeneratedFileInfo[]
+  ): Promise<TypeSafetyValidationResult> {
     // Implementation placeholder
     return {
       score: 95,
       coverage: 98,
       errors: [],
       warnings: [],
-      strictModeCompliance: true
+      strictModeCompliance: true,
     };
   }
 }

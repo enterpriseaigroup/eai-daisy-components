@@ -1,10 +1,10 @@
 /**
  * Pipeline Orchestrator for DAISY v1 Component Extraction Pipeline
- * 
+ *
  * Main execution engine that coordinates discovery, parsing, analysis, and
  * inventory generation. Provides configurable execution modes, progress
  * tracking, and comprehensive error handling.
- * 
+ *
  * @version 1.0.0
  * @author DAISY Component Extraction Pipeline
  */
@@ -15,19 +15,28 @@ import { FileSystemManager } from '../utils/filesystem.js';
 import type { ExtractionConfig, ComponentDefinition } from '@/types';
 
 // Import our analysis engines
-import { ComponentDiscoveryEngine, type DiscoveryResult } from '../engine/discovery.js';
+import {
+  ComponentDiscoveryEngine,
+  type DiscoveryResult,
+} from '../engine/discovery.js';
 import { ComponentParser, type ParseResult } from '../engine/parser.js';
-import { DependencyAnalyzer, type DependencyAnalysisResult } from '../engine/analyzer.js';
-import { ComponentInventoryGenerator, type ComponentInventory } from '../engine/inventory.js';
+import {
+  DependencyAnalyzer,
+  type DependencyAnalysisResult,
+} from '../engine/analyzer.js';
+import {
+  ComponentInventoryGenerator,
+  type ComponentInventory,
+} from '../engine/inventory.js';
 
 /**
  * Pipeline execution mode
  */
-export type ExecutionMode = 
-  | 'discovery-only'     // Only run component discovery
-  | 'analysis-only'      // Discovery + parsing + dependency analysis
-  | 'full-pipeline'      // Complete analysis + inventory generation
-  | 'incremental';       // Resume from previous state
+export type ExecutionMode =
+  | 'discovery-only' // Only run component discovery
+  | 'analysis-only' // Discovery + parsing + dependency analysis
+  | 'full-pipeline' // Complete analysis + inventory generation
+  | 'incremental'; // Resume from previous state
 
 /**
  * Pipeline execution options
@@ -35,31 +44,31 @@ export type ExecutionMode =
 export interface PipelineOptions {
   /** Execution mode */
   mode: ExecutionMode;
-  
+
   /** Enable parallel processing */
   parallel: boolean;
-  
+
   /** Maximum number of worker threads */
   maxWorkers: number;
-  
+
   /** Skip components with errors */
   skipErrors: boolean;
-  
+
   /** Generate detailed reports */
   generateReports: boolean;
-  
+
   /** Output directory for results */
   outputDir: string;
-  
+
   /** Save intermediate results */
   saveIntermediateResults: boolean;
-  
+
   /** Resume from checkpoint */
   resumeFromCheckpoint?: string;
-  
+
   /** Maximum execution time (minutes) */
   maxExecutionTime: number;
-  
+
   /** Dry run mode - no file writes */
   dryRun: boolean;
 }
@@ -70,22 +79,22 @@ export interface PipelineOptions {
 export interface PipelineContext {
   /** Execution start time */
   startTime: Date;
-  
+
   /** Current phase */
   currentPhase: PipelinePhase;
-  
+
   /** Total components to process */
   totalComponents: number;
-  
+
   /** Components processed so far */
   processedComponents: number;
-  
+
   /** Execution options */
   options: PipelineOptions;
-  
+
   /** Configuration */
   config: ExtractionConfig;
-  
+
   /** Working directory */
   workingDir: string;
 }
@@ -93,7 +102,7 @@ export interface PipelineContext {
 /**
  * Pipeline execution phase
  */
-export type PipelinePhase = 
+export type PipelinePhase =
   | 'initialization'
   | 'discovery'
   | 'parsing'
@@ -110,19 +119,19 @@ export type PipelinePhase =
 export interface PipelineProgress {
   /** Current phase */
   phase: PipelinePhase;
-  
+
   /** Phase progress (0-100) */
   phaseProgress: number;
-  
+
   /** Overall progress (0-100) */
   overallProgress: number;
-  
+
   /** Current operation description */
   currentOperation: string;
-  
+
   /** Estimated time remaining */
   estimatedTimeRemaining?: string;
-  
+
   /** Processing statistics */
   stats: {
     componentsDiscovered: number;
@@ -139,34 +148,34 @@ export interface PipelineProgress {
 export interface PipelineResult {
   /** Execution success status */
   success: boolean;
-  
+
   /** Execution context */
   context: PipelineContext;
-  
+
   /** Final progress state */
   progress: PipelineProgress;
-  
+
   /** Discovery results */
   discovery?: DiscoveryResult | undefined;
-  
+
   /** Parsing results */
   parsing?: Map<string, ParseResult> | undefined;
-  
+
   /** Dependency analysis results */
   dependencies?: DependencyAnalysisResult | undefined;
-  
+
   /** Component inventory */
   inventory?: ComponentInventory | undefined;
-  
+
   /** Execution metrics */
   metrics: PipelineMetrics;
-  
+
   /** Errors encountered */
   errors: PipelineError[];
-  
+
   /** Warnings generated */
   warnings: string[];
-  
+
   /** Output file paths */
   outputPaths: string[];
 }
@@ -177,26 +186,26 @@ export interface PipelineResult {
 export interface PipelineMetrics {
   /** Total execution time */
   totalDuration: number;
-  
+
   /** Phase durations */
   phaseDurations: Record<PipelinePhase, number>;
-  
+
   /** Components processed per minute */
   throughput: number;
-  
+
   /** Memory usage statistics */
   memoryUsage: {
     peak: number;
     average: number;
   };
-  
+
   /** File system operations */
   fileOperations: {
     filesRead: number;
     filesWritten: number;
     bytesProcessed: number;
   };
-  
+
   /** Error statistics */
   errorStats: {
     parseErrors: number;
@@ -211,22 +220,22 @@ export interface PipelineMetrics {
 export interface PipelineError {
   /** Error message */
   message: string;
-  
+
   /** Error code */
   code: string;
-  
+
   /** Error severity */
   severity: 'warning' | 'error' | 'critical';
-  
+
   /** Phase where error occurred */
   phase: PipelinePhase;
-  
+
   /** Component path if applicable */
   componentPath?: string | undefined;
-  
+
   /** Original error */
   originalError?: Error | undefined;
-  
+
   /** Error timestamp */
   timestamp: Date;
 }
@@ -240,7 +249,7 @@ export interface PipelineEventHandler {
   onProgress?(progress: PipelineProgress): void;
   onError?(error: PipelineError): void;
   onWarning?(warning: string): void;
-  onComponentProcessed?(componentPath: string, result: any): void;
+  onComponentProcessed?(componentPath: string, result: any): void; // @any-allowed: callback result type
 }
 
 /**
@@ -250,13 +259,13 @@ export class PipelineOrchestrator {
   private readonly logger: Logger;
   private readonly fileSystem: FileSystemManager;
   private readonly eventHandlers: PipelineEventHandler[] = [];
-  
+
   // Analysis engines
   private discoveryEngine?: ComponentDiscoveryEngine;
   private parser?: ComponentParser;
   private dependencyAnalyzer?: DependencyAnalyzer;
   private inventoryGenerator?: ComponentInventoryGenerator;
-  
+
   // Execution state
   private context?: PipelineContext;
   private progress?: PipelineProgress;
@@ -307,23 +316,25 @@ export class PipelineOrchestrator {
       this.logger.info('Starting pipeline execution', {
         mode: context.options.mode,
         sourcePath: config.sourcePath,
-        outputDir: context.options.outputDir
+        outputDir: context.options.outputDir,
       });
 
       // Execute pipeline phases
       const result = await this.executePipeline(context);
-      
+
       this.logger.info('Pipeline execution completed', {
         success: result.success,
         duration: result.metrics.totalDuration,
-        componentsProcessed: result.progress.stats.componentsDiscovered
+        componentsProcessed: result.progress.stats.componentsDiscovered,
       });
 
       return result;
-
     } catch (error) {
-      this.logger.error('Pipeline execution failed:', error instanceof Error ? error : undefined);
-      
+      this.logger.error(
+        'Pipeline execution failed:',
+        error instanceof Error ? error : undefined
+      );
+
       return this.createErrorResult(
         error instanceof Error ? error : new Error('Unknown pipeline error')
       );
@@ -384,7 +395,7 @@ export class PipelineOrchestrator {
       saveIntermediateResults: false,
       maxExecutionTime: 60, // 1 hour
       dryRun: false,
-      ...options
+      ...options,
     };
 
     // Ensure output directory exists
@@ -400,7 +411,7 @@ export class PipelineOrchestrator {
       processedComponents: 0,
       options: pipelineOptions,
       config,
-      workingDir: resolve(pipelineOptions.outputDir)
+      workingDir: resolve(pipelineOptions.outputDir),
     };
 
     // Initialize progress tracking
@@ -414,8 +425,8 @@ export class PipelineOrchestrator {
         componentsParsed: 0,
         componentsAnalyzed: 0,
         errorsEncountered: 0,
-        warningsGenerated: 0
-      }
+        warningsGenerated: 0,
+      },
     };
 
     return context;
@@ -424,7 +435,9 @@ export class PipelineOrchestrator {
   /**
    * Execute pipeline phases based on mode
    */
-  private async executePipeline(context: PipelineContext): Promise<PipelineResult> {
+  private async executePipeline(
+    context: PipelineContext
+  ): Promise<PipelineResult> {
     const startTime = Date.now();
     const errors: PipelineError[] = [];
     const warnings: string[] = [];
@@ -440,37 +453,53 @@ export class PipelineOrchestrator {
       if (this.shouldExecutePhase('discovery', context.options.mode)) {
         discovery = await this.executeDiscoveryPhase(context);
         context.totalComponents = discovery.components.length;
-        
+
         if (this.shouldCancel) {
           throw new Error('Pipeline cancelled by user');
         }
       }
 
       // Phase 2: Component Parsing
-      if (this.shouldExecutePhase('parsing', context.options.mode) && discovery) {
+      if (
+        this.shouldExecutePhase('parsing', context.options.mode) &&
+        discovery
+      ) {
         parsing = await this.executeParsingPhase(context, discovery.components);
-        
+
         if (this.shouldCancel) {
           throw new Error('Pipeline cancelled by user');
         }
       }
 
       // Phase 3: Dependency Analysis
-      if (this.shouldExecutePhase('dependency-analysis', context.options.mode) && discovery) {
-        dependencies = await this.executeDependencyAnalysisPhase(context, discovery.components);
-        
+      if (
+        this.shouldExecutePhase('dependency-analysis', context.options.mode) &&
+        discovery
+      ) {
+        dependencies = await this.executeDependencyAnalysisPhase(
+          context,
+          discovery.components
+        );
+
         if (this.shouldCancel) {
           throw new Error('Pipeline cancelled by user');
         }
       }
 
       // Phase 4: Inventory Generation
-      if (this.shouldExecutePhase('inventory-generation', context.options.mode) && 
-          discovery && parsing && dependencies) {
+      if (
+        this.shouldExecutePhase('inventory-generation', context.options.mode) &&
+        discovery &&
+        parsing &&
+        dependencies
+      ) {
         inventory = await this.executeInventoryGenerationPhase(
-          context, discovery, parsing, dependencies
+          context,
+          discovery,
+          parsing,
+          dependencies
         );
-        
+
         if (context.options.generateReports && !context.options.dryRun) {
           const reportPaths = await this.generateReports(inventory);
           outputPaths.push(...reportPaths);
@@ -485,7 +514,7 @@ export class PipelineOrchestrator {
         phase: 'completed',
         phaseProgress: 100,
         overallProgress: 100,
-        currentOperation: 'Pipeline completed successfully'
+        currentOperation: 'Pipeline completed successfully',
       });
 
       return {
@@ -499,9 +528,8 @@ export class PipelineOrchestrator {
         metrics,
         errors,
         warnings,
-        outputPaths
+        outputPaths,
       };
-
     } catch (error) {
       const pipelineError: PipelineError = {
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -509,7 +537,7 @@ export class PipelineOrchestrator {
         severity: 'critical',
         phase: context.currentPhase,
         originalError: error instanceof Error ? error : undefined,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       errors.push(pipelineError);
@@ -526,7 +554,7 @@ export class PipelineOrchestrator {
         metrics: this.calculateMetrics(context, startTime),
         errors,
         warnings,
-        outputPaths
+        outputPaths,
       };
     }
   }
@@ -534,7 +562,9 @@ export class PipelineOrchestrator {
   /**
    * Execute component discovery phase
    */
-  private async executeDiscoveryPhase(context: PipelineContext): Promise<DiscoveryResult> {
+  private async executeDiscoveryPhase(
+    context: PipelineContext
+  ): Promise<DiscoveryResult> {
     this.updatePhase('discovery', 'Discovering components...');
 
     // Initialize discovery engine if needed
@@ -544,14 +574,14 @@ export class PipelineOrchestrator {
         this.logger,
         {
           parallel: context.options.parallel,
-          workers: context.options.maxWorkers
+          workers: context.options.maxWorkers,
         }
       );
     }
 
     this.updateProgress({
       phaseProgress: 10,
-      currentOperation: 'Scanning source directory...'
+      currentOperation: 'Scanning source directory...',
     });
 
     const result = await this.discoveryEngine.discoverComponents();
@@ -561,8 +591,8 @@ export class PipelineOrchestrator {
       currentOperation: `Discovered ${result.components.length} components`,
       stats: {
         ...this.progress!.stats,
-        componentsDiscovered: result.components.length
-      }
+        componentsDiscovered: result.components.length,
+      },
     });
 
     this.emitPhaseComplete('discovery');
@@ -584,7 +614,7 @@ export class PipelineOrchestrator {
         includePrivateMethods: false,
         extractJSDoc: true,
         analyzeComplexity: true,
-        maxFileSize: 1024 * 1024 // 1MB
+        maxFileSize: 1024 * 1024, // 1MB
       });
     }
 
@@ -597,27 +627,29 @@ export class PipelineOrchestrator {
       try {
         this.updateProgress({
           phaseProgress: Math.round((processed / components.length) * 100),
-          currentOperation: `Parsing ${component.name}...`
+          currentOperation: `Parsing ${component.name}...`,
         });
 
-        const parseResult = await this.parser.parseComponent(component.sourcePath, component);
+        const parseResult = await this.parser.parseComponent(
+          component.sourcePath,
+          component
+        );
         results.set(component.sourcePath, parseResult);
 
         if (parseResult.success) {
           this.progress!.stats.componentsParsed++;
         } else {
           this.progress!.stats.errorsEncountered++;
-          
+
           if (!context.options.skipErrors) {
             this.emitWarning(`Failed to parse component: ${component.name}`);
           }
         }
 
         this.emitComponentProcessed(component.sourcePath, parseResult);
-
       } catch (error) {
         this.progress!.stats.errorsEncountered++;
-        
+
         if (!context.options.skipErrors) {
           throw error;
         } else {
@@ -631,7 +663,7 @@ export class PipelineOrchestrator {
 
     this.updateProgress({
       phaseProgress: 100,
-      currentOperation: `Parsed ${this.progress!.stats.componentsParsed} components`
+      currentOperation: `Parsed ${this.progress!.stats.componentsParsed} components`,
     });
 
     this.emitPhaseComplete('parsing');
@@ -653,24 +685,25 @@ export class PipelineOrchestrator {
         includeTransitive: true,
         maxDepth: 5,
         detectCycles: true,
-        generateClusters: true
+        generateClusters: true,
       });
     }
 
     this.updateProgress({
       phaseProgress: 10,
-      currentOperation: 'Building dependency graph...'
+      currentOperation: 'Building dependency graph...',
     });
 
-    const result = await this.dependencyAnalyzer.analyzeDependencies(components);
+    const result =
+      await this.dependencyAnalyzer.analyzeDependencies(components);
 
     this.updateProgress({
       phaseProgress: 100,
       currentOperation: `Analyzed ${result.dependencies.length} dependencies`,
       stats: {
         ...this.progress!.stats,
-        componentsAnalyzed: components.length
-      }
+        componentsAnalyzed: components.length,
+      },
     });
 
     this.emitPhaseComplete('dependency-analysis');
@@ -686,7 +719,10 @@ export class PipelineOrchestrator {
     parsing: Map<string, ParseResult>,
     dependencies: DependencyAnalysisResult
   ): Promise<ComponentInventory> {
-    this.updatePhase('inventory-generation', 'Generating component inventory...');
+    this.updatePhase(
+      'inventory-generation',
+      'Generating component inventory...'
+    );
 
     // Initialize inventory generator if needed
     if (!this.inventoryGenerator) {
@@ -695,13 +731,13 @@ export class PipelineOrchestrator {
         includeDetailedReports: true,
         generateJson: true,
         generateMarkdown: true,
-        readinessThreshold: 75
+        readinessThreshold: 75,
       });
     }
 
     this.updateProgress({
       phaseProgress: 50,
-      currentOperation: 'Assessing component readiness...'
+      currentOperation: 'Assessing component readiness...',
     });
 
     const inventory = await this.inventoryGenerator.generateInventory(
@@ -713,7 +749,7 @@ export class PipelineOrchestrator {
 
     this.updateProgress({
       phaseProgress: 100,
-      currentOperation: 'Component inventory generated'
+      currentOperation: 'Component inventory generated',
     });
 
     this.emitPhaseComplete('inventory-generation');
@@ -723,17 +759,19 @@ export class PipelineOrchestrator {
   /**
    * Generate output reports
    */
-  private async generateReports(inventory: ComponentInventory): Promise<string[]> {
+  private async generateReports(
+    inventory: ComponentInventory
+  ): Promise<string[]> {
     if (!this.inventoryGenerator) {
       throw new Error('Inventory generator not initialized');
     }
 
     await this.inventoryGenerator.exportInventory(inventory);
-    
+
     // Return paths to generated files
     return [
       join(inventory.metadata.config.sourcePath, 'component-inventory.json'),
-      join(inventory.metadata.config.sourcePath, 'component-inventory.md')
+      join(inventory.metadata.config.sourcePath, 'component-inventory.md'),
     ];
   }
 
@@ -779,18 +817,18 @@ export class PipelineOrchestrator {
   private updateProgress(updates: Partial<PipelineProgress>): void {
     if (this.progress) {
       Object.assign(this.progress, updates);
-      
+
       // Calculate overall progress based on phase
       const phaseWeights = {
-        'initialization': 5,
-        'discovery': 20,
-        'parsing': 30,
+        initialization: 5,
+        discovery: 20,
+        parsing: 30,
         'dependency-analysis': 25,
         'inventory-generation': 15,
         'output-generation': 5,
-        'cleanup': 0,
-        'completed': 0,
-        'failed': 0
+        cleanup: 0,
+        completed: 0,
+        failed: 0,
       };
 
       const completedWeight = Object.entries(phaseWeights)
@@ -798,9 +836,13 @@ export class PipelineOrchestrator {
         .reduce((sum, [, weight]) => sum + weight, 0);
 
       const currentPhaseWeight = phaseWeights[this.progress.phase] || 0;
-      const currentPhaseProgress = (this.progress.phaseProgress / 100) * currentPhaseWeight;
+      const currentPhaseProgress =
+        (this.progress.phaseProgress / 100) * currentPhaseWeight;
 
-      this.progress.overallProgress = Math.min(100, completedWeight + currentPhaseProgress);
+      this.progress.overallProgress = Math.min(
+        100,
+        completedWeight + currentPhaseProgress
+      );
 
       this.emitProgress(this.progress);
     }
@@ -811,10 +853,15 @@ export class PipelineOrchestrator {
    */
   private isPhaseComplete(phase: PipelinePhase): boolean {
     if (!this.progress) return false;
-    
+
     const phaseOrder: PipelinePhase[] = [
-      'initialization', 'discovery', 'parsing', 'dependency-analysis', 
-      'inventory-generation', 'output-generation', 'cleanup'
+      'initialization',
+      'discovery',
+      'parsing',
+      'dependency-analysis',
+      'inventory-generation',
+      'output-generation',
+      'cleanup',
     ];
 
     const currentIndex = phaseOrder.indexOf(this.progress.phase);
@@ -826,10 +873,16 @@ export class PipelineOrchestrator {
   /**
    * Calculate execution metrics
    */
-  private calculateMetrics(context: PipelineContext, startTime: number): PipelineMetrics {
+  private calculateMetrics(
+    context: PipelineContext,
+    startTime: number
+  ): PipelineMetrics {
     const totalDuration = Date.now() - startTime;
     const componentsProcessed = context.processedComponents;
-    const throughput = componentsProcessed > 0 ? (componentsProcessed / (totalDuration / 60000)) : 0;
+    const throughput =
+      componentsProcessed > 0
+        ? componentsProcessed / (totalDuration / 60000)
+        : 0;
 
     return {
       totalDuration,
@@ -837,18 +890,18 @@ export class PipelineOrchestrator {
       throughput,
       memoryUsage: {
         peak: process.memoryUsage().heapUsed,
-        average: process.memoryUsage().heapUsed
+        average: process.memoryUsage().heapUsed,
       },
       fileOperations: {
         filesRead: componentsProcessed,
         filesWritten: 0, // TODO: Track file writes
-        bytesProcessed: 0 // TODO: Track bytes processed
+        bytesProcessed: 0, // TODO: Track bytes processed
       },
       errorStats: {
         parseErrors: this.progress?.stats.errorsEncountered || 0,
         analysisErrors: 0,
-        ioErrors: 0
-      }
+        ioErrors: 0,
+      },
     } as PipelineMetrics;
   }
 
@@ -862,7 +915,7 @@ export class PipelineOrchestrator {
       severity: 'critical',
       phase: this.context?.currentPhase || 'initialization',
       timestamp: new Date(),
-      originalError: error
+      originalError: error,
     };
 
     return {
@@ -872,7 +925,7 @@ export class PipelineOrchestrator {
       metrics: this.calculateMetrics(this.context!, Date.now()),
       errors: [pipelineError],
       warnings: [],
-      outputPaths: []
+      outputPaths: [],
     };
   }
 
@@ -920,6 +973,7 @@ export class PipelineOrchestrator {
   }
 
   private emitComponentProcessed(path: string, result: any): void {
+    // @any-allowed: callback result type
     this.eventHandlers.forEach(handler => {
       if (handler.onComponentProcessed) {
         handler.onComponentProcessed(path, result);

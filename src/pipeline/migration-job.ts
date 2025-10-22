@@ -7,7 +7,11 @@
  * @version 1.0.0
  */
 
-import type { ComponentDefinition, ExtractionConfig, MigrationResult } from '@/types';
+import type {
+  ComponentDefinition,
+  ExtractionConfig,
+  MigrationResult,
+} from '@/types';
 import { ComponentDiscoveryService } from './extractors/discovery';
 import { V1ComponentExtractor } from './extractors/v1-extractor';
 import { ConfiguratorTransformer } from './transformers/configurator-transformer';
@@ -82,7 +86,9 @@ export class MigrationJob {
     return { results, summary };
   }
 
-  private async migrateComponent(component: ComponentDefinition): Promise<MigrationResult> {
+  private async migrateComponent(
+    component: ComponentDefinition
+  ): Promise<MigrationResult> {
     const perfStart = this.performanceMonitor.startMonitoring(component.name);
 
     try {
@@ -100,9 +106,16 @@ export class MigrationJob {
       const generation = await generator.generate(transformation, sourceCode);
 
       const validator = new MigrationValidator(this.config);
-      const validation = await validator.validate(component, transformation, generation);
+      const validation = await validator.validate(
+        component,
+        transformation,
+        generation
+      );
 
-      const performance = this.performanceMonitor.endMonitoring(component.name, perfStart);
+      const performance = this.performanceMonitor.endMonitoring(
+        component.name,
+        perfStart
+      );
 
       return {
         success: validation.valid,
@@ -132,7 +145,9 @@ export class MigrationJob {
         quality: {
           overallScore: validation.score,
           typeSafety: 100,
-          businessLogicPreservation: transformation.businessLogicPreserved ? 100 : 0,
+          businessLogicPreservation: transformation.businessLogicPreserved
+            ? 100
+            : 0,
           codeQuality: 100,
           performance: 100,
           maintainability: 100,

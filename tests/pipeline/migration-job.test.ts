@@ -3,10 +3,7 @@
  */
 
 import { describe, it, expect, jest } from '@jest/globals';
-import {
-  MigrationJob,
-  createMigrationJob,
-} from '@/pipeline/migration-job';
+import { MigrationJob, createMigrationJob } from '@/pipeline/migration-job';
 import type { ExtractionConfig } from '@/types';
 
 jest.mock('@/pipeline/extractors/discovery');
@@ -26,19 +23,58 @@ const mockConfig: ExtractionConfig = {
     mode: 'parallel',
     concurrency: 4,
     continueOnError: true,
-    retry: { maxAttempts: 3, delay: 1000, backoffMultiplier: 2, retryableOperations: [] },
-    filters: { include: [], exclude: [], types: [], complexity: [], custom: [] },
+    retry: {
+      maxAttempts: 3,
+      delay: 1000,
+      backoffMultiplier: 2,
+      retryableOperations: [],
+    },
+    filters: {
+      include: [],
+      exclude: [],
+      types: [],
+      complexity: [],
+      custom: [],
+    },
   },
-  performance: { memoryLimit: 1024, timeoutPerComponent: 30000, maxBundleSizeIncrease: 120, monitoring: true },
-  validation: { strict: false, typescript: true, eslint: false, componentStructure: true, businessLogicPreservation: true },
+  performance: {
+    memoryLimit: 1024,
+    timeoutPerComponent: 30000,
+    maxBundleSizeIncrease: 120,
+    monitoring: true,
+  },
+  validation: {
+    strict: false,
+    typescript: true,
+    eslint: false,
+    componentStructure: true,
+    businessLogicPreservation: true,
+  },
   output: {
     generateDeclarations: true,
     generateDocs: false,
     generateExamples: false,
-    format: { typescript: '.tsx', indentation: 'spaces', indentationSize: 2, lineEnding: 'lf', quotes: 'single' },
-    naming: { componentFiles: 'PascalCase', interfaces: 'PascalCase', utilities: 'camelCase', constants: 'UPPER_SNAKE_CASE' },
+    format: {
+      typescript: '.tsx',
+      indentation: 'spaces',
+      indentationSize: 2,
+      lineEnding: 'lf',
+      quotes: 'single',
+    },
+    naming: {
+      componentFiles: 'PascalCase',
+      interfaces: 'PascalCase',
+      utilities: 'camelCase',
+      constants: 'UPPER_SNAKE_CASE',
+    },
   },
-  logging: { level: 'info', outputs: ['console'], format: 'detailed', timestamps: true, stackTraces: true },
+  logging: {
+    level: 'info',
+    outputs: ['console'],
+    format: 'detailed',
+    timestamps: true,
+    stackTraces: true,
+  },
 };
 
 const mockComponent = {
@@ -57,24 +93,42 @@ const mockComponent = {
 
 describe('MigrationJob', () => {
   beforeEach(() => {
-    const { ComponentDiscoveryService } = require('@/pipeline/extractors/discovery');
-    const { V1ComponentExtractor } = require('@/pipeline/extractors/v1-extractor');
-    const { ConfiguratorTransformer } = require('@/pipeline/transformers/configurator-transformer');
-    const { V2ComponentGenerator } = require('@/pipeline/generators/v2-generator');
-    const { MigrationValidator } = require('@/pipeline/validators/migration-validator');
+    const {
+      ComponentDiscoveryService,
+    } = require('@/pipeline/extractors/discovery');
+    const {
+      V1ComponentExtractor,
+    } = require('@/pipeline/extractors/v1-extractor');
+    const {
+      ConfiguratorTransformer,
+    } = require('@/pipeline/transformers/configurator-transformer');
+    const {
+      V2ComponentGenerator,
+    } = require('@/pipeline/generators/v2-generator');
+    const {
+      MigrationValidator,
+    } = require('@/pipeline/validators/migration-validator');
     const { FileSystemManager } = require('@/utils/filesystem');
 
-    ComponentDiscoveryService.prototype.discoverComponents = jest.fn().mockResolvedValue({
-      components: [mockComponent],
-      statistics: { componentsFound: 1, componentsByType: {}, componentsByComplexity: {} },
-      duration: 100,
-    });
+    ComponentDiscoveryService.prototype.discoverComponents = jest
+      .fn()
+      .mockResolvedValue({
+        components: [mockComponent],
+        statistics: {
+          componentsFound: 1,
+          componentsByType: {},
+          componentsByComplexity: {},
+        },
+        duration: 100,
+      });
 
-    V1ComponentExtractor.prototype.extractComponent = jest.fn().mockResolvedValue({
-      success: true,
-      component: mockComponent,
-      extractedFiles: [],
-    });
+    V1ComponentExtractor.prototype.extractComponent = jest
+      .fn()
+      .mockResolvedValue({
+        success: true,
+        component: mockComponent,
+        extractedFiles: [],
+      });
 
     ConfiguratorTransformer.prototype.transform = jest.fn().mockResolvedValue({
       original: mockComponent,
@@ -90,7 +144,13 @@ describe('MigrationJob', () => {
     V2ComponentGenerator.prototype.generate = jest.fn().mockResolvedValue({
       component: mockComponent,
       artifacts: {
-        component: { path: 'Test.tsx', content: '', size: 0, type: 'component', generatedAt: new Date() },
+        component: {
+          path: 'Test.tsx',
+          content: '',
+          size: 0,
+          type: 'component',
+          generatedAt: new Date(),
+        },
         types: [],
         tests: [],
         documentation: [],
@@ -143,8 +203,12 @@ describe('MigrationJob', () => {
     });
 
     it('should handle migration failures', async () => {
-      const { ConfiguratorTransformer } = require('@/pipeline/transformers/configurator-transformer');
-      ConfiguratorTransformer.prototype.transform = jest.fn().mockRejectedValue(new Error('Transform failed'));
+      const {
+        ConfiguratorTransformer,
+      } = require('@/pipeline/transformers/configurator-transformer');
+      ConfiguratorTransformer.prototype.transform = jest
+        .fn()
+        .mockRejectedValue(new Error('Transform failed'));
 
       const job = new MigrationJob({ config: mockConfig });
 
@@ -152,12 +216,20 @@ describe('MigrationJob', () => {
     });
 
     it('should process multiple components', async () => {
-      const { ComponentDiscoveryService } = require('@/pipeline/extractors/discovery');
-      ComponentDiscoveryService.prototype.discoverComponents = jest.fn().mockResolvedValue({
-        components: [mockComponent, { ...mockComponent, id: '2' }],
-        statistics: { componentsFound: 2, componentsByType: {}, componentsByComplexity: {} },
-        duration: 100,
-      });
+      const {
+        ComponentDiscoveryService,
+      } = require('@/pipeline/extractors/discovery');
+      ComponentDiscoveryService.prototype.discoverComponents = jest
+        .fn()
+        .mockResolvedValue({
+          components: [mockComponent, { ...mockComponent, id: '2' }],
+          statistics: {
+            componentsFound: 2,
+            componentsByType: {},
+            componentsByComplexity: {},
+          },
+          duration: 100,
+        });
 
       const job = new MigrationJob({ config: mockConfig });
       const result = await job.execute();
@@ -179,7 +251,10 @@ describe('Utility Functions', () => {
   });
 
   it('should accept component name filter', () => {
-    const job = createMigrationJob({ config: mockConfig, componentName: 'Test' });
+    const job = createMigrationJob({
+      config: mockConfig,
+      componentName: 'Test',
+    });
     expect(job).toBeInstanceOf(MigrationJob);
   });
 });

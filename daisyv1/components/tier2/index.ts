@@ -1,6 +1,6 @@
 /**
  * DAISY v1 Component Library - Tier 2 Components
- * 
+ *
  * This index exports all Tier 2 components from the original DAISY v1 system.
  * These components represent the baseline that needs to be preserved while
  * transforming to Configurator v2 architecture.
@@ -30,14 +30,14 @@ export const DAISY_V1_COMPONENTS = {
       'loading states',
       'tooltip functionality',
       'keyboard navigation',
-      'haptic feedback'
+      'haptic feedback',
     ],
     transformationChallenges: [
       'HOC pattern to functional composition',
       'Custom event tracking to standard analytics',
       'CSS theming to design tokens',
       'Direct DOM manipulation to React patterns',
-      'Custom tooltip to standard tooltip system'
-    ]
-  }
+      'Custom tooltip to standard tooltip system',
+    ],
+  },
 } as const;

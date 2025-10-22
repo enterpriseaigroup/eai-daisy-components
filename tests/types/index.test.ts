@@ -107,7 +107,9 @@ describe('Type Definitions', () => {
       ];
 
       hookPatterns.forEach(pattern => {
-        expect(pattern.startsWith('use') || pattern.includes('hook')).toBe(true);
+        expect(pattern.startsWith('use') || pattern.includes('hook')).toBe(
+          true
+        );
       });
     });
 
@@ -254,7 +256,8 @@ describe('Type Definitions', () => {
     it('should define complex business logic with dependencies', () => {
       const logic: BusinessLogicDefinition = {
         name: 'fetchUserData',
-        signature: 'const fetchUserData = async (userId: string): Promise<User>',
+        signature:
+          'const fetchUserData = async (userId: string): Promise<User>',
         purpose: 'Fetch user data from API',
         parameters: [
           {

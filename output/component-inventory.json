@@ -16,31 +16,13 @@
           "maxAttempts": 2,
           "delay": 1000,
           "backoffMultiplier": 1.5,
-          "retryableOperations": [
-            "file-read",
-            "ast-parsing"
-          ]
+          "retryableOperations": ["file-read", "ast-parsing"]
         },
         "filters": {
-          "include": [
-            "**/*.tsx",
-            "**/*.ts",
-            "**/*.css"
-          ],
-          "exclude": [
-            "**/*.test.*",
-            "**/*.spec.*"
-          ],
-          "types": [
-            "functional",
-            "class",
-            "higher-order"
-          ],
-          "complexity": [
-            "simple",
-            "moderate",
-            "complex"
-          ],
+          "include": ["**/*.tsx", "**/*.ts", "**/*.css"],
+          "exclude": ["**/*.test.*", "**/*.spec.*"],
+          "types": ["functional", "class", "higher-order"],
+          "complexity": ["simple", "moderate", "complex"],
           "custom": []
         }
       },
@@ -77,10 +59,7 @@
       },
       "logging": {
         "level": "info",
-        "outputs": [
-          "console",
-          "file"
-        ],
+        "outputs": ["console", "file"],
         "format": "simple",
         "timestamps": true,
         "stackTraces": true
@@ -367,10 +346,7 @@
         "phase": 1,
         "name": "Phase 1: Foundation",
         "description": "Extract ready components to establish migration foundation",
-        "components": [
-          "Button",
-          "TestComponent"
-        ],
+        "components": ["Button", "TestComponent"],
         "dependencies": [],
         "estimatedDuration": "1 week",
         "successCriteria": [
@@ -389,12 +365,7 @@
     "resourceRequirements": {
       "developers": 1,
       "duration": "3 weeks",
-      "skills": [
-        "React",
-        "TypeScript",
-        "Component Architecture",
-        "Testing"
-      ]
+      "skills": ["React", "TypeScript", "Component Architecture", "Testing"]
     },
     "successMetrics": [
       "All components successfully migrated",
@@ -656,10 +627,7 @@
           "circularDependencies": 0,
           "averageCoupling": 0,
           "density": 0,
-          "hubs": [
-            "Button",
-            "TestComponent"
-          ]
+          "hubs": ["Button", "TestComponent"]
         }
       },
       "metrics": {
@@ -670,10 +638,7 @@
         "circularDependencies": 0,
         "averageCoupling": 0,
         "density": 0,
-        "hubs": [
-          "Button",
-          "TestComponent"
-        ]
+        "hubs": ["Button", "TestComponent"]
       },
       "recommendations": [
         {

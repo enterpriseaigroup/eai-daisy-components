@@ -1,9 +1,9 @@
 /**
  * Configuration Management System
- * 
- * Provides runtime-validated configuration management for the component 
+ *
+ * Provides runtime-validated configuration management for the component
  * extraction pipeline using Zod schemas for type safety and validation.
- * 
+ *
  * @fileoverview Configuration management with Zod validation
  * @version 1.0.0
  */
@@ -22,6 +22,10 @@ import type {
   RetryConfig,
   ComponentFilters,
   LoggingConfig,
+  RetryableOperation,
+  LogOutput,
+  ComponentType,
+  ComplexityLevel,
 } from '@/types';
 
 // ============================================================================
@@ -33,7 +37,7 @@ import type {
  */
 const ComponentTypeSchema = z.enum([
   'functional',
-  'class', 
+  'class',
   'higher-order',
   'hook',
   'utility',
@@ -52,33 +56,17 @@ const ComplexityLevelSchema = z.enum([
 /**
  * Schema for log level validation
  */
-const LogLevelSchema = z.enum([
-  'debug',
-  'info',
-  'warn',
-  'error',
-  'silent',
-]);
+const LogLevelSchema = z.enum(['debug', 'info', 'warn', 'error', 'silent']);
 
 /**
  * Schema for log output validation
  */
-const LogOutputSchema = z.enum([
-  'console',
-  'file',
-  'json',
-  'structured',
-]);
+const LogOutputSchema = z.enum(['console', 'file', 'json', 'structured']);
 
 /**
  * Schema for log format validation
  */
-const LogFormatSchema = z.enum([
-  'simple',
-  'detailed',
-  'json',
-  'structured',
-]);
+const LogFormatSchema = z.enum(['simple', 'detailed', 'json', 'structured']);
 
 /**
  * Schema for retryable operations
@@ -94,15 +82,16 @@ const RetryableOperationSchema = z.enum([
 /**
  * Schema for file path validation with existence check
  */
-const FilePathSchema = z.string()
+const FilePathSchema = z
+  .string()
   .min(1, 'Path cannot be empty')
-  .refine((path) => {
+  .refine(path => {
     if (!isAbsolute(path)) {
       return false;
     }
     return true;
   }, 'Path must be absolute')
-  .refine((path) => {
+  .refine(path => {
     try {
       accessSync(path, constants.F_OK);
       return true;
@@ -114,9 +103,10 @@ const FilePathSchema = z.string()
 /**
  * Schema for directory path validation
  */
-const DirectoryPathSchema = z.string()
+const DirectoryPathSchema = z
+  .string()
   .min(1, 'Directory path cannot be empty')
-  .refine((path) => isAbsolute(path), 'Directory path must be absolute');
+  .refine(path => isAbsolute(path), 'Directory path must be absolute');
 
 /**
  * Schema for output format configuration
@@ -133,10 +123,14 @@ const OutputFormatSchema: z.ZodType<OutputFormat> = z.object({
  * Schema for naming conventions configuration
  */
 const NamingConventionsSchema: z.ZodType<NamingConventions> = z.object({
-  componentFiles: z.enum(['PascalCase', 'kebab-case', 'camelCase']).default('PascalCase'),
+  componentFiles: z
+    .enum(['PascalCase', 'kebab-case', 'camelCase'])
+    .default('PascalCase'),
   interfaces: z.enum(['PascalCase', 'IPascalCase']).default('PascalCase'),
   utilities: z.enum(['camelCase', 'snake_case']).default('camelCase'),
-  constants: z.enum(['UPPER_SNAKE_CASE', 'UPPER_CAMEL_CASE']).default('UPPER_SNAKE_CASE'),
+  constants: z
+    .enum(['UPPER_SNAKE_CASE', 'UPPER_CAMEL_CASE'])
+    .default('UPPER_SNAKE_CASE'),
 }) as z.ZodType<NamingConventions>;
 
 /**
@@ -146,11 +140,9 @@ const RetryConfigSchema: z.ZodType<RetryConfig> = z.object({
   maxAttempts: z.number().int().min(0).max(10).default(3),
   delay: z.number().int().min(0).max(60000).default(1000),
   backoffMultiplier: z.number().min(1).max(5).default(2),
-  retryableOperations: z.array(RetryableOperationSchema).default([
-    'file-read',
-    'file-write',
-    'ast-parsing',
-  ]),
+  retryableOperations: z
+    .array(RetryableOperationSchema)
+    .default(['file-read', 'file-write', 'ast-parsing']),
 }) as z.ZodType<RetryConfig>;
 
 /**
@@ -158,25 +150,21 @@ const RetryConfigSchema: z.ZodType<RetryConfig> = z.object({
  */
 const ComponentFiltersSchema: z.ZodType<ComponentFilters> = z.object({
   include: z.array(z.string()).default(['**/*']),
-  exclude: z.array(z.string()).default([
-    '**/node_modules/**',
-    '**/dist/**',
-    '**/build/**',
-    '**/*.test.*',
-    '**/*.spec.*',
-  ]),
-  types: z.array(ComponentTypeSchema).default([
-    'functional',
-    'class',
-    'higher-order',
-    'hook',
-  ]),
-  complexity: z.array(ComplexityLevelSchema).default([
-    'simple',
-    'moderate',
-    'complex',
-    'critical',
-  ]),
+  exclude: z
+    .array(z.string())
+    .default([
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/*.test.*',
+      '**/*.spec.*',
+    ]),
+  types: z
+    .array(ComponentTypeSchema)
+    .default(['functional', 'class', 'higher-order', 'hook']),
+  complexity: z
+    .array(ComplexityLevelSchema)
+    .default(['simple', 'moderate', 'complex', 'critical']),
   custom: z.array(z.function()).default([]),
 }) as z.ZodType<ComponentFilters>;
 
@@ -187,8 +175,23 @@ const ProcessingConfigSchema: z.ZodType<ProcessingConfig> = z.object({
   mode: z.enum(['serial', 'parallel', 'adaptive']).default('serial'),
   concurrency: z.number().int().min(1).max(16).optional(),
   continueOnError: z.boolean().default(false),
-  retry: RetryConfigSchema.default({}),
-  filters: ComponentFiltersSchema.default({}),
+  retry: RetryConfigSchema.default(() => ({
+    maxAttempts: 3,
+    delay: 1000,
+    backoffMultiplier: 2,
+    retryableOperations: [
+      'file-read',
+      'file-write',
+      'ast-parsing',
+    ] as RetryableOperation[],
+  })),
+  filters: ComponentFiltersSchema.default(() => ({
+    include: ['**/*'],
+    exclude: ['**/node_modules/**', '**/dist/**'],
+    types: ['functional', 'class', 'higher-order'] as ComponentType[],
+    complexity: ['simple', 'moderate', 'complex'] as ComplexityLevel[],
+    custom: [],
+  })),
 }) as z.ZodType<ProcessingConfig>;
 
 /**
@@ -219,8 +222,19 @@ const OutputConfigSchema: z.ZodType<OutputConfig> = z.object({
   generateDeclarations: z.boolean().default(true),
   generateDocs: z.boolean().default(true),
   generateExamples: z.boolean().default(true),
-  format: OutputFormatSchema.default({}),
-  naming: NamingConventionsSchema.default({}),
+  format: OutputFormatSchema.default(() => ({
+    typescript: '.tsx' as const,
+    indentation: 'spaces' as const,
+    indentationSize: 2,
+    lineEnding: 'lf' as const,
+    quotes: 'single' as const,
+  })),
+  naming: NamingConventionsSchema.default(() => ({
+    componentFiles: 'PascalCase' as const,
+    interfaces: 'PascalCase' as const,
+    utilities: 'camelCase' as const,
+    constants: 'UPPER_SNAKE_CASE' as const,
+  })),
 }) as z.ZodType<OutputConfig>;
 
 /**
@@ -241,11 +255,65 @@ const ExtractionConfigSchema: z.ZodType<ExtractionConfig> = z.object({
   sourcePath: FilePathSchema,
   outputPath: DirectoryPathSchema,
   preserveBaseline: z.boolean().default(true),
-  processing: ProcessingConfigSchema.default({}),
-  performance: PerformanceConfigSchema.default({}),
-  validation: ValidationConfigSchema.default({}),
-  output: OutputConfigSchema.default({}),
-  logging: LoggingConfigSchema.default({}),
+  processing: ProcessingConfigSchema.default(() => ({
+    mode: 'serial' as const,
+    continueOnError: true,
+    retry: {
+      maxAttempts: 3,
+      delay: 1000,
+      backoffMultiplier: 2,
+      retryableOperations: [
+        'file-read',
+        'file-write',
+        'ast-parsing',
+      ] as RetryableOperation[],
+    },
+    filters: {
+      include: ['**/*'],
+      exclude: ['**/node_modules/**', '**/dist/**'],
+      types: ['functional', 'class', 'higher-order'] as ComponentType[],
+      complexity: ['simple', 'moderate', 'complex'] as ComplexityLevel[],
+      custom: [],
+    },
+  })),
+  performance: PerformanceConfigSchema.default(() => ({
+    memoryLimit: 500,
+    timeoutPerComponent: 1800000,
+    maxBundleSizeIncrease: 120,
+    monitoring: true,
+  })),
+  validation: ValidationConfigSchema.default(() => ({
+    strict: true,
+    typescript: true,
+    eslint: true,
+    componentStructure: true,
+    businessLogicPreservation: true,
+  })),
+  output: OutputConfigSchema.default(() => ({
+    generateDeclarations: true,
+    generateDocs: true,
+    generateExamples: true,
+    format: {
+      typescript: '.tsx' as const,
+      indentation: 'spaces' as const,
+      indentationSize: 2,
+      lineEnding: 'lf' as const,
+      quotes: 'single' as const,
+    },
+    naming: {
+      componentFiles: 'PascalCase' as const,
+      interfaces: 'PascalCase' as const,
+      utilities: 'camelCase' as const,
+      constants: 'UPPER_SNAKE_CASE' as const,
+    },
+  })),
+  logging: LoggingConfigSchema.default(() => ({
+    level: 'info' as const,
+    outputs: ['console', 'file'] as LogOutput[],
+    format: 'simple' as const,
+    timestamps: true,
+    stackTraces: true,
+  })),
 }) as z.ZodType<ExtractionConfig>;
 
 // ============================================================================
@@ -268,7 +336,7 @@ export class ConfigurationManager {
 
   /**
    * Load and validate configuration from object
-   * 
+   *
    * @param configData - Raw configuration data
    * @returns Validated configuration
    * @throws {ConfigurationError} When validation fails
@@ -286,13 +354,15 @@ export class ConfigurationManager {
           this.formatZodErrors(error)
         );
       }
-      throw new ConfigurationError('Configuration loading failed', [error as Error]);
+      throw new ConfigurationError('Configuration loading failed', [
+        error as Error,
+      ]);
     }
   }
 
   /**
    * Load configuration from JSON file
-   * 
+   *
    * @param filePath - Path to configuration file
    * @returns Validated configuration
    */
@@ -312,7 +382,7 @@ export class ConfigurationManager {
 
   /**
    * Create configuration with minimal required options
-   * 
+   *
    * @param sourcePath - Source directory path
    * @param outputPath - Output directory path
    * @param overrides - Optional configuration overrides
@@ -334,7 +404,7 @@ export class ConfigurationManager {
 
   /**
    * Get current configuration
-   * 
+   *
    * @returns Current configuration or null if not loaded
    */
   public getCurrentConfig(): ExtractionConfig | null {
@@ -343,7 +413,7 @@ export class ConfigurationManager {
 
   /**
    * Validate configuration paths
-   * 
+   *
    * @param config - Configuration to validate
    * @throws {ConfigurationError} When path validation fails
    */
@@ -371,7 +441,8 @@ export class ConfigurationManager {
     }
 
     if (errors.length > 0) {
-      throw new ConfigurationError('Path validation failed', 
+      throw new ConfigurationError(
+        'Path validation failed',
         errors.map(msg => new Error(msg))
       );
     }
@@ -379,7 +450,7 @@ export class ConfigurationManager {
 
   /**
    * Format Zod validation errors for user-friendly display
-   * 
+   *
    * @param zodError - Zod validation error
    * @returns Array of formatted error messages
    */
@@ -393,7 +464,7 @@ export class ConfigurationManager {
 
   /**
    * Get default configuration
-   * 
+   *
    * @returns Default configuration with placeholder paths
    */
   public static getDefaults(): Partial<ExtractionConfig> {
@@ -465,7 +536,7 @@ export class ConfigurationManager {
 
   /**
    * Validate individual configuration section
-   * 
+   *
    * @param section - Configuration section name
    * @param data - Section data to validate
    * @returns Validated section data
@@ -484,7 +555,10 @@ export class ConfigurationManager {
 
     const schema = sectionSchemas[section as keyof typeof sectionSchemas];
     if (!schema) {
-      throw new ConfigurationError(`Unknown configuration section: ${String(section)}`, []);
+      throw new ConfigurationError(
+        `Unknown configuration section: ${String(section)}`,
+        []
+      );
     }
 
     try {
@@ -515,7 +589,7 @@ export class ConfigurationError extends Error {
     super(message);
     this.name = 'ConfigurationError';
     this.errors = errors;
-    
+
     // Maintain proper stack trace
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ConfigurationError);
@@ -530,7 +604,9 @@ export class ConfigurationError extends Error {
       return this.message;
     }
 
-    const errorMessages = this.errors.map(error => `  - ${error.message}`).join('\n');
+    const errorMessages = this.errors
+      .map(error => `  - ${error.message}`)
+      .join('\n');
     return `${this.message}:\n${errorMessages}`;
   }
 
@@ -555,9 +631,9 @@ export function createConfigurationManager(): ConfigurationManager {
 
 /**
  * Quick configuration creation for common use cases
- * 
+ *
  * @param sourcePath - Source directory path
- * @param outputPath - Output directory path  
+ * @param outputPath - Output directory path
  * @param options - Optional configuration overrides
  * @returns Validated configuration
  */
@@ -572,7 +648,7 @@ export function createQuickConfig(
 
 /**
  * Validate configuration object without creating manager
- * 
+ *
  * @param configData - Configuration data to validate
  * @returns Validation result
  */
@@ -587,21 +663,21 @@ export function validateConfiguration(configData: unknown): {
     return { valid: true, config };
   } catch (error) {
     if (error instanceof ConfigurationError) {
-      return { 
-        valid: false, 
-        errors: error.getAllErrors() 
+      return {
+        valid: false,
+        errors: error.getAllErrors(),
       };
     }
-    return { 
-      valid: false, 
-      errors: [error instanceof Error ? error.message : 'Unknown error'] 
+    return {
+      valid: false,
+      errors: [error instanceof Error ? error.message : 'Unknown error'],
     };
   }
 }
 
 /**
  * Merge configuration objects with validation
- * 
+ *
  * @param base - Base configuration
  * @param override - Override configuration
  * @returns Merged and validated configuration
@@ -617,8 +693,8 @@ export function mergeConfigurations(
     processing: { ...base.processing, ...override.processing },
     performance: { ...base.performance, ...override.performance },
     validation: { ...base.validation, ...override.validation },
-    output: { 
-      ...base.output, 
+    output: {
+      ...base.output,
       ...override.output,
       format: { ...base.output?.format, ...override.output?.format },
       naming: { ...base.output?.naming, ...override.output?.naming },
@@ -642,7 +718,7 @@ export {
   ValidationConfigSchema,
   OutputConfigSchema,
   LoggingConfigSchema,
-  
+
   // Schema components
   ComponentTypeSchema,
   ComplexityLevelSchema,
@@ -676,7 +752,9 @@ export function createDefaultConfig(): Partial<ExtractionConfig> {
 /**
  * Load configuration from file (async wrapper)
  */
-export async function loadConfigFromFile(filePath: string): Promise<ExtractionConfig> {
+export async function loadConfigFromFile(
+  filePath: string
+): Promise<ExtractionConfig> {
   const manager = createConfigurationManager();
   return manager.loadFromFile(filePath);
 }

@@ -55,7 +55,7 @@ export async function runEquivalencyTests(
       expect(result.score).toBeGreaterThanOrEqual(80);
     });
 
-    test.testCases.forEach((testCase) => {
+    test.testCases.forEach(testCase => {
       it(testCase.description, async () => {
         const result = await testComponentEquivalency(
           test.v1Component,

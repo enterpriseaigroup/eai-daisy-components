@@ -6,7 +6,14 @@
  * @fileoverview Tests for repository configuration and path management
  */
 
-import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+  jest,
+} from '@jest/globals';
 import { promises as fs } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -75,14 +82,18 @@ describe('RepositoryConfigManager', () => {
     it('should throw error if repository does not exist', async () => {
       const nonExistentPath = join(testDir, 'does-not-exist');
       configManager = new RepositoryConfigManager(nonExistentPath);
-      await expect(configManager.initialize()).rejects.toThrow(ConfigurationError);
+      await expect(configManager.initialize()).rejects.toThrow(
+        ConfigurationError
+      );
     });
 
     it('should throw error if repository path is a file', async () => {
       const filePath = join(testDir, 'file.txt');
       await fs.writeFile(filePath, 'content', 'utf-8');
       configManager = new RepositoryConfigManager(filePath);
-      await expect(configManager.initialize()).rejects.toThrow(ConfigurationError);
+      await expect(configManager.initialize()).rejects.toThrow(
+        ConfigurationError
+      );
     });
 
     it('should throw error if repository is not readable', async () => {
@@ -97,7 +108,9 @@ describe('RepositoryConfigManager', () => {
     it('should throw error if source directory does not exist', async () => {
       await fs.rm(join(testDir, 'src'), { recursive: true });
       configManager = new RepositoryConfigManager(testDir);
-      await expect(configManager.initialize()).rejects.toThrow(ConfigurationError);
+      await expect(configManager.initialize()).rejects.toThrow(
+        ConfigurationError
+      );
     });
 
     it('should load metadata from package.json if available', async () => {
@@ -133,7 +146,11 @@ describe('RepositoryConfigManager', () => {
     });
 
     it('should use default metadata if package.json is invalid', async () => {
-      await fs.writeFile(join(testDir, 'package.json'), 'invalid json', 'utf-8');
+      await fs.writeFile(
+        join(testDir, 'package.json'),
+        'invalid json',
+        'utf-8'
+      );
       configManager = new RepositoryConfigManager(testDir);
       await configManager.initialize();
       const config = configManager.getConfig();
@@ -158,7 +175,9 @@ describe('RepositoryConfigManager', () => {
 
     it('should throw if not initialized', () => {
       const uninitializedManager = new RepositoryConfigManager(testDir);
-      expect(() => uninitializedManager.getConfig()).toThrow(ConfigurationError);
+      expect(() => uninitializedManager.getConfig()).toThrow(
+        ConfigurationError
+      );
     });
 
     it('should include component directories', () => {
@@ -252,7 +271,8 @@ describe('RepositoryConfigManager', () => {
     it('should create path when create option is true', async () => {
       const newPath = 'src/new-directory';
       await configManager.resolvePath(newPath, { create: true });
-      const exists = await fs.access(join(testDir, newPath))
+      const exists = await fs
+        .access(join(testDir, newPath))
         .then(() => true)
         .catch(() => false);
       expect(exists).toBe(true);
@@ -401,7 +421,9 @@ describe('Utility Functions', () => {
     });
 
     it('should return false for non-existent path', async () => {
-      const isValid = await validateRepositoryPath(join(testDir, 'does-not-exist'));
+      const isValid = await validateRepositoryPath(
+        join(testDir, 'does-not-exist')
+      );
       expect(isValid).toBe(false);
     });
 
@@ -425,7 +447,11 @@ describe('Utility Functions', () => {
   describe('findComponentDirectories', () => {
     it('should find directories with component files', async () => {
       await fs.mkdir(join(testDir, 'src', 'components'), { recursive: true });
-      await fs.writeFile(join(testDir, 'src', 'components', 'Test.tsx'), 'code', 'utf-8');
+      await fs.writeFile(
+        join(testDir, 'src', 'components', 'Test.tsx'),
+        'code',
+        'utf-8'
+      );
 
       const dirs = await findComponentDirectories(testDir);
       expect(dirs).toContain('components');
@@ -450,7 +476,11 @@ describe('Utility Functions', () => {
 
     it('should detect TypeScript files', async () => {
       await fs.mkdir(join(testDir, 'src', 'utils'), { recursive: true });
-      await fs.writeFile(join(testDir, 'src', 'utils', 'helper.ts'), 'code', 'utf-8');
+      await fs.writeFile(
+        join(testDir, 'src', 'utils', 'helper.ts'),
+        'code',
+        'utf-8'
+      );
 
       const dirs = await findComponentDirectories(testDir);
       expect(dirs).toContain('utils');
@@ -458,7 +488,11 @@ describe('Utility Functions', () => {
 
     it('should detect JavaScript files', async () => {
       await fs.mkdir(join(testDir, 'src', 'legacy'), { recursive: true });
-      await fs.writeFile(join(testDir, 'src', 'legacy', 'old.js'), 'code', 'utf-8');
+      await fs.writeFile(
+        join(testDir, 'src', 'legacy', 'old.js'),
+        'code',
+        'utf-8'
+      );
 
       const dirs = await findComponentDirectories(testDir);
       expect(dirs).toContain('legacy');
@@ -509,7 +543,9 @@ describe('Global Configuration', () => {
       // Reset global state by requiring fresh module
       jest.resetModules();
       expect(() => {
-        const { getRepositoryConfig: freshGetConfig } = require('@/config/repository-config');
+        const {
+          getRepositoryConfig: freshGetConfig,
+        } = require('@/config/repository-config');
         freshGetConfig();
       }).toThrow(ConfigurationError);
     });
@@ -518,7 +554,9 @@ describe('Global Configuration', () => {
   describe('isRepositoryConfigInitialized', () => {
     it('should return false before initialization', () => {
       jest.resetModules();
-      const { isRepositoryConfigInitialized: freshCheck } = require('@/config/repository-config');
+      const {
+        isRepositoryConfigInitialized: freshCheck,
+      } = require('@/config/repository-config');
       expect(freshCheck()).toBe(false);
     });
 
@@ -583,7 +621,11 @@ describe('Edge Cases and Error Handling', () => {
   });
 
   it('should handle malformed package.json gracefully', async () => {
-    await fs.writeFile(join(testDir, 'package.json'), '{invalid json}', 'utf-8');
+    await fs.writeFile(
+      join(testDir, 'package.json'),
+      '{invalid json}',
+      'utf-8'
+    );
     const manager = new RepositoryConfigManager(testDir);
     await expect(manager.initialize()).resolves.not.toThrow();
   });

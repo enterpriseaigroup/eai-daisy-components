@@ -27,7 +27,10 @@ export class PerformanceMonitor {
     return Date.now();
   }
 
-  public endMonitoring(componentName: string, startTime: number): PerformanceMetrics {
+  public endMonitoring(
+    componentName: string,
+    startTime: number
+  ): PerformanceMetrics {
     const endTime = Date.now();
     const duration = endTime - startTime;
     const memoryUsage = process.memoryUsage().heapUsed;
