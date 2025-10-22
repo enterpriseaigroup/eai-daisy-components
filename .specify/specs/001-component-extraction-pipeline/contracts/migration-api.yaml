@@ -1,0 +1,1116 @@
+openapi: 3.0.3
+info:
+  title: Component Migration Pipeline API
+  description: API for migrating DAISY v1 components to Configurator-compatible DAISY v2 components
+  version: 1.0.0
+  contact:
+    name: EAI Design System Team
+    email: design-system@enterpriseaigroup.com
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+  - url: https://migration-pipeline.eai.dev/api/v1
+    description: Production server
+
+paths:
+  /components:
+    get:
+      summary: List all components
+      description: Retrieve a list of all components in the system (both DAISY v1 and v2)
+      parameters:
+        - name: type
+          in: query
+          description: Filter by component type
+          schema:
+            $ref: '#/components/schemas/ComponentType'
+        - name: status
+          in: query
+          description: Filter by migration status
+          schema:
+            $ref: '#/components/schemas/MigrationPhase'
+        - name: limit
+          in: query
+          description: Maximum number of components to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: Number of components to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of components
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ComponentSummary'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      summary: Create new component
+      description: Create a new component definition or initiate migration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateComponentRequest'
+      responses:
+        '201':
+          description: Component created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentDefinition'
+        '400':
+          description: Invalid component data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /components/{componentId}:
+    parameters:
+      - name: componentId
+        in: path
+        required: true
+        description: Unique component identifier
+        schema:
+          type: string
+
+    get:
+      summary: Get component details
+      description: Retrieve detailed information about a specific component
+      responses:
+        '200':
+          description: Component details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentDefinition'
+        '404':
+          description: Component not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update component
+      description: Update component definition or migration status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateComponentRequest'
+      responses:
+        '200':
+          description: Component updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentDefinition'
+        '404':
+          description: Component not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete component
+      description: Remove component from the system
+      responses:
+        '204':
+          description: Component deleted successfully
+        '404':
+          description: Component not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /components/{componentId}/migrate:
+    parameters:
+      - name: componentId
+        in: path
+        required: true
+        description: Unique component identifier
+        schema:
+          type: string
+
+    post:
+      summary: Start component migration
+      description: Initiate migration process for a DAISY v1 component
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MigrationRequest'
+      responses:
+        '202':
+          description: Migration started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationJob'
+        '400':
+          description: Invalid migration request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Migration already in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /components/{componentId}/migration-status:
+    parameters:
+      - name: componentId
+        in: path
+        required: true
+        description: Unique component identifier
+        schema:
+          type: string
+
+    get:
+      summary: Get migration status
+      description: Retrieve current migration status and progress
+      responses:
+        '200':
+          description: Migration status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationStatus'
+        '404':
+          description: Component not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /components/{componentId}/tests:
+    parameters:
+      - name: componentId
+        in: path
+        required: true
+        description: Unique component identifier
+        schema:
+          type: string
+
+    get:
+      summary: Get component tests
+      description: Retrieve all test definitions and results for a component
+      responses:
+        '200':
+          description: Component tests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestDefinition'
+
+    post:
+      summary: Run component tests
+      description: Execute test suite for a component
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunTestsRequest'
+      responses:
+        '202':
+          description: Tests started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestJob'
+
+  /migration-jobs:
+    get:
+      summary: List migration jobs
+      description: Retrieve list of active and completed migration jobs
+      parameters:
+        - name: status
+          in: query
+          description: Filter by job status
+          schema:
+            type: string
+            enum: [pending, running, completed, failed]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: List of migration jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MigrationJob'
+
+  /migration-jobs/{jobId}:
+    parameters:
+      - name: jobId
+        in: path
+        required: true
+        description: Migration job identifier
+        schema:
+          type: string
+
+    get:
+      summary: Get migration job details
+      description: Retrieve detailed information about a migration job
+      responses:
+        '200':
+          description: Migration job details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationJob'
+
+components:
+  schemas:
+    ComponentType:
+      type: string
+      enum:
+        - daisy-v1
+        - daisy-v2
+        - utility
+        - foundation
+
+    MigrationPhase:
+      type: string
+      enum:
+        - not-started
+        - extracting
+        - analyzing
+        - transforming
+        - testing
+        - validating
+        - completed
+        - failed
+
+    ComponentSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique component identifier
+        name:
+          type: string
+          description: Human-readable component name
+        version:
+          type: string
+          description: Semantic version
+        type:
+          $ref: '#/components/schemas/ComponentType'
+        migrationPhase:
+          $ref: '#/components/schemas/MigrationPhase'
+        lastUpdated:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - version
+        - type
+
+    ComponentDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique component identifier
+        name:
+          type: string
+          description: Human-readable component name
+        version:
+          type: string
+          description: Semantic version
+        type:
+          $ref: '#/components/schemas/ComponentType'
+        source:
+          $ref: '#/components/schemas/ComponentSource'
+        metadata:
+          $ref: '#/components/schemas/ComponentMetadata'
+        businessLogic:
+          $ref: '#/components/schemas/BusinessLogicDefinition'
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentDependency'
+        tests:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestDefinition'
+        migration:
+          $ref: '#/components/schemas/MigrationStatus'
+      required:
+        - id
+        - name
+        - version
+        - type
+        - source
+
+    ComponentSource:
+      type: object
+      properties:
+        entryPoint:
+          type: string
+          description: Main component file path
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceFile'
+        styleFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/StyleFile'
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetFile'
+        documentation:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentationFile'
+      required:
+        - entryPoint
+        - sourceFiles
+
+    SourceFile:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Relative file path
+        content:
+          type: string
+          description: File content
+        language:
+          type: string
+          enum: [typescript, javascript, tsx, jsx]
+        hash:
+          type: string
+          description: Content hash for change detection
+      required:
+        - path
+        - content
+        - language
+        - hash
+
+    StyleFile:
+      type: object
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum: [css, scss, sass, less]
+        hash:
+          type: string
+      required:
+        - path
+        - content
+        - type
+        - hash
+
+    AssetFile:
+      type: object
+      properties:
+        path:
+          type: string
+        type:
+          type: string
+          description: MIME type
+        size:
+          type: integer
+          description: File size in bytes
+        hash:
+          type: string
+      required:
+        - path
+        - type
+        - size
+        - hash
+
+    DocumentationFile:
+      type: object
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum: [readme, story, api, changelog]
+        hash:
+          type: string
+      required:
+        - path
+        - content
+        - type
+        - hash
+
+    ComponentMetadata:
+      type: object
+      properties:
+        description:
+          type: string
+        author:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+        complexity:
+          type: string
+          enum: [simple, moderate, complex]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    BusinessLogicDefinition:
+      type: object
+      properties:
+        patterns:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessLogicPattern'
+        apiIntegrations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiIntegration'
+        stateManagement:
+          $ref: '#/components/schemas/StateManagement'
+        eventHandlers:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventHandler'
+
+    BusinessLogicPattern:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [data-fetching, state-mutation, event-handling, validation, transformation, side-effect]
+        description:
+          type: string
+        sourceLocation:
+          $ref: '#/components/schemas/SourceLocation'
+        configuratorMapping:
+          $ref: '#/components/schemas/ConfiguratorMapping'
+      required:
+        - type
+        - description
+        - sourceLocation
+
+    ApiIntegration:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+        endpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiEndpoint'
+        authentication:
+          $ref: '#/components/schemas/AuthenticationMethod'
+        configuratorEquivalent:
+          type: string
+      required:
+        - name
+        - baseUrl
+        - endpoints
+
+    StateManagement:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [local, context, redux, zustand, custom]
+        stateShape:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/StateProperty'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/StateAction'
+      required:
+        - type
+
+    ComponentDependency:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        type:
+          type: string
+          enum: [component, library, utility, api, style]
+        source:
+          type: string
+          enum: [npm, internal, cdn, local]
+        optional:
+          type: boolean
+        migrationImpact:
+          $ref: '#/components/schemas/MigrationImpact'
+      required:
+        - name
+        - version
+        - type
+        - source
+        - optional
+
+    MigrationImpact:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [keep, replace, remove, upgrade]
+        replacement:
+          type: string
+        reason:
+          type: string
+      required:
+        - action
+        - reason
+
+    MigrationStatus:
+      type: object
+      properties:
+        phase:
+          $ref: '#/components/schemas/MigrationPhase'
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        startedAt:
+          type: string
+          format: date-time
+        lastUpdated:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/MigrationIssue'
+        validations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationResult'
+      required:
+        - phase
+        - progress
+        - startedAt
+        - lastUpdated
+
+    MigrationIssue:
+      type: object
+      properties:
+        id:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        category:
+          type: string
+          enum: [compatibility, performance, security, accessibility, business-logic, dependencies]
+        message:
+          type: string
+        sourceLocation:
+          $ref: '#/components/schemas/SourceLocation'
+        suggestion:
+          type: string
+        resolved:
+          type: boolean
+      required:
+        - id
+        - severity
+        - category
+        - message
+        - resolved
+
+    TestDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [unit, integration, equivalency, visual, accessibility, performance]
+        category:
+          type: string
+          enum: [rendering, interaction, state, props, events, business-logic]
+        specification:
+          $ref: '#/components/schemas/TestSpecification'
+        expectedResult:
+          $ref: '#/components/schemas/TestResult'
+        actualResult:
+          $ref: '#/components/schemas/TestResult'
+      required:
+        - id
+        - name
+        - type
+        - category
+        - specification
+        - expectedResult
+
+    TestSpecification:
+      type: object
+      properties:
+        description:
+          type: string
+        setup:
+          $ref: '#/components/schemas/TestSetup'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestAction'
+        assertions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestAssertion'
+      required:
+        - description
+        - setup
+        - actions
+        - assertions
+
+    TestResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [passed, failed, skipped, pending]
+        executionTime:
+          type: integer
+          description: Test execution time in milliseconds
+        details:
+          type: string
+        artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestArtifact'
+      required:
+        - status
+        - executionTime
+
+    MigrationRequest:
+      type: object
+      properties:
+        sourceComponentId:
+          type: string
+          description: DAISY v1 component to migrate
+        targetVersion:
+          type: string
+          description: Target version for V2 component
+        options:
+          type: object
+          properties:
+            preserveStyles:
+              type: boolean
+              default: true
+            runTests:
+              type: boolean
+              default: true
+            generateDocs:
+              type: boolean
+              default: true
+      required:
+        - sourceComponentId
+
+    MigrationJob:
+      type: object
+      properties:
+        id:
+          type: string
+        componentId:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobLog'
+        result:
+          $ref: '#/components/schemas/MigrationResult'
+      required:
+        - id
+        - componentId
+        - status
+        - progress
+        - startedAt
+
+    CreateComponentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/ComponentType'
+        sourceUrl:
+          type: string
+          description: URL to source repository or archive
+        metadata:
+          $ref: '#/components/schemas/ComponentMetadata'
+      required:
+        - name
+        - type
+
+    UpdateComponentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/ComponentMetadata'
+        source:
+          $ref: '#/components/schemas/ComponentSource'
+
+    RunTestsRequest:
+      type: object
+      properties:
+        testTypes:
+          type: array
+          items:
+            type: string
+            enum: [unit, integration, equivalency, visual, accessibility, performance]
+        testIds:
+          type: array
+          items:
+            type: string
+        options:
+          type: object
+          properties:
+            parallel:
+              type: boolean
+              default: true
+            timeout:
+              type: integer
+              default: 30000
+
+    TestJob:
+      type: object
+      properties:
+        id:
+          type: string
+        componentId:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestResult'
+      required:
+        - id
+        - componentId
+        - status
+        - progress
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        hasMore:
+          type: boolean
+      required:
+        - total
+        - limit
+        - offset
+        - hasMore
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+      required:
+        - code
+        - message
+
+    # Supporting schemas for complex nested objects
+    SourceLocation:
+      type: object
+      properties:
+        file:
+          type: string
+        line:
+          type: integer
+        column:
+          type: integer
+      required:
+        - file
+        - line
+
+    ConfiguratorMapping:
+      type: object
+      properties:
+        api:
+          type: string
+        method:
+          type: string
+        parameters:
+          type: object
+      required:
+        - api
+        - method
+
+    ApiEndpoint:
+      type: object
+      properties:
+        path:
+          type: string
+        method:
+          type: string
+          enum: [GET, POST, PUT, DELETE, PATCH]
+        description:
+          type: string
+      required:
+        - path
+        - method
+
+    AuthenticationMethod:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [none, bearer, basic, api-key, oauth2]
+        configuration:
+          type: object
+      required:
+        - type
+
+    StateProperty:
+      type: object
+      properties:
+        type:
+          type: string
+        defaultValue:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: object
+        validation:
+          type: object
+      required:
+        - type
+
+    StateAction:
+      type: object
+      properties:
+        name:
+          type: string
+        parameters:
+          type: array
+          items:
+            type: object
+        effect:
+          type: string
+      required:
+        - name
+        - effect
+
+    EventHandler:
+      type: object
+      properties:
+        event:
+          type: string
+        handler:
+          type: string
+        sourceLocation:
+          $ref: '#/components/schemas/SourceLocation'
+      required:
+        - event
+        - handler
+
+    ValidationResult:
+      type: object
+      properties:
+        type:
+          type: string
+        status:
+          type: string
+          enum: [passed, failed, warning]
+        message:
+          type: string
+        details:
+          type: object
+      required:
+        - type
+        - status
+        - message
+
+    TestSetup:
+      type: object
+      properties:
+        props:
+          type: object
+        context:
+          type: object
+        mocks:
+          type: array
+          items:
+            type: object
+      required:
+        - props
+
+    TestAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [click, type, hover, scroll, wait]
+        target:
+          type: string
+        value:
+          oneOf:
+            - type: string
+            - type: number
+            - type: object
+      required:
+        - type
+        - target
+
+    TestAssertion:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [exists, visible, text, attribute, style, count]
+        target:
+          type: string
+        expected:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: object
+      required:
+        - type
+        - target
+        - expected
+
+    TestArtifact:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [screenshot, video, log, report]
+        path:
+          type: string
+        size:
+          type: integer
+      required:
+        - type
+        - path
+
+    JobLog:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        level:
+          type: string
+          enum: [debug, info, warn, error]
+        message:
+          type: string
+        context:
+          type: object
+      required:
+        - timestamp
+        - level
+        - message
+
+    MigrationResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        componentId:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        artifacts:
+          type: array
+          items:
+            type: string
+      required:
+        - success

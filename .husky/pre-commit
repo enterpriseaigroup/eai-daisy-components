@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit quality checks..."
+
+# Run type checking
+echo "TypeScript type checking..."
+npm run typecheck || exit 1
+
+# Run linting and auto-fix
+echo "ESLint checking and fixing..."
+npm run lint:fix || exit 1
+
+# Run formatting
+echo "Prettier formatting..."
+npm run format || exit 1
+
+# Run tests
+echo "Running tests..."
+npm test || exit 1
+
+# Constitutional compliance check
+echo "Constitutional compliance check..."
+if grep -r " any " src/ --include="*.ts" --include="*.tsx" 2>/dev/null; then
+  echo "❌ Found 'any' types - violates TypeScript safety constitutional principle"
+  echo "Please replace 'any' types with proper TypeScript types"
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"

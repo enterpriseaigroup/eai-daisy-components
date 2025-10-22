@@ -1,18 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git remote add:*)",
-      "Bash(find . -name \"*.md\" -type f -exec sh -c 'tail -c 1 \"\"\"\"$1\"\"\"\" | od -An -tx1 | grep -q \"\"\"\"0a\"\"\"\" || echo \"\"\"\"$1: Missing newline\"\"\"\"' _ {})",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git checkout:*)",
-      "Bash(git push:*)",
-      "Bash(ls:*)",
-      "Bash(bash:*)",
-      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
-      "Read(//Users/douglaswross/Code/eai/Configurator/.specify/**)",
-      "Bash(find:*)",
-      "Bash(cat:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(test:*)",
+      "Bash(npm run lint:*)",
+      "Bash(pnpm install:*)",
+      "Bash(npm install)",
+      "Bash(npx tsc:*)",
+      "Bash(tree:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run measure:baseline:*)"
     ],
     "deny": [],
     "ask": []

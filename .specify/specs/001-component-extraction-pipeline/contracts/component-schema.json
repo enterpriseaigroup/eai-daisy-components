@@ -1,0 +1,882 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schemas.eai.dev/component-definition.json",
+  "title": "Component Definition Schema",
+  "description": "Schema for DAISY component definitions used in the migration pipeline",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Unique component identifier in kebab-case"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable component name"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "description": "Semantic version (semver)"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["daisy-v1", "daisy-v2", "utility", "foundation"],
+      "description": "Component classification"
+    },
+    "source": {
+      "$ref": "#/definitions/ComponentSource"
+    },
+    "metadata": {
+      "$ref": "#/definitions/ComponentMetadata"
+    },
+    "businessLogic": {
+      "$ref": "#/definitions/BusinessLogicDefinition"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ComponentDependency"
+      },
+      "uniqueItems": true
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/TestDefinition"
+      },
+      "uniqueItems": true
+    },
+    "migration": {
+      "$ref": "#/definitions/MigrationStatus"
+    }
+  },
+  "required": ["id", "name", "version", "type", "source"],
+  "additionalProperties": false,
+
+  "definitions": {
+    "ComponentSource": {
+      "type": "object",
+      "properties": {
+        "entryPoint": {
+          "type": "string",
+          "description": "Main component file path"
+        },
+        "sourceFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SourceFile"
+          },
+          "minItems": 1
+        },
+        "styleFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StyleFile"
+          }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AssetFile"
+          }
+        },
+        "documentation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DocumentationFile"
+          }
+        }
+      },
+      "required": ["entryPoint", "sourceFiles"],
+      "additionalProperties": false
+    },
+
+    "SourceFile": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[^/].*\\.(ts|tsx|js|jsx)$",
+          "description": "Relative file path"
+        },
+        "content": {
+          "type": "string",
+          "description": "File content"
+        },
+        "language": {
+          "type": "string",
+          "enum": ["typescript", "javascript", "tsx", "jsx"]
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash of content"
+        }
+      },
+      "required": ["path", "content", "language", "hash"],
+      "additionalProperties": false
+    },
+
+    "StyleFile": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[^/].*\\.(css|scss|sass|less)$"
+        },
+        "content": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["css", "scss", "sass", "less"]
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": ["path", "content", "type", "hash"],
+      "additionalProperties": false
+    },
+
+    "AssetFile": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[^/].*"
+        },
+        "type": {
+          "type": "string",
+          "description": "MIME type"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": ["path", "type", "size", "hash"],
+      "additionalProperties": false
+    },
+
+    "DocumentationFile": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[^/].*\\.md$"
+        },
+        "content": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["readme", "story", "api", "changelog"]
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": ["path", "content", "type", "hash"],
+      "additionalProperties": false
+    },
+
+    "ComponentMetadata": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "author": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "uniqueItems": true,
+          "maxItems": 10
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "form",
+            "navigation",
+            "layout",
+            "feedback",
+            "data-display",
+            "input",
+            "overlay",
+            "utility",
+            "media"
+          ]
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["simple", "moderate", "complex"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "BusinessLogicDefinition": {
+      "type": "object",
+      "properties": {
+        "patterns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BusinessLogicPattern"
+          }
+        },
+        "apiIntegrations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApiIntegration"
+          }
+        },
+        "stateManagement": {
+          "$ref": "#/definitions/StateManagement"
+        },
+        "eventHandlers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EventHandler"
+          }
+        },
+        "computedProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ComputedProperty"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "BusinessLogicPattern": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "data-fetching",
+            "state-mutation",
+            "event-handling",
+            "validation",
+            "transformation",
+            "side-effect"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "sourceLocation": {
+          "$ref": "#/definitions/SourceLocation"
+        },
+        "configuratorMapping": {
+          "$ref": "#/definitions/ConfiguratorMapping"
+        }
+      },
+      "required": ["type", "description", "sourceLocation"],
+      "additionalProperties": false
+    },
+
+    "ApiIntegration": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApiEndpoint"
+          },
+          "minItems": 1
+        },
+        "authentication": {
+          "$ref": "#/definitions/AuthenticationMethod"
+        },
+        "configuratorEquivalent": {
+          "type": "string",
+          "description": "Configurator API equivalent"
+        }
+      },
+      "required": ["name", "baseUrl", "endpoints"],
+      "additionalProperties": false
+    },
+
+    "StateManagement": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["local", "context", "redux", "zustand", "custom"]
+        },
+        "stateShape": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+              "$ref": "#/definitions/StateProperty"
+            }
+          },
+          "additionalProperties": false
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StateAction"
+          }
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "ComponentDependency": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[~^]?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["component", "library", "utility", "api", "style"]
+        },
+        "source": {
+          "type": "string",
+          "enum": ["npm", "internal", "cdn", "local"]
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "migrationImpact": {
+          "$ref": "#/definitions/MigrationImpact"
+        }
+      },
+      "required": ["name", "version", "type", "source", "optional"],
+      "additionalProperties": false
+    },
+
+    "MigrationImpact": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["keep", "replace", "remove", "upgrade"]
+        },
+        "replacement": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["action", "reason"],
+      "additionalProperties": false
+    },
+
+    "TestDefinition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": ["unit", "integration", "equivalency", "visual", "accessibility", "performance"]
+        },
+        "category": {
+          "type": "string",
+          "enum": ["rendering", "interaction", "state", "props", "events", "business-logic"]
+        },
+        "specification": {
+          "$ref": "#/definitions/TestSpecification"
+        },
+        "expectedResult": {
+          "$ref": "#/definitions/TestResult"
+        },
+        "actualResult": {
+          "$ref": "#/definitions/TestResult"
+        }
+      },
+      "required": ["id", "name", "type", "category", "specification", "expectedResult"],
+      "additionalProperties": false
+    },
+
+    "MigrationStatus": {
+      "type": "object",
+      "properties": {
+        "phase": {
+          "type": "string",
+          "enum": [
+            "not-started",
+            "extracting",
+            "analyzing",
+            "transforming",
+            "testing",
+            "validating",
+            "completed",
+            "failed"
+          ]
+        },
+        "progress": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MigrationIssue"
+          }
+        },
+        "validations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ValidationResult"
+          }
+        }
+      },
+      "required": ["phase", "progress", "startedAt", "lastUpdated"],
+      "additionalProperties": false
+    },
+
+    "MigrationIssue": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "compatibility",
+            "performance",
+            "security",
+            "accessibility",
+            "business-logic",
+            "dependencies"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceLocation": {
+          "$ref": "#/definitions/SourceLocation"
+        },
+        "suggestion": {
+          "type": "string"
+        },
+        "resolved": {
+          "type": "boolean"
+        }
+      },
+      "required": ["id", "severity", "category", "message", "resolved"],
+      "additionalProperties": false
+    },
+
+    "SourceLocation": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["file", "line"],
+      "additionalProperties": false
+    },
+
+    "ConfiguratorMapping": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parameters": {
+          "type": "object"
+        }
+      },
+      "required": ["api", "method"],
+      "additionalProperties": false
+    },
+
+    "ApiEndpoint": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["path", "method"],
+      "additionalProperties": false
+    },
+
+    "AuthenticationMethod": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["none", "bearer", "basic", "api-key", "oauth2"]
+        },
+        "configuration": {
+          "type": "object"
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "StateProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "object", "array"]
+        },
+        "defaultValue": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "number"},
+            {"type": "boolean"},
+            {"type": "object"},
+            {"type": "array"}
+          ]
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "required": {"type": "boolean"},
+            "min": {"type": "number"},
+            "max": {"type": "number"},
+            "pattern": {"type": "string"}
+          }
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+
+    "StateAction": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"type": "string"},
+              "required": {"type": "boolean"}
+            },
+            "required": ["name", "type"]
+          }
+        },
+        "effect": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["name", "effect"],
+      "additionalProperties": false
+    },
+
+    "EventHandler": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "pattern": "^on[A-Z][a-zA-Z]*$"
+        },
+        "handler": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceLocation": {
+          "$ref": "#/definitions/SourceLocation"
+        }
+      },
+      "required": ["event", "handler"],
+      "additionalProperties": false
+    },
+
+    "ComputedProperty": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "computation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceLocation": {
+          "$ref": "#/definitions/SourceLocation"
+        }
+      },
+      "required": ["name", "dependencies", "computation"],
+      "additionalProperties": false
+    },
+
+    "TestSpecification": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "setup": {
+          "$ref": "#/definitions/TestSetup"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TestAction"
+          }
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TestAssertion"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["description", "setup", "actions", "assertions"],
+      "additionalProperties": false
+    },
+
+    "TestResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["passed", "failed", "skipped", "pending"]
+        },
+        "executionTime": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "details": {
+          "type": "string"
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TestArtifact"
+          }
+        }
+      },
+      "required": ["status", "executionTime"],
+      "additionalProperties": false
+    },
+
+    "ValidationResult": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": ["passed", "failed", "warning"]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "details": {
+          "type": "object"
+        }
+      },
+      "required": ["type", "status", "message"],
+      "additionalProperties": false
+    },
+
+    "TestSetup": {
+      "type": "object",
+      "properties": {
+        "props": {
+          "type": "object"
+        },
+        "context": {
+          "type": "object"
+        },
+        "mocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "target": {"type": "string"},
+              "implementation": {"type": "object"}
+            },
+            "required": ["target"]
+          }
+        }
+      },
+      "required": ["props"],
+      "additionalProperties": false
+    },
+
+    "TestAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["click", "type", "hover", "scroll", "wait"]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "number"},
+            {"type": "object"}
+          ]
+        }
+      },
+      "required": ["type", "target"],
+      "additionalProperties": false
+    },
+
+    "TestAssertion": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["exists", "visible", "text", "attribute", "style", "count"]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "number"},
+            {"type": "boolean"},
+            {"type": "object"}
+          ]
+        }
+      },
+      "required": ["type", "target", "expected"],
+      "additionalProperties": false
+    },
+
+    "TestArtifact": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["screenshot", "video", "log", "report"]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["type", "path"],
+      "additionalProperties": false
+    }
+  }
+}

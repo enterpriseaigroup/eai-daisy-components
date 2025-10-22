@@ -1,0 +1,97 @@
+{
+  "name": "eai-daisy-components",
+  "version": "1.0.0",
+  "description": "Component extraction pipeline for migrating DAISY v1 components to Configurator v2 architecture with business logic preservation",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite dev",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:types": "tsc --noEmit --project tsconfig.test.json",
+    "ci": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "prepare": "husky install",
+    "measure:baseline": "node scripts/measure-bundle-baseline.cjs",
+    "migrate:component": "node dist/cli/migrate-component.js"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^3.22.4",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.11.19",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "jest": "^29.7.0",
+    "@jest/globals": "^29.7.0",
+    "@testing-library/react": "^14.2.1",
+    "@testing-library/jest-dom": "^6.4.2",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4",
+    "prettier": "^3.2.5",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2"
+  },
+  "peerDependencies": {
+    "@configurator/sdk": "^2.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@configurator/sdk": {
+      "optional": true
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{md,json,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "component-migration",
+    "daisy-v1",
+    "configurator-v2",
+    "typescript",
+    "react",
+    "pipeline",
+    "extraction"
+  ],
+  "author": "EAI Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eai/eai-daisy-components.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eai/eai-daisy-components/issues"
+  },
+  "homepage": "https://github.com/eai/eai-daisy-components#readme"
+}

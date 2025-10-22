@@ -5,6 +5,16 @@
 **Status**: Draft  
 **Input**: User description: "This repo serves as the public distribution channel for design system components migrated from DAISY v1 to Configurator (DAISY v2) architecture. Components maintain business logic while transforming to work with modern Configurator patterns, shadcn/ui foundation, and elevenlabs integration."
 
+## Clarifications
+
+### Session 2025-10-22
+
+- Q: How should migration pipeline performance be scoped across component complexity levels? → A: All complexity levels (30 min), serial processing
+- Q: What scope should functional equivalency validation cover? → A: Exhaustive testing including all possible interactions
+- Q: How should business logic conflicts between DAISY v1 and Configurator be resolved? → A: DAISY v1 logic preserved exactly, Configurator adapts
+- Q: How should component dependency migration order be handled? → A: Dependency-first migration with temporary stubs
+- Q: What triggers migration synchronization between DAISY v1 and migrated versions? → A: One-time migration only
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Component Developer Migrates DAISY v1 Components (Priority: P1)
@@ -39,47 +49,45 @@ An external developer wants to discover, install, and use components from the EA
 
 ---
 
-### User Story 3 - Design System Team Maintains Migration Sync (Priority: P3)
+### User Story 3 - Design System Team Manages One-Time Migration (Priority: P3)
 
-The design system team needs to keep the component migration pipeline synchronized with updates from both DAISY v1 baseline and Configurator platform changes while maintaining business logic equivalency and tracking architectural transformation decisions.
+The design system team needs to execute a comprehensive one-time migration of all DAISY v1 components to Configurator-compatible versions, maintaining business logic equivalency and tracking architectural transformation decisions without ongoing synchronization requirements.
 
-**Why this priority**: Long-term sustainability requires automated synchronization between baseline and migrated versions. Manual processes don't scale and lead to drift between architectures.
+**Why this priority**: Since no further DAISY v1 changes are expected, the focus shifts from ongoing sync to thorough one-time migration with comprehensive validation and documentation.
 
-**Independent Test**: Can be tested by updating business logic in a DAISY v1 component, triggering the migration sync process, and verifying the Configurator-compatible version receives appropriate updates with preserved functionality.
+**Independent Test**: Can be tested by completing the full migration of all DAISY v1 components, validating functional equivalency, and confirming no synchronization mechanism is needed for future updates.
 
 **Acceptance Scenarios**:
 
-1. **Given** business logic update in DAISY v1 component, **When** sync process runs, **Then** baseline in `/daisyv1/` is updated and migration assessment is triggered
-2. **Given** breaking change in Configurator platform, **When** migration analysis runs, **Then** affected components are identified and transformation plan is generated
-3. **Given** new business logic pattern in DAISY v1, **When** marked for migration, **Then** component appears in migration queue with architecture transformation analysis
+1. **Given** complete DAISY v1 component inventory, **When** one-time migration process runs, **Then** all components are migrated with business logic preservation and no sync mechanism established
+2. **Given** migrated component library, **When** validation process completes, **Then** all components pass equivalency tests and migration is marked as final
+3. **Given** completed migration, **When** DAISY v1 changes occur (edge case), **Then** system logs but does not automatically sync, requiring manual intervention if needed
 
 ---
 
 ### Edge Cases
 
-- What happens when DAISY v1 business logic conflicts with Configurator architectural patterns?
-- How does the system handle components that use DAISY v1-specific APIs or services?
-- What happens when DAISY v1 and Configurator have different business logic implementations for the same feature?
-- How are components handled that require DAISY v1 authentication patterns but need to work with Configurator?
-- What happens when migrated components have dependencies on other unmigrated DAISY v1 components?
-- How does the system handle business logic that spans multiple DAISY v1 components but needs to be consolidated in Configurator?
+- When DAISY v1 business logic conflicts with Configurator architectural patterns, DAISY v1 logic is preserved exactly and Configurator architecture adapts to accommodate the original business logic behavior
+- When components use DAISY v1-specific APIs or services, the system copies the entire component and its business logic. If API calls cause errors, the system stubs the API calls so errors do not impact the Storybook display of the element
+- When DAISY v1 and Configurator have different business logic implementations for the same feature, the system performs a complete copy of DAISY v1 business logic without modification. Configurator alignment will be addressed in future feature branches
+- When components require DAISY v1 authentication patterns, the system copies the authentication logic as-is. Authentication integration with Configurator will be resolved in later feature branches
+- When migrated components have dependencies on other unmigrated DAISY v1 components, the system uses dependency-first migration order with temporary stubs to allow parallel development
+- When business logic spans multiple DAISY v1 components, the system highlights the cross-component business logic in both components' documentation to aid future consolidation planning
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-001**: System MUST copy UI components from DAISY v1 repository to `/daisyv1/` directory while preserving complete business logic and functionality
-- **FR-002**: System MUST transform DAISY v1 business logic to work with Configurator architecture patterns while maintaining functional equivalency
+- **FR-002**: System MUST transform DAISY v1 business logic to work with Configurator architecture patterns while maintaining functional equivalency, with Configurator architecture adapting to preserve exact DAISY v1 business logic behavior when conflicts arise, and MUST validate business logic preservation by testing against DAISY v1 baseline functionality in isolated environments
 - **FR-003**: System MUST generate TypeScript definitions for all migrated components with interfaces compatible with Configurator integration patterns
 - **FR-004**: System MUST create comprehensive documentation including business logic transformation notes, API reference, usage examples, and migration rationale for each component
 - **FR-005**: System MUST package components as npm modules with appropriate shadcn/ui foundation, elevenlabs integration, and Configurator-compatible dependencies
 - **FR-006**: System MUST implement semantic versioning with automated version management based on business logic changes and architectural transformations
-- **FR-007**: System MUST provide automated testing pipeline including functional equivalency tests between DAISY v1 baseline and migrated versions
+- **FR-007**: System MUST provide automated testing pipeline including comprehensive functional equivalency tests between DAISY v1 baseline and migrated versions covering all possible component interactions, edge cases, and state combinations
 - **FR-008**: System MUST generate usage examples and storybook documentation showing both DAISY v1 baseline behavior and Configurator-compatible implementation
-- **FR-009**: System MUST validate business logic preservation by testing against DAISY v1 baseline functionality in isolated environments
-- **FR-010**: System MUST maintain transformation mapping between DAISY v1 patterns and their Configurator-compatible equivalents
-- **FR-011**: System MUST provide CI/CD pipeline for automated migration, business logic transformation validation, and publishing to npm
-- **FR-012**: System MUST generate migration guides when business logic transformations require API or integration pattern changes
+- **FR-009**: System MUST maintain transformation mapping between DAISY v1 patterns and their Configurator-compatible equivalents
+- **FR-010**: System MUST generate migration guides when business logic transformations require API or integration pattern changes
 
 ### Key Entities
 
@@ -94,12 +102,12 @@ The design system team needs to keep the component migration pipeline synchroniz
 
 ### Measurable Outcomes
 
-- **SC-001**: Components can be copied from DAISY v1 and migrated to Configurator architecture with zero functional regression within 30 minutes per component
+- **SC-001**: Components can be copied from DAISY v1 and migrated to Configurator architecture with zero functional regression within 30 minutes per component regardless of complexity level, using serial processing approach
 - **SC-002**: External developers can successfully install and implement any migrated component within 15 minutes using Configurator patterns and documentation
-- **SC-003**: 100% of migrated components pass functional equivalency validation against their DAISY v1 baseline versions
+- **SC-003**: 100% of migrated components pass comprehensive functional equivalency validation against their DAISY v1 baseline versions including all possible interactions, edge cases, and state combinations
 - **SC-004**: Component library achieves 95% test coverage including unit, integration, and functional equivalency tests between baseline and migrated versions
 - **SC-005**: Documentation generation produces complete business logic transformation notes and examples for 100% of component migrations
-- **SC-006**: Migration synchronization between DAISY v1 baseline and Configurator versions maintains <48 hour lag for business logic updates
+- **SC-006**: One-time migration process completes successfully for all DAISY v1 components within project timeline with comprehensive documentation and no ongoing synchronization requirements
 - **SC-007**: Business logic transformation accuracy achieves 100% functional equivalency with automated regression detection
 - **SC-008**: Component bundle sizes remain under 75KB gzipped for 90% of migrated components while preserving full business logic
 - **SC-009**: TypeScript integration provides complete type safety with Configurator-compatible interfaces and zero 'any' types in public APIs
@@ -114,5 +122,6 @@ The design system team needs to keep the component migration pipeline synchroniz
 - npm registry will be the primary distribution channel for both baseline and migrated components
 - External consumers will primarily use TypeScript or JavaScript with modern build tools and Configurator platform integration
 - Business logic transformation can be systematically analyzed and adapted through architectural pattern mapping
-- DAISY v1 components contain well-structured business logic that can be preserved during architecture migration
+- DAISY v1 components contain well-structured business logic that can be preserved during one-time architecture migration
 - Configurator platform provides sufficient APIs and patterns to support all existing DAISY v1 business logic use cases
+- No ongoing DAISY v1 updates are expected, making one-time migration approach viable and cost-effective

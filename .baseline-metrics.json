@@ -1,0 +1,100 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2025-10-22T09:48:21.746Z",
+  "baseline": {
+    "bundleSize": {
+      "description": "Based on analyzed DAISY v1 components",
+      "v1Average": 1934,
+      "v1Total": 3868,
+      "target": 2321,
+      "maxIncrease": "20%",
+      "notes": "Target is ≤120% of DAISY v1 baseline as per specification"
+    },
+    "performance": {
+      "migrationTime": {
+        "tier1": "30min",
+        "tier2": "2hours",
+        "tier3": "1day"
+      },
+      "memoryLimit": "500MB",
+      "processingTargets": {
+        "componentsPerHour": 10,
+        "batchSize": 5
+      }
+    },
+    "testCoverage": {
+      "minimum": "80%",
+      "target": "95%",
+      "current": "25.32%"
+    },
+    "qualityThresholds": {
+      "typeScoreSafetyScore": 0.9,
+      "businessLogicPreservation": 1,
+      "structuralSimilarity": 0.95,
+      "performanceRegression": 0.2
+    }
+  },
+  "componentBaselines": {
+    "tier1": {
+      "v1": {
+        "count": 1,
+        "averageRawSize": 1279,
+        "averageGzippedSize": 652,
+        "averageLines": 43,
+        "averageImports": 1
+      },
+      "v2": {
+        "count": 0,
+        "averageRawSize": 0,
+        "averageGzippedSize": 0,
+        "averageLines": 0,
+        "averageImports": 0
+      },
+      "components": [
+        "index.ts"
+      ]
+    },
+    "tier2": {
+      "v1": {
+        "count": 1,
+        "averageRawSize": 10419,
+        "averageGzippedSize": 3216,
+        "averageLines": 360,
+        "averageImports": 1
+      },
+      "v2": {
+        "count": 0,
+        "averageRawSize": 0,
+        "averageGzippedSize": 0,
+        "averageLines": 0,
+        "averageImports": 0
+      },
+      "components": [
+        "Button.tsx"
+      ]
+    },
+    "tier3": {
+      "v1": {
+        "count": 0,
+        "averageRawSize": 0,
+        "averageGzippedSize": 0,
+        "averageLines": 0,
+        "averageImports": 0
+      },
+      "v2": {
+        "count": 0,
+        "averageRawSize": 0,
+        "averageGzippedSize": 0,
+        "averageLines": 0,
+        "averageImports": 0
+      },
+      "components": []
+    }
+  },
+  "notes": [
+    "Baseline metrics will be populated during Phase 2 after first component migration",
+    "Bundle size targets based on DAISY v1 component analysis",
+    "Performance metrics will be measured and updated continuously",
+    "Quality thresholds aligned with constitutional principles"
+  ]
+}

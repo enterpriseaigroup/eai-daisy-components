@@ -1,0 +1,695 @@
+{
+  "metadata": {
+    "generatedAt": "2025-10-22T09:21:02.622Z",
+    "pipelineVersion": "1.0.0",
+    "sourceBasePath": "/Users/douglaswross/Code/eai/eai-daisy-components/daisyv1",
+    "analysisDuration": 1,
+    "config": {
+      "sourcePath": "/Users/douglaswross/Code/eai/eai-daisy-components/daisyv1",
+      "outputPath": "/Users/douglaswross/Code/eai/eai-daisy-components/output",
+      "preserveBaseline": true,
+      "processing": {
+        "mode": "serial",
+        "concurrency": 1,
+        "continueOnError": true,
+        "retry": {
+          "maxAttempts": 2,
+          "delay": 1000,
+          "backoffMultiplier": 1.5,
+          "retryableOperations": [
+            "file-read",
+            "ast-parsing"
+          ]
+        },
+        "filters": {
+          "include": [
+            "**/*.tsx",
+            "**/*.ts",
+            "**/*.css"
+          ],
+          "exclude": [
+            "**/*.test.*",
+            "**/*.spec.*"
+          ],
+          "types": [
+            "functional",
+            "class",
+            "higher-order"
+          ],
+          "complexity": [
+            "simple",
+            "moderate",
+            "complex"
+          ],
+          "custom": []
+        }
+      },
+      "performance": {
+        "memoryLimit": 512,
+        "timeoutPerComponent": 30000,
+        "maxBundleSizeIncrease": 50,
+        "monitoring": true
+      },
+      "validation": {
+        "strict": false,
+        "typescript": true,
+        "eslint": false,
+        "componentStructure": true,
+        "businessLogicPreservation": true
+      },
+      "output": {
+        "generateDeclarations": true,
+        "generateDocs": true,
+        "generateExamples": true,
+        "format": {
+          "typescript": ".tsx",
+          "indentation": "spaces",
+          "indentationSize": 2,
+          "lineEnding": "lf",
+          "quotes": "single"
+        },
+        "naming": {
+          "componentFiles": "PascalCase",
+          "interfaces": "PascalCase",
+          "utilities": "camelCase",
+          "constants": "UPPER_SNAKE_CASE"
+        }
+      },
+      "logging": {
+        "level": "info",
+        "outputs": [
+          "console",
+          "file"
+        ],
+        "format": "simple",
+        "timestamps": true,
+        "stackTraces": true
+      }
+    }
+  },
+  "summary": {
+    "totalComponents": 2,
+    "componentsByReadiness": {
+      "needs-work": 2
+    },
+    "componentsByType": {
+      "functional": 2
+    },
+    "componentsByComplexity": {
+      "critical": 1,
+      "simple": 1
+    },
+    "averageReadiness": 65,
+    "totalEstimatedEffort": "2 person-months",
+    "keyRecommendations": [
+      "Improve test coverage across the codebase before migration"
+    ],
+    "criticalRisks": [
+      "1 components have critical extraction risks",
+      "Over 50% of components lack test coverage"
+    ]
+  },
+  "readiness": [
+    {
+      "componentId": "components/tier2/Button.tsx:Button",
+      "name": "Button",
+      "readinessScore": 67,
+      "readinessLevel": "needs-work",
+      "criteria": {
+        "codeQuality": 50,
+        "documentation": 80,
+        "testCoverage": 0,
+        "dependencyComplexity": 100,
+        "propsClarity": 100,
+        "businessLogicSeparation": 70,
+        "reactCompliance": 85,
+        "migrationCompatibility": 75
+      },
+      "blockers": [
+        "Critical complexity level requires refactoring",
+        "Component contains syntax errors or parse failures"
+      ],
+      "prerequisites": [
+        "Resolve identified blockers",
+        "Improve test coverage to at least 50%",
+        "Refactor to improve code quality"
+      ],
+      "effort": "high",
+      "risk": "critical"
+    },
+    {
+      "componentId": "components/tier2/index.ts:TestComponent",
+      "name": "TestComponent",
+      "readinessScore": 62,
+      "readinessLevel": "needs-work",
+      "criteria": {
+        "codeQuality": 50,
+        "documentation": 80,
+        "testCoverage": 0,
+        "dependencyComplexity": 90,
+        "propsClarity": 80,
+        "businessLogicSeparation": 70,
+        "reactCompliance": 60,
+        "migrationCompatibility": 90
+      },
+      "blockers": [
+        "Missing TypeScript props interface definition",
+        "Component contains syntax errors or parse failures"
+      ],
+      "prerequisites": [
+        "Resolve identified blockers",
+        "Improve test coverage to at least 50%",
+        "Refactor to improve code quality"
+      ],
+      "effort": "low",
+      "risk": "medium"
+    }
+  ],
+  "sections": [
+    {
+      "title": "Needs Preparation",
+      "description": "Components that require some preparation before extraction",
+      "components": [
+        {
+          "id": "components/tier2/Button.tsx:Button",
+          "name": "Button",
+          "type": "functional",
+          "sourcePath": "components/tier2/Button.tsx",
+          "props": [
+            {
+              "name": "children",
+              "type": "React.ReactNode",
+              "required": true,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "variant",
+              "type": "'primary' | 'secondary' | 'tertiary' | 'danger'",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "size",
+              "type": "'small' | 'medium' | 'large'",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "loading",
+              "type": "boolean",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "type",
+              "type": "'button' | 'submit' | 'reset'",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "onClick",
+              "type": "(event: React.MouseEvent<HTMLButtonElement>) => void",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "tooltip",
+              "type": "string",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "autoFocus",
+              "type": "boolean",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "trackingId",
+              "type": "string",
+              "required": false,
+              "description": "Prop for Button"
+            }
+          ],
+          "businessLogic": [
+            {
+              "name": "handleKeyDown",
+              "signature": "handleKeyDown()",
+              "purpose": "Business logic method in Button",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            },
+            {
+              "name": "handleMouseDown",
+              "signature": "handleMouseDown()",
+              "purpose": "Business logic method in Button",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            },
+            {
+              "name": "withDaisyTheme",
+              "signature": "withDaisyTheme()",
+              "purpose": "Business logic method in Button",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            },
+            {
+              "name": "detectTheme",
+              "signature": "detectTheme()",
+              "purpose": "Business logic method in Button",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            }
+          ],
+          "reactPatterns": [
+            "useState",
+            "useEffect",
+            "useCallback",
+            "custom-hook"
+          ],
+          "dependencies": [],
+          "complexity": "critical",
+          "migrationStatus": "pending",
+          "metadata": {
+            "createdAt": "2025-10-22T09:00:38.836Z",
+            "lastModified": "2025-10-22T09:04:04.116Z",
+            "author": "Unknown",
+            "documentation": "Component Button from Button.tsx",
+            "performance": {
+              "bundleSize": 10419,
+              "memoryUsage": "0KB"
+            },
+            "testing": {
+              "coverage": 0,
+              "testPath": "/Users/douglaswross/Code/eai/eai-daisy-components/daisyv1/components/tier2/Button.test.ts"
+            }
+          }
+        },
+        {
+          "id": "components/tier2/index.ts:TestComponent",
+          "name": "TestComponent",
+          "type": "functional",
+          "sourcePath": "components/tier2/index.ts",
+          "props": [],
+          "businessLogic": [
+            {
+              "name": "TestComponent",
+              "signature": "TestComponent()",
+              "purpose": "Business logic method in TestComponent",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            }
+          ],
+          "reactPatterns": [],
+          "dependencies": [
+            {
+              "name": "react",
+              "type": "external",
+              "importPath": "react",
+              "critical": true
+            }
+          ],
+          "complexity": "simple",
+          "migrationStatus": "pending",
+          "metadata": {
+            "createdAt": "2025-10-22T09:03:13.675Z",
+            "lastModified": "2025-10-22T09:20:27.274Z",
+            "author": "Unknown",
+            "documentation": "Component TestComponent from index.ts",
+            "performance": {
+              "bundleSize": 1279,
+              "memoryUsage": "0KB"
+            },
+            "testing": {
+              "coverage": 0,
+              "testPath": "/Users/douglaswross/Code/eai/eai-daisy-components/daisyv1/components/tier2/index.test.ts"
+            }
+          }
+        }
+      ],
+      "metrics": {
+        "count": 2,
+        "averageScore": 64.5
+      },
+      "recommendations": [
+        "Focus on improving test coverage",
+        "Add missing documentation",
+        "Simplify prop interfaces"
+      ]
+    }
+  ],
+  "roadmap": {
+    "approach": "incremental",
+    "phases": [
+      {
+        "phase": 1,
+        "name": "Phase 1: Foundation",
+        "description": "Extract ready components to establish migration foundation",
+        "components": [
+          "Button",
+          "TestComponent"
+        ],
+        "dependencies": [],
+        "estimatedDuration": "1 week",
+        "successCriteria": [
+          "All phase components migrated successfully",
+          "Integration tests passing",
+          "Performance benchmarks met"
+        ],
+        "riskMitigation": [
+          "Thorough testing before deployment",
+          "Rollback plan prepared",
+          "Monitoring in place"
+        ]
+      }
+    ],
+    "timelineEstimate": "3 weeks",
+    "resourceRequirements": {
+      "developers": 1,
+      "duration": "3 weeks",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Component Architecture",
+        "Testing"
+      ]
+    },
+    "successMetrics": [
+      "All components successfully migrated",
+      "No functionality regression",
+      "Performance maintained or improved",
+      "Test coverage maintained"
+    ]
+  },
+  "analysis": {
+    "discovery": {
+      "components": [
+        {
+          "id": "components/tier2/Button.tsx:Button",
+          "name": "Button",
+          "type": "functional",
+          "sourcePath": "components/tier2/Button.tsx",
+          "props": [
+            {
+              "name": "children",
+              "type": "React.ReactNode",
+              "required": true,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "variant",
+              "type": "'primary' | 'secondary' | 'tertiary' | 'danger'",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "size",
+              "type": "'small' | 'medium' | 'large'",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "loading",
+              "type": "boolean",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "type",
+              "type": "'button' | 'submit' | 'reset'",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "onClick",
+              "type": "(event: React.MouseEvent<HTMLButtonElement>) => void",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "tooltip",
+              "type": "string",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "autoFocus",
+              "type": "boolean",
+              "required": false,
+              "description": "Prop for Button"
+            },
+            {
+              "name": "trackingId",
+              "type": "string",
+              "required": false,
+              "description": "Prop for Button"
+            }
+          ],
+          "businessLogic": [
+            {
+              "name": "handleKeyDown",
+              "signature": "handleKeyDown()",
+              "purpose": "Business logic method in Button",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            },
+            {
+              "name": "handleMouseDown",
+              "signature": "handleMouseDown()",
+              "purpose": "Business logic method in Button",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            },
+            {
+              "name": "withDaisyTheme",
+              "signature": "withDaisyTheme()",
+              "purpose": "Business logic method in Button",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            },
+            {
+              "name": "detectTheme",
+              "signature": "detectTheme()",
+              "purpose": "Business logic method in Button",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            }
+          ],
+          "reactPatterns": [
+            "useState",
+            "useEffect",
+            "useCallback",
+            "custom-hook"
+          ],
+          "dependencies": [],
+          "complexity": "critical",
+          "migrationStatus": "pending",
+          "metadata": {
+            "createdAt": "2025-10-22T09:00:38.836Z",
+            "lastModified": "2025-10-22T09:04:04.116Z",
+            "author": "Unknown",
+            "documentation": "Component Button from Button.tsx",
+            "performance": {
+              "bundleSize": 10419,
+              "memoryUsage": "0KB"
+            },
+            "testing": {
+              "coverage": 0,
+              "testPath": "/Users/douglaswross/Code/eai/eai-daisy-components/daisyv1/components/tier2/Button.test.ts"
+            }
+          }
+        },
+        {
+          "id": "components/tier2/index.ts:TestComponent",
+          "name": "TestComponent",
+          "type": "functional",
+          "sourcePath": "components/tier2/index.ts",
+          "props": [],
+          "businessLogic": [
+            {
+              "name": "TestComponent",
+              "signature": "TestComponent()",
+              "purpose": "Business logic method in TestComponent",
+              "parameters": [],
+              "returnType": "unknown",
+              "complexity": "simple",
+              "externalDependencies": []
+            }
+          ],
+          "reactPatterns": [],
+          "dependencies": [
+            {
+              "name": "react",
+              "type": "external",
+              "importPath": "react",
+              "critical": true
+            }
+          ],
+          "complexity": "simple",
+          "migrationStatus": "pending",
+          "metadata": {
+            "createdAt": "2025-10-22T09:03:13.675Z",
+            "lastModified": "2025-10-22T09:20:27.274Z",
+            "author": "Unknown",
+            "documentation": "Component TestComponent from index.ts",
+            "performance": {
+              "bundleSize": 1279,
+              "memoryUsage": "0KB"
+            },
+            "testing": {
+              "coverage": 0,
+              "testPath": "/Users/douglaswross/Code/eai/eai-daisy-components/daisyv1/components/tier2/index.test.ts"
+            }
+          }
+        }
+      ],
+      "statistics": {
+        "filesScanned": 2,
+        "componentFiles": 2,
+        "componentsFound": 2,
+        "componentsByType": {
+          "functional": 2,
+          "class": 0,
+          "higher-order": 0,
+          "hook": 0,
+          "utility": 0
+        },
+        "componentsByComplexity": {
+          "simple": 1,
+          "moderate": 0,
+          "complex": 0,
+          "critical": 1
+        },
+        "reactPatterns": {
+          "useState": 1,
+          "useEffect": 1,
+          "useContext": 0,
+          "useReducer": 0,
+          "useMemo": 0,
+          "useCallback": 1,
+          "custom-hook": 1,
+          "render-props": 0,
+          "children-as-function": 0
+        },
+        "averageComplexity": 2.5
+      },
+      "duration": 16,
+      "errors": [],
+      "skippedFiles": []
+    },
+    "parsing": {},
+    "dependencies": {
+      "success": true,
+      "dependencies": [],
+      "external": [],
+      "graph": {
+        "nodes": [
+          {
+            "id": "components/tier2/Button.tsx",
+            "name": "Button",
+            "type": "component",
+            "path": "components/tier2/Button.tsx",
+            "inDegree": 0,
+            "outDegree": 0,
+            "centrality": 0
+          },
+          {
+            "id": "components/tier2/index.ts",
+            "name": "TestComponent",
+            "type": "component",
+            "path": "components/tier2/index.ts",
+            "inDegree": 0,
+            "outDegree": 0,
+            "centrality": 0
+          }
+        ],
+        "edges": [],
+        "cycles": [],
+        "clusters": [],
+        "metrics": {
+          "totalComponents": 2,
+          "totalDependencies": 0,
+          "externalDependencies": 0,
+          "internalDependencies": 0,
+          "circularDependencies": 0,
+          "averageCoupling": 0,
+          "density": 0,
+          "hubs": [
+            "Button",
+            "TestComponent"
+          ]
+        }
+      },
+      "metrics": {
+        "totalComponents": 2,
+        "totalDependencies": 0,
+        "externalDependencies": 0,
+        "internalDependencies": 0,
+        "circularDependencies": 0,
+        "averageCoupling": 0,
+        "density": 0,
+        "hubs": [
+          "Button",
+          "TestComponent"
+        ]
+      },
+      "recommendations": [
+        {
+          "target": "low-coupling-components",
+          "type": "extract-first",
+          "reasoning": "Components with minimal dependencies should be extracted first to establish foundation",
+          "prerequisites": [
+            "Set up extraction pipeline",
+            "Define component interfaces"
+          ],
+          "effort": "low",
+          "risk": "low"
+        }
+      ],
+      "errors": [],
+      "warnings": []
+    }
+  }
+}
