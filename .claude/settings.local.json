@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git remote add:*)"
+      "Bash(git remote add:*)",
+      "Bash(find . -name \"*.md\" -type f -exec sh -c 'tail -c 1 \"\"\"\"$1\"\"\"\" | od -An -tx1 | grep -q \"\"\"\"0a\"\"\"\" || echo \"\"\"\"$1: Missing newline\"\"\"\"' _ {})"
     ],
     "deny": [],
     "ask": []
