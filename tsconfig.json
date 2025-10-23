@@ -61,7 +61,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src/**/*", "vite.config.ts"],
+  "include": ["src/**/*", "tools/**/*", "docs/**/*", "vite.config.ts"],
   "exclude": [
     "node_modules",
     "dist",

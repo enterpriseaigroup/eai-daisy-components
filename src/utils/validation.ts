@@ -9,7 +9,7 @@
  * @version 1.0.0
  */
 
-import { resolve, extname, dirname } from 'path';
+import { dirname, extname, resolve } from 'path';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import type {
@@ -19,7 +19,7 @@ import type {
   ValidationConfig,
 } from '@/types';
 import { ValidationError } from '@/utils/errors';
-import { Logger } from '@/utils/logging';
+import type { Logger } from '@/utils/logging';
 
 // ============================================================================
 // VALIDATION TYPES
@@ -190,7 +190,7 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     categories: ['structure', 'filesystem'],
     async validate(
       component: ComponentDefinition,
-      context: ValidationContext
+      context: ValidationContext,
     ): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
       const fullPath = resolve(context.rootPath, component.sourcePath);
@@ -291,7 +291,7 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
         if (dep.type === 'component' && dep.importPath.startsWith('./')) {
           const depPath = resolve(
             dirname(component.sourcePath),
-            dep.importPath
+            dep.importPath,
           );
 
           if (
@@ -325,7 +325,7 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
     categories: ['dependencies', 'circular'],
     async validate(
       component: ComponentDefinition,
-      context: ValidationContext
+      context: ValidationContext,
     ): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
       const visited = new Set<string>();
@@ -333,7 +333,7 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
 
       const findCircularDeps = (
         currentId: string,
-        path: string[]
+        path: string[],
       ): string[] | null => {
         if (recursionStack.has(currentId)) {
           const circleStart = path.indexOf(currentId);
@@ -348,21 +348,25 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
         recursionStack.add(currentId);
 
         const currentComponent = context.allComponents.find(
-          c => c.id === currentId
+          c => c.id === currentId,
         );
-        if (!currentComponent) return null;
+        if (!currentComponent) {
+return null;
+}
 
         for (const dep of currentComponent.dependencies) {
           if (dep.type === 'component') {
             const depComponent = context.allComponents.find(
-              c => c.name === dep.name
+              c => c.name === dep.name,
             );
             if (depComponent) {
               const cycle = findCircularDeps(depComponent.id, [
                 ...path,
                 currentId,
               ]);
-              if (cycle) return cycle;
+              if (cycle) {
+return cycle;
+}
             }
           }
         }
@@ -444,7 +448,7 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
             'custom-hook',
             'render-props',
             'children-as-function',
-          ].includes(pattern)
+          ].includes(pattern),
         );
 
         if (complexPatterns.length > 0) {
@@ -565,7 +569,7 @@ export class ComponentValidator {
    * Validate single component
    */
   public async validateComponent(
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): Promise<ComponentValidationResult> {
     const startTime = Date.now();
     const issues: ValidationIssue[] = [];
@@ -637,7 +641,7 @@ export class ComponentValidator {
    * Validate multiple components
    */
   public async validateComponents(
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): Promise<ComponentValidationResult[]> {
     const results: ComponentValidationResult[] = [];
 
@@ -680,7 +684,7 @@ export class ComponentValidator {
           {
             componentId: component.id,
             componentName: component.name,
-          }
+          },
         );
       }
     }
@@ -742,7 +746,7 @@ export function createValidationContext(
   config: ExtractionConfig,
   logger: Logger,
   allComponents: ComponentDefinition[],
-  rootPath: string
+  rootPath: string,
 ): ValidationContext {
   return {
     config,
@@ -758,7 +762,7 @@ export function createValidationContext(
  * Format validation results for display
  */
 export function formatValidationResults(
-  results: ComponentValidationResult[]
+  results: ComponentValidationResult[],
 ): string {
   const lines: string[] = [];
 
@@ -783,7 +787,7 @@ export function formatValidationResults(
   results.forEach(result => {
     if (result.issues.length > 0) {
       lines.push(
-        `Component: ${result.component.name} (${result.component.sourcePath})`
+        `Component: ${result.component.name} (${result.component.sourcePath})`,
       );
       lines.push('-'.repeat(40));
 
@@ -825,7 +829,7 @@ export function validateExtractionConfig(config: unknown): ExtractionConfig {
         operation: 'config-validation',
         data: { configType: typeof config },
       },
-      error as Error
+      error as Error,
     );
   }
 }
@@ -847,7 +851,7 @@ export async function isValidComponentFile(filePath: string): Promise<boolean> {
     // Basic checks for component patterns
     const hasExport = /export\s+(default\s+)?/.test(content);
     const hasComponent = /function\s+\w+|class\s+\w+|const\s+\w+\s*=/.test(
-      content
+      content,
     );
 
     return hasExport && hasComponent;
@@ -869,7 +873,7 @@ export type ValidationEngine = ComponentValidator;
  * Create a validation engine (alias for creating validator)
  */
 export function createValidationEngine(
-  context: ValidationContext
+  context: ValidationContext,
 ): ValidationEngine {
   return new ComponentValidator(context);
 }
@@ -879,7 +883,7 @@ export function createValidationEngine(
  */
 export async function validateComponentDefinition(
   component: ComponentDefinition,
-  context: ValidationContext
+  context: ValidationContext,
 ): Promise<ComponentValidationResult> {
   const validator = new ComponentValidator(context);
   return validator.validateComponent(component);
@@ -891,7 +895,7 @@ export async function validateComponentDefinition(
 export async function validateMigrationResult(
   component: ComponentDefinition,
   transformedCode: string,
-  context: ValidationContext
+  context: ValidationContext,
 ): Promise<ComponentValidationResult> {
   // For now, validate the component definition
   // In the future, this would also validate the transformed code

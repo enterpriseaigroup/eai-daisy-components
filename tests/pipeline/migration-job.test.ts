@@ -2,7 +2,7 @@
  * Migration Job Tests
  */
 
-import { describe, it, expect, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import { MigrationJob, createMigrationJob } from '@/pipeline/migration-job';
 import type { ExtractionConfig } from '@/types';
 

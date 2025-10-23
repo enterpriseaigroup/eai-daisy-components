@@ -10,27 +10,27 @@
  * @version 4.0.0
  */
 
-import { writeFile, mkdir } from 'fs/promises';
-import { join, dirname } from 'path';
+import { mkdir, writeFile } from 'fs/promises';
+import { dirname, join } from 'path';
 import type {
+  BundleSizeImpact,
   ComponentDefinition,
-  MigrationResult,
   ExtractionConfig,
+  GeneratedArtifacts,
+  GeneratedFile,
+  MigrationIssue,
   MigrationOperation,
   MigrationPerformance,
-  QualityAssessment,
-  GeneratedArtifacts,
-  MigrationIssue,
+  MigrationResult,
   OperationStep,
-  GeneratedFile,
-  BundleSizeImpact,
+  QualityAssessment,
 } from '../types/index.js';
 import { ComponentExtractor, type ExtractionResult } from './extractor.js';
 import {
   BusinessLogicTransformer,
   type TransformationResult,
 } from './transformer.js';
-import { EquivalencyValidator, type ComparisonResult } from './validator.js';
+import { type ComparisonResult, EquivalencyValidator } from './validator.js';
 import { getGlobalLogger } from '../utils/logging.js';
 
 // ============================================================================
@@ -120,7 +120,7 @@ export class MigrationPipeline {
    * @returns Pipeline execution result
    */
   public async execute(
-    options: PipelineOptions
+    options: PipelineOptions,
   ): Promise<PipelineExecutionResult> {
     const startTime = Date.now();
     this.logger.info('Starting migration pipeline execution');
@@ -136,7 +136,7 @@ export class MigrationPipeline {
           deepAnalysis: true,
           extractDocs: config.output.generateDocs,
           analyzeDependencies: true,
-        }
+        },
       );
 
       const results: MigrationResult[] = [];
@@ -156,7 +156,7 @@ export class MigrationPipeline {
           const migrationResult = await this.migrateComponent(
             extraction,
             config,
-            saveArtifacts
+            saveArtifacts,
           );
 
           results.push(migrationResult);
@@ -169,11 +169,11 @@ export class MigrationPipeline {
         } catch (error) {
           this.logger.error(
             `Failed to migrate component ${extraction.component.name}`,
-            error as Error
+            error as Error,
           );
           failCount++;
           results.push(
-            this.createFailedMigrationResult(extraction, config, error as Error)
+            this.createFailedMigrationResult(extraction, config, error as Error),
           );
         }
       }
@@ -219,7 +219,7 @@ export class MigrationPipeline {
   public async migrateComponent(
     extraction: ExtractionResult,
     config: ExtractionConfig,
-    saveArtifacts: boolean = true
+    saveArtifacts: boolean = true,
   ): Promise<MigrationResult> {
     const component = extraction.component;
     const operationStart = new Date();
@@ -236,7 +236,7 @@ export class MigrationPipeline {
           targetVersion: '2.0.0',
           transformAPICalls: true,
           addConfiguratorIntegration: true,
-        }
+        },
       );
 
       steps.push({
@@ -265,7 +265,7 @@ export class MigrationPipeline {
           strict: config.validation.strict,
           validateBusinessLogic: config.validation.businessLogicPreservation,
           validateTypes: config.validation.typescript,
-        }
+        },
       );
 
       steps.push({
@@ -286,7 +286,7 @@ export class MigrationPipeline {
       const qualityStart = Date.now();
       const quality = await this.validator.assessQuality(
         component,
-        transformation.component
+        transformation.component,
       );
 
       steps.push({
@@ -308,7 +308,7 @@ export class MigrationPipeline {
         component,
         transformation,
         config,
-        saveArtifacts
+        saveArtifacts,
       );
 
       steps.push({
@@ -342,7 +342,7 @@ export class MigrationPipeline {
         fileOperations: saveArtifacts ? this.countArtifacts(artifacts) : 0,
         bundleSizeImpact: this.calculateBundleSizeImpact(
           component,
-          transformation
+          transformation,
         ),
         warnings: [],
       };
@@ -351,7 +351,7 @@ export class MigrationPipeline {
       const issues: MigrationIssue[] = [
         ...comparison.validation.errors.map(e => this.createIssueFromError(e)),
         ...comparison.validation.warnings.map(w =>
-          this.createIssueFromWarning(w)
+          this.createIssueFromWarning(w),
         ),
         ...transformation.warnings.map(w => ({
           severity: 'warning' as const,
@@ -385,7 +385,7 @@ export class MigrationPipeline {
     } catch (error) {
       this.logger.error(
         `Migration failed for component ${component.name}`,
-        error as Error
+        error as Error,
       );
 
       const operationEnd = new Date();
@@ -445,7 +445,7 @@ export class MigrationPipeline {
     component: ComponentDefinition,
     transformation: TransformationResult,
     config: ExtractionConfig,
-    save: boolean
+    save: boolean,
   ): Promise<GeneratedArtifacts> {
     const componentFile: GeneratedFile = {
       path: join(config.outputPath, `${component.name}.tsx`),
@@ -482,7 +482,7 @@ export class MigrationPipeline {
     } catch (error) {
       this.logger.error(
         `Failed to save artifact: ${artifact.path}`,
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -494,7 +494,7 @@ export class MigrationPipeline {
   private async generateReports(
     results: MigrationResult[],
     config: ExtractionConfig,
-    executionTime: number
+    executionTime: number,
   ): Promise<void> {
     this.logger.info('Generating migration reports');
 
@@ -531,7 +531,7 @@ export class MigrationPipeline {
    */
   private calculateBundleSizeImpact(
     component: ComponentDefinition,
-    transformation: TransformationResult
+    transformation: TransformationResult,
   ): BundleSizeImpact {
     const originalSize = component.metadata.performance?.bundleSize || 0;
     const migratedSize = Buffer.byteLength(transformation.code, 'utf-8');
@@ -553,25 +553,25 @@ export class MigrationPipeline {
    */
   private generateRecommendations(
     quality: QualityAssessment,
-    comparison: ComparisonResult
+    comparison: ComparisonResult,
   ): string[] {
     const recommendations: string[] = [];
 
     if (quality.businessLogicPreservation < 90) {
       recommendations.push(
-        'Review business logic preservation - some functions may be missing'
+        'Review business logic preservation - some functions may be missing',
       );
     }
 
     if (quality.typeSafety < 90) {
       recommendations.push(
-        'Review type definitions - some props may have changed'
+        'Review type definitions - some props may have changed',
       );
     }
 
     if (comparison.differences.some(d => d.severity === 'error')) {
       recommendations.push(
-        'Address critical differences before production deployment'
+        'Address critical differences before production deployment',
       );
     }
 
@@ -581,7 +581,7 @@ export class MigrationPipeline {
 
     if (recommendations.length === 0) {
       recommendations.push(
-        'Component migration successful - ready for testing'
+        'Component migration successful - ready for testing',
       );
     }
 
@@ -593,15 +593,15 @@ export class MigrationPipeline {
    */
   private calculatePerformanceMetrics(
     results: MigrationResult[],
-    totalTime: number
+    totalTime: number,
   ): PipelinePerformanceMetrics {
     const avgTime = results.length > 0 ? totalTime / results.length : 0;
     const peakMemory = Math.max(
-      ...results.map(r => r.performance.peakMemoryUsage)
+      ...results.map(r => r.performance.peakMemoryUsage),
     );
     const fileOps = results.reduce(
       (sum, r) => sum + r.performance.fileOperations,
-      0
+      0,
     );
 
     return {
@@ -632,7 +632,7 @@ export class MigrationPipeline {
   private createFailedMigrationResult(
     extraction: ExtractionResult,
     config: ExtractionConfig,
-    error?: Error
+    error?: Error,
   ): MigrationResult {
     const now = new Date();
 
@@ -669,7 +669,7 @@ export class MigrationPipeline {
           category: 'parsing' as const,
           message: e,
           blocking: true,
-          error,
+          ...(error instanceof Error ? { error } : {}),
         })),
       ],
       recommendations: ['Fix extraction errors before attempting migration'],
@@ -763,7 +763,7 @@ export function createPipeline(): MigrationPipeline {
 
 // Quick execution helper
 export async function executePipeline(
-  options: PipelineOptions
+  options: PipelineOptions,
 ): Promise<PipelineExecutionResult> {
   const pipeline = createPipeline();
   return pipeline.execute(options);

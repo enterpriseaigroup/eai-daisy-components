@@ -7,23 +7,23 @@
  * @fileoverview Validation logic tests
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 import {
   EquivalencyValidator,
+  assessComponentQuality,
+  compareComponents,
   createValidator,
   validateMigration,
-  compareComponents,
-  assessComponentQuality,
 } from '@/pipeline/validator';
 import type {
-  ValidationOptions,
   ComparisonResult,
   CustomValidator,
+  ValidationOptions,
 } from '@/pipeline/validator';
 import type {
   ComponentDefinition,
-  ValidationResult,
   QualityAssessment,
+  ValidationResult,
 } from '@/types';
 
 describe('EquivalencyValidator', () => {
@@ -115,7 +115,7 @@ describe('EquivalencyValidator', () => {
     it('should validate identical components successfully', async () => {
       const result = await validator.validate(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.valid).toBe(true);
@@ -131,13 +131,13 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.validate(
         baselineComponent,
-        migratedWithMissingProp
+        migratedWithMissingProp,
       );
 
       expect(result.valid).toBe(false);
       expect(result.errors.length).toBeGreaterThan(0);
       expect(result.errors.some(e => e.code === 'MISSING_REQUIRED_PROP')).toBe(
-        true
+        true,
       );
     });
 
@@ -149,12 +149,12 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.validate(
         baselineComponent,
-        migratedWithoutLogic
+        migratedWithoutLogic,
       );
 
       expect(result.valid).toBe(false);
       expect(result.errors.some(e => e.code === 'MISSING_BUSINESS_LOGIC')).toBe(
-        true
+        true,
       );
     });
 
@@ -166,12 +166,12 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.validate(
         baselineComponent,
-        migratedWithoutCount
+        migratedWithoutCount,
       );
 
       expect(result.warnings.length).toBeGreaterThan(0);
       expect(
-        result.warnings.some(w => w.code === 'MISSING_OPTIONAL_PROP')
+        result.warnings.some(w => w.code === 'MISSING_OPTIONAL_PROP'),
       ).toBe(true);
     });
 
@@ -185,7 +185,7 @@ describe('EquivalencyValidator', () => {
       const result = await validator.validate(
         baselineComponent,
         migratedComponent,
-        options
+        options,
       );
 
       expect(result).toBeDefined();
@@ -207,19 +207,19 @@ describe('EquivalencyValidator', () => {
       const result = await validator.validate(
         baselineComponent,
         migratedWithoutLogic,
-        options
+        options,
       );
 
       // Should not fail for missing business logic since validation is disabled
       expect(
-        result.errors.filter(e => e.code === 'MISSING_BUSINESS_LOGIC').length
+        result.errors.filter(e => e.code === 'MISSING_BUSINESS_LOGIC').length,
       ).toBe(0);
     });
 
     it('should calculate validation score', async () => {
       const result = await validator.validate(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.score).toBeGreaterThanOrEqual(0);
@@ -234,7 +234,7 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.validate(
         baselineComponent,
-        migratedWithDifferentName
+        migratedWithDifferentName,
       );
 
       expect(result.valid).toBe(false);
@@ -249,7 +249,7 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.validate(
         baselineComponent,
-        migratedAsClass
+        migratedAsClass,
       );
 
       // Type conversion warnings may or may not be generated depending on validation logic
@@ -260,17 +260,17 @@ describe('EquivalencyValidator', () => {
       const migratedWithoutReact: ComponentDefinition = {
         ...migratedComponent,
         dependencies: migratedComponent.dependencies.filter(
-          d => d.name !== 'react'
+          d => d.name !== 'react',
         ),
       };
 
       const result = await validator.validate(
         baselineComponent,
-        migratedWithoutReact
+        migratedWithoutReact,
       );
 
       expect(
-        result.errors.some(e => e.code === 'MISSING_CRITICAL_DEPENDENCY')
+        result.errors.some(e => e.code === 'MISSING_CRITICAL_DEPENDENCY'),
       ).toBe(true);
     });
 
@@ -300,7 +300,7 @@ describe('EquivalencyValidator', () => {
       const result = await validator.validate(
         baselineComponent,
         migratedComponent,
-        options
+        options,
       );
 
       expect(result).toBeDefined();
@@ -311,7 +311,7 @@ describe('EquivalencyValidator', () => {
     it('should compare identical components', async () => {
       const result = await validator.compare(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.equivalent).toBe(true);
@@ -336,7 +336,7 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.compare(
         baselineComponent,
-        migratedWithExtraProp
+        migratedWithExtraProp,
       );
 
       expect(result.differences.length).toBeGreaterThan(0);
@@ -346,7 +346,7 @@ describe('EquivalencyValidator', () => {
     it('should calculate business logic preservation score', async () => {
       const result = await validator.compare(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.businessLogicScore).toBe(100); // All logic preserved
@@ -360,7 +360,7 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.compare(
         baselineComponent,
-        migratedWithoutLogic
+        migratedWithoutLogic,
       );
 
       expect(result.businessLogicScore).toBeLessThan(100);
@@ -370,7 +370,7 @@ describe('EquivalencyValidator', () => {
     it('should include validation result in comparison', async () => {
       const result = await validator.compare(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.validation).toBeDefined();
@@ -394,18 +394,18 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.compare(
         baselineComponent,
-        migratedWithExtraDep
+        migratedWithExtraDep,
       );
 
       expect(result.differences.some(d => d.category === 'dependencies')).toBe(
-        true
+        true,
       );
     });
 
     it('should assess structure score', async () => {
       const result = await validator.compare(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.structureScore).toBeGreaterThanOrEqual(0);
@@ -417,7 +417,7 @@ describe('EquivalencyValidator', () => {
     it('should assess quality of migrated component', async () => {
       const assessment = await validator.assessQuality(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(assessment.overallScore).toBeGreaterThan(0);
@@ -438,7 +438,7 @@ describe('EquivalencyValidator', () => {
 
       const assessment = await validator.assessQuality(
         baselineComponent,
-        complexMigrated
+        complexMigrated,
       );
 
       expect(assessment.issues.length).toBeGreaterThan(0);
@@ -447,7 +447,7 @@ describe('EquivalencyValidator', () => {
     it('should calculate overall score from component scores', async () => {
       const assessment = await validator.assessQuality(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       // Overall score should be average of individual scores
@@ -456,7 +456,7 @@ describe('EquivalencyValidator', () => {
           assessment.businessLogicPreservation +
           assessment.codeQuality +
           assessment.performance) /
-          4
+          4,
       );
 
       expect(assessment.overallScore).toBe(expectedAverage);
@@ -465,7 +465,7 @@ describe('EquivalencyValidator', () => {
     it('should assess high quality for good migrations', async () => {
       const assessment = await validator.assessQuality(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(assessment.overallScore).toBeGreaterThan(80);
@@ -476,7 +476,7 @@ describe('EquivalencyValidator', () => {
     it('should include maintainability score', async () => {
       const assessment = await validator.assessQuality(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(assessment.maintainability).toBeGreaterThanOrEqual(0);
@@ -493,7 +493,7 @@ describe('EquivalencyValidator', () => {
     it('should validate via helper function', async () => {
       const result = await validateMigration(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.valid).toBe(true);
@@ -503,7 +503,7 @@ describe('EquivalencyValidator', () => {
     it('should compare via helper function', async () => {
       const result = await compareComponents(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.equivalent).toBe(true);
@@ -513,7 +513,7 @@ describe('EquivalencyValidator', () => {
     it('should assess quality via helper function', async () => {
       const assessment = await assessComponentQuality(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(assessment.overallScore).toBeGreaterThan(0);
@@ -525,7 +525,7 @@ describe('EquivalencyValidator', () => {
     it('should give perfect score for identical components', async () => {
       const result = await validator.compare(
         baselineComponent,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result.businessLogicScore).toBe(100);
@@ -545,7 +545,7 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.compare(
         baselineSimple,
-        moreComplexMigrated
+        moreComplexMigrated,
       );
 
       expect(result.structureScore).toBeLessThan(100);
@@ -559,11 +559,11 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.compare(
         baselineComponent,
-        migratedWithFewerPatterns
+        migratedWithFewerPatterns,
       );
 
       expect(
-        result.validation.warnings.some(w => w.code === 'PATTERN_REMOVED')
+        result.validation.warnings.some(w => w.code === 'PATTERN_REMOVED'),
       ).toBe(true);
     });
   });
@@ -577,7 +577,7 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.validate(
         invalidBaseline,
-        migratedComponent
+        migratedComponent,
       );
 
       expect(result).toBeDefined();
@@ -592,7 +592,7 @@ describe('EquivalencyValidator', () => {
 
       const result = await validator.validate(
         baselineComponent,
-        migratedWithMissingProp
+        migratedWithMissingProp,
       );
 
       expect(result.errors.length).toBeGreaterThan(0);

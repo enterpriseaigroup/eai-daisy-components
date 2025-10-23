@@ -9,10 +9,10 @@
  * @author DAISY Component Extraction Pipeline
  */
 
-import { resolve, dirname, basename } from 'path';
+import { basename, dirname, resolve } from 'path';
 import { parse } from '@typescript-eslint/typescript-estree';
 import type { TSESTree } from '@typescript-eslint/typescript-estree';
-import { createSimpleLogger, type Logger } from '../utils/logging.js';
+import { type Logger, createSimpleLogger } from '../utils/logging.js';
 import { readFile } from 'fs/promises';
 import type { ComponentDefinition } from '@/types';
 
@@ -357,11 +357,11 @@ export class DependencyAnalyzer {
    * Analyze dependencies for a set of components
    */
   async analyzeDependencies(
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): Promise<DependencyAnalysisResult> {
     try {
       this.logger.info(
-        `Analyzing dependencies for ${components.length} components...`
+        `Analyzing dependencies for ${components.length} components...`,
       );
 
       // Clear caches
@@ -393,7 +393,7 @@ export class DependencyAnalyzer {
       const metrics = this.calculateMetrics(
         graph,
         directDependencies,
-        externalDependencies
+        externalDependencies,
       );
 
       // Step 7: Generate recommendations
@@ -402,7 +402,7 @@ export class DependencyAnalyzer {
         externalDependencies,
         cycles,
         clusters,
-        metrics
+        metrics,
       );
 
       this.logger.info('Dependency analysis completed successfully');
@@ -425,7 +425,7 @@ export class DependencyAnalyzer {
     } catch (error) {
       this.logger.error(
         'Dependency analysis failed:',
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
       return {
         success: false,
@@ -450,13 +450,13 @@ export class DependencyAnalyzer {
    * Analyze direct dependencies for components
    */
   private async analyzeDirectDependencies(
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): Promise<DependencyDetail[]> {
     const allDependencies: DependencyDetail[] = [];
 
     for (const component of components) {
       this.logger.debug(
-        `Analyzing dependencies for component: ${component.name}`
+        `Analyzing dependencies for component: ${component.name}`,
       );
 
       try {
@@ -465,7 +465,9 @@ export class DependencyAnalyzer {
 
         // Parse AST
         const ast = this.parseComponentAST(content, component.sourcePath);
-        if (!ast) continue;
+        if (!ast) {
+continue;
+}
 
         // Extract dependencies from AST
         const dependencies = this.extractDependenciesFromAST(ast, component);
@@ -476,7 +478,7 @@ export class DependencyAnalyzer {
       } catch (error) {
         this.logger.warn(
           `Failed to analyze dependencies for ${component.name}:`,
-          { error: error instanceof Error ? error.message : 'Unknown error' }
+          { error: error instanceof Error ? error.message : 'Unknown error' },
         );
       }
     }
@@ -496,7 +498,7 @@ export class DependencyAnalyzer {
    */
   private parseComponentAST(
     content: string,
-    filePath: string
+    filePath: string,
   ): TSESTree.Program | null {
     try {
       return parse(content, {
@@ -522,7 +524,7 @@ export class DependencyAnalyzer {
    */
   private extractDependenciesFromAST(
     ast: TSESTree.Program,
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): DependencyDetail[] {
     const dependencies: DependencyDetail[] = [];
     const usageContexts = new Map<string, DependencyUsageContext[]>();
@@ -535,7 +537,7 @@ export class DependencyAnalyzer {
             node,
             component,
             dependencies,
-            usageContexts
+            usageContexts,
           );
           break;
         case 'CallExpression':
@@ -565,9 +567,9 @@ export class DependencyAnalyzer {
     node: TSESTree.ImportDeclaration,
     component: ComponentDefinition,
     dependencies: DependencyDetail[],
-    usageContexts: Map<string, DependencyUsageContext[]>
+    usageContexts: Map<string, DependencyUsageContext[]>,
   ): void {
-    const importPath = node.source.value as string;
+    const importPath = node.source.value;
     const imports = this.extractImportNames(node);
 
     // Determine if this is an external or internal dependency
@@ -627,7 +629,7 @@ export class DependencyAnalyzer {
           names.push(
             spec.imported.type === 'Identifier'
               ? spec.imported.name
-              : spec.imported.value
+              : spec.imported.value,
           );
           break;
         case 'ImportNamespaceSpecifier':
@@ -645,7 +647,7 @@ export class DependencyAnalyzer {
   private trackExternalPackage(
     packageName: string,
     imports: string[],
-    usedBy: string
+    usedBy: string,
   ): void {
     // Clean package name (remove subpaths)
     const cleanName = packageName.split('/')[0] || packageName;
@@ -674,14 +676,14 @@ export class DependencyAnalyzer {
    * Classify external dependency type
    */
   private classifyExternalDependency(
-    packageName: string
+    packageName: string,
   ): ExternalDependencyType {
     if (packageName === 'react' || packageName.startsWith('react-')) {
       return 'react';
     }
     if (
       ['@mui/material', '@ant-design', 'antd', 'chakra-ui'].some(ui =>
-        packageName.includes(ui)
+        packageName.includes(ui),
       )
     ) {
       return 'ui-library';
@@ -691,7 +693,7 @@ export class DependencyAnalyzer {
     }
     if (
       ['jest', 'testing-library', 'enzyme', 'cypress'].some(test =>
-        packageName.includes(test)
+        packageName.includes(test),
       )
     ) {
       return 'testing';
@@ -723,11 +725,17 @@ export class DependencyAnalyzer {
    * Suggest migration strategy for external dependency
    */
   private suggestMigrationStrategy(
-    packageName: string
+    packageName: string,
   ): ExternalDependency['migrationStrategy'] {
-    if (packageName === 'react') return 'keep';
-    if (packageName.includes('test')) return 'evaluate';
-    if (packageName.includes('build')) return 'replace';
+    if (packageName === 'react') {
+return 'keep';
+}
+    if (packageName.includes('test')) {
+return 'evaluate';
+}
+    if (packageName.includes('build')) {
+return 'replace';
+}
     return 'evaluate';
   }
 
@@ -736,13 +744,18 @@ export class DependencyAnalyzer {
    */
   private assessExtractionRisk(
     importPath: string,
-    imports: string[]
+    imports: string[],
   ): DependencyDetail['extractionRisk'] {
     // High risk for deeply nested imports or many specific imports
-    if (imports.length > 5) return 'high';
-    if (importPath.includes('..')) return 'medium';
-    if (imports.some(imp => imp.toLowerCase().includes('context')))
-      return 'high';
+    if (imports.length > 5) {
+return 'high';
+}
+    if (importPath.includes('..')) {
+return 'medium';
+}
+    if (imports.some(imp => imp.toLowerCase().includes('context'))) {
+return 'high';
+}
     return 'low';
   }
 
@@ -753,7 +766,7 @@ export class DependencyAnalyzer {
   private analyzeCallExpression(
     _node: TSESTree.CallExpression,
     _component: ComponentDefinition,
-    _usageContexts: Map<string, DependencyUsageContext[]>
+    _usageContexts: Map<string, DependencyUsageContext[]>,
   ): void {
     // Implementation for dynamic imports, require calls, etc.
   }
@@ -765,7 +778,7 @@ export class DependencyAnalyzer {
   private analyzeJSXElement(
     _node: TSESTree.JSXElement,
     _component: ComponentDefinition,
-    _usageContexts: Map<string, DependencyUsageContext[]>
+    _usageContexts: Map<string, DependencyUsageContext[]>,
   ): void {
     // Implementation for JSX component usage tracking
   }
@@ -777,7 +790,7 @@ export class DependencyAnalyzer {
   private analyzeMemberExpression(
     _node: TSESTree.MemberExpression,
     _component: ComponentDefinition,
-    _usageContexts: Map<string, DependencyUsageContext[]>
+    _usageContexts: Map<string, DependencyUsageContext[]>,
   ): void {
     // Implementation for property access analysis
   }
@@ -787,7 +800,7 @@ export class DependencyAnalyzer {
    */
   private traverseAST(
     node: TSESTree.Node,
-    visitor: (node: TSESTree.Node) => void
+    visitor: (node: TSESTree.Node) => void,
   ): void {
     visitor(node);
 
@@ -810,7 +823,7 @@ export class DependencyAnalyzer {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async analyzeTransitiveDependencies(
-    _directDeps: DependencyDetail[]
+    _directDeps: DependencyDetail[],
   ): Promise<DependencyDetail[]> {
     // Implementation for transitive dependency analysis
     return [];
@@ -821,7 +834,7 @@ export class DependencyAnalyzer {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async analyzeExternalDependencies(
-    _components: ComponentDefinition[]
+    _components: ComponentDefinition[],
   ): Promise<ExternalDependency[]> {
     return Array.from(this.externalPackages.values());
   }
@@ -831,7 +844,7 @@ export class DependencyAnalyzer {
    */
   private buildDependencyGraph(
     dependencies: DependencyDetail[],
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): Omit<DependencyGraph, 'cycles' | 'clusters' | 'metrics'> {
     const nodeMap = new Map<string, DependencyNode>();
     const edges: DependencyEdge[] = [];
@@ -883,8 +896,12 @@ export class DependencyAnalyzer {
       // Update node degrees
       const sourceNode = nodeMap.get(dep.source);
       const targetNode = nodeMap.get(dep.target);
-      if (sourceNode) sourceNode.outDegree++;
-      if (targetNode) targetNode.inDegree++;
+      if (sourceNode) {
+sourceNode.outDegree++;
+}
+      if (targetNode) {
+targetNode.inDegree++;
+}
     });
 
     // Calculate centrality scores (simplified PageRank-like)
@@ -902,7 +919,7 @@ export class DependencyAnalyzer {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private detectCircularDependencies(
-    _graph: Omit<DependencyGraph, 'cycles' | 'clusters' | 'metrics'>
+    _graph: Omit<DependencyGraph, 'cycles' | 'clusters' | 'metrics'>,
   ): DependencyCycle[] {
     // Implementation for cycle detection using DFS
     return [];
@@ -913,7 +930,7 @@ export class DependencyAnalyzer {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private generateClusters(
-    _graph: Omit<DependencyGraph, 'cycles' | 'clusters' | 'metrics'>
+    _graph: Omit<DependencyGraph, 'cycles' | 'clusters' | 'metrics'>,
   ): DependencyCluster[] {
     // Implementation for community detection/clustering
     return [];
@@ -925,7 +942,7 @@ export class DependencyAnalyzer {
   private calculateMetrics(
     graph: Omit<DependencyGraph, 'cycles' | 'clusters' | 'metrics'>,
     dependencies: DependencyDetail[],
-    external: ExternalDependency[]
+    external: ExternalDependency[],
   ): DependencyMetrics {
     const componentNodes = graph.nodes.filter(n => n.type === 'component');
     const totalNodes = graph.nodes.length;
@@ -966,7 +983,7 @@ export class DependencyAnalyzer {
     _external: ExternalDependency[],
     _cycles: DependencyCycle[],
     _clusters: DependencyCluster[],
-    _metrics: DependencyMetrics
+    _metrics: DependencyMetrics,
   ): ExtractionRecommendation[] {
     const recommendations: ExtractionRecommendation[] = [];
 

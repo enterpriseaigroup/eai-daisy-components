@@ -11,11 +11,11 @@
 
 import type {
   ComponentDefinition,
-  ValidationResult,
-  ValidationError,
-  ValidationWarning,
   QualityAssessment,
   QualityIssue,
+  ValidationError,
+  ValidationResult,
+  ValidationWarning,
 } from '@/types';
 import { getGlobalLogger } from '@/utils/logging';
 
@@ -141,7 +141,7 @@ export class EquivalencyValidator {
   public async validate(
     baseline: ComponentDefinition,
     migrated: ComponentDefinition,
-    options: ValidationOptions = {}
+    options: ValidationOptions = {},
   ): Promise<ValidationResult> {
     this.logger.info(`Validating migration for ${baseline.name}`);
 
@@ -150,7 +150,7 @@ export class EquivalencyValidator {
       validateBusinessLogic = true,
       validateTypes = true,
       validateStructure = true,
-      validatePerformance = true,
+      validatePerformance: _validatePerformance = true,
       customValidators = [],
     } = options;
 
@@ -173,7 +173,7 @@ export class EquivalencyValidator {
           migrated,
           errors,
           warnings,
-          strict
+          strict,
         );
       }
 
@@ -215,7 +215,7 @@ export class EquivalencyValidator {
     } catch (error) {
       this.logger.error(
         `Validation failed for ${baseline.name}`,
-        error as Error
+        error as Error,
       );
 
       return {
@@ -248,10 +248,10 @@ export class EquivalencyValidator {
   public async compare(
     baseline: ComponentDefinition,
     migrated: ComponentDefinition,
-    options: ValidationOptions = {}
+    options: ValidationOptions = {},
   ): Promise<ComparisonResult> {
     this.logger.info(
-      `Comparing baseline and migrated versions of ${baseline.name}`
+      `Comparing baseline and migrated versions of ${baseline.name}`,
     );
 
     const validation = await this.validate(baseline, migrated, options);
@@ -260,7 +260,7 @@ export class EquivalencyValidator {
     // Calculate individual scores
     const businessLogicScore = this.calculateBusinessLogicScore(
       baseline,
-      migrated
+      migrated,
     );
     const typeSafetyScore = this.calculateTypeSafetyScore(baseline, migrated);
     const structureScore = this.calculateStructureScore(baseline, migrated);
@@ -269,7 +269,7 @@ export class EquivalencyValidator {
     const equivalent =
       validation.valid &&
       differences.filter(
-        d => d.severity === 'critical' || d.severity === 'error'
+        d => d.severity === 'critical' || d.severity === 'error',
       ).length === 0;
 
     return {
@@ -292,7 +292,7 @@ export class EquivalencyValidator {
    */
   public async assessQuality(
     baseline: ComponentDefinition,
-    migrated: ComponentDefinition
+    migrated: ComponentDefinition,
   ): Promise<QualityAssessment> {
     const comparison = await this.compare(baseline, migrated);
 
@@ -315,7 +315,7 @@ export class EquivalencyValidator {
         comparison.typeSafetyScore +
         comparison.structureScore +
         comparison.performanceScore) /
-        4
+        4,
     );
 
     return {
@@ -339,7 +339,7 @@ export class EquivalencyValidator {
   private validateIdentity(
     baseline: ComponentDefinition,
     migrated: ComponentDefinition,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): void {
     if (baseline.name !== migrated.name) {
       errors.push({
@@ -359,7 +359,7 @@ export class EquivalencyValidator {
     migrated: ComponentDefinition,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    strict: boolean
+    strict: boolean,
   ): void {
     const baselineProps = new Map(baseline.props.map(p => [p.name, p]));
     const migratedProps = new Map(migrated.props.map(p => [p.name, p]));
@@ -417,13 +417,13 @@ export class EquivalencyValidator {
     migrated: ComponentDefinition,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    strict: boolean
+    strict: boolean,
   ): void {
     const baselineLogic = new Map(
-      baseline.businessLogic.map(bl => [bl.name, bl])
+      baseline.businessLogic.map(bl => [bl.name, bl]),
     );
     const migratedLogic = new Map(
-      migrated.businessLogic.map(bl => [bl.name, bl])
+      migrated.businessLogic.map(bl => [bl.name, bl]),
     );
 
     // Check for missing business logic
@@ -468,8 +468,8 @@ export class EquivalencyValidator {
   private validateStructure(
     baseline: ComponentDefinition,
     migrated: ComponentDefinition,
-    errors: ValidationError[],
-    warnings: ValidationWarning[]
+    _errors: ValidationError[],
+    warnings: ValidationWarning[],
   ): void {
     // Validate component type compatibility
     if (baseline.type === 'class' && migrated.type !== 'functional') {
@@ -508,9 +508,9 @@ export class EquivalencyValidator {
     baseline: ComponentDefinition,
     migrated: ComponentDefinition,
     errors: ValidationError[],
-    warnings: ValidationWarning[]
+    _warnings: ValidationWarning[],
   ): void {
-    const baselineDeps = new Set(baseline.dependencies.map(d => d.name));
+    // Note: Baseline dependencies comparison reserved for future bidirectional validation
     const migratedDeps = new Set(migrated.dependencies.map(d => d.name));
 
     // Check for removed critical dependencies
@@ -533,7 +533,7 @@ export class EquivalencyValidator {
   private validateReactPatterns(
     baseline: ComponentDefinition,
     migrated: ComponentDefinition,
-    warnings: ValidationWarning[]
+    warnings: ValidationWarning[],
   ): void {
     const baselinePatterns = new Set(baseline.reactPatterns);
     const migratedPatterns = new Set(migrated.reactPatterns);
@@ -560,7 +560,7 @@ export class EquivalencyValidator {
    */
   private findDifferences(
     baseline: ComponentDefinition,
-    migrated: ComponentDefinition
+    migrated: ComponentDefinition,
   ): Difference[] {
     const differences: Difference[] = [];
 
@@ -624,15 +624,17 @@ export class EquivalencyValidator {
    */
   private calculateBusinessLogicScore(
     baseline: ComponentDefinition,
-    migrated: ComponentDefinition
+    migrated: ComponentDefinition,
   ): number {
-    if (baseline.businessLogic.length === 0) return 100;
+    if (baseline.businessLogic.length === 0) {
+return 100;
+}
 
     const baselineNames = new Set(baseline.businessLogic.map(bl => bl.name));
     const migratedNames = new Set(migrated.businessLogic.map(bl => bl.name));
 
     const preserved = [...baselineNames].filter(name =>
-      migratedNames.has(name)
+      migratedNames.has(name),
     ).length;
     return Math.round((preserved / baseline.businessLogic.length) * 100);
   }
@@ -642,15 +644,17 @@ export class EquivalencyValidator {
    */
   private calculateTypeSafetyScore(
     baseline: ComponentDefinition,
-    migrated: ComponentDefinition
+    migrated: ComponentDefinition,
   ): number {
-    if (baseline.props.length === 0) return 100;
+    if (baseline.props.length === 0) {
+return 100;
+}
 
     const baselineProps = new Set(baseline.props.map(p => p.name));
     const migratedProps = new Set(migrated.props.map(p => p.name));
 
     const preserved = [...baselineProps].filter(name =>
-      migratedProps.has(name)
+      migratedProps.has(name),
     ).length;
     return Math.round((preserved / baseline.props.length) * 100);
   }
@@ -660,7 +664,7 @@ export class EquivalencyValidator {
    */
   private calculateStructureScore(
     baseline: ComponentDefinition,
-    migrated: ComponentDefinition
+    migrated: ComponentDefinition,
   ): number {
     let score = 100;
 
@@ -689,7 +693,7 @@ export class EquivalencyValidator {
    */
   private calculatePerformanceScore(
     _baseline: ComponentDefinition,
-    migrated: ComponentDefinition
+    migrated: ComponentDefinition,
   ): number {
     // Simple heuristic based on complexity
     const complexityScores = {
@@ -705,7 +709,7 @@ export class EquivalencyValidator {
    * Calculate maintainability score
    */
   private calculateMaintainabilityScore(
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): number {
     let score = 100;
 
@@ -736,7 +740,7 @@ export class EquivalencyValidator {
    */
   private calculateValidationScore(
     errors: ValidationError[],
-    warnings: ValidationWarning[]
+    warnings: ValidationWarning[],
   ): number {
     let score = 100;
 
@@ -751,7 +755,7 @@ export class EquivalencyValidator {
    * Map difference category to quality category
    */
   private mapDifferenceToQualityCategory(
-    category: Difference['category']
+    category: Difference['category'],
   ): QualityIssue['category'] {
     const mapping: Record<Difference['category'], QualityIssue['category']> = {
       props: 'type-safety',
@@ -782,7 +786,7 @@ export function createValidator(): EquivalencyValidator {
 export async function validateMigration(
   baseline: ComponentDefinition,
   migrated: ComponentDefinition,
-  options?: ValidationOptions
+  options?: ValidationOptions,
 ): Promise<ValidationResult> {
   const validator = createValidator();
   return validator.validate(baseline, migrated, options);
@@ -794,7 +798,7 @@ export async function validateMigration(
 export async function compareComponents(
   baseline: ComponentDefinition,
   migrated: ComponentDefinition,
-  options?: ValidationOptions
+  options?: ValidationOptions,
 ): Promise<ComparisonResult> {
   const validator = createValidator();
   return validator.compare(baseline, migrated, options);
@@ -805,7 +809,7 @@ export async function compareComponents(
  */
 export async function assessComponentQuality(
   baseline: ComponentDefinition,
-  migrated: ComponentDefinition
+  migrated: ComponentDefinition,
 ): Promise<QualityAssessment> {
   const validator = createValidator();
   return validator.assessQuality(baseline, migrated);

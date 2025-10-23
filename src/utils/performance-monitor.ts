@@ -20,7 +20,7 @@ export interface PerformanceMetrics {
 
 export class PerformanceMonitor {
   private readonly logger = getGlobalLogger('PerformanceMonitor');
-  private metrics: PerformanceMetrics[] = [];
+  private readonly metrics: PerformanceMetrics[] = [];
   private readonly targetDuration = 1800000;
 
   public startMonitoring(_componentName: string): number {
@@ -29,7 +29,7 @@ export class PerformanceMonitor {
 
   public endMonitoring(
     componentName: string,
-    startTime: number
+    startTime: number,
   ): PerformanceMetrics {
     const endTime = Date.now();
     const duration = endTime - startTime;
@@ -60,7 +60,9 @@ export class PerformanceMonitor {
   }
 
   public getAverageDuration(): number {
-    if (this.metrics.length === 0) return 0;
+    if (this.metrics.length === 0) {
+return 0;
+}
     const total = this.metrics.reduce((sum, m) => sum + m.duration, 0);
     return total / this.metrics.length;
   }

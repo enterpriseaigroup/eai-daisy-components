@@ -54,7 +54,8 @@ import { getGlobalLogger } from './logging';
  * @param level - Optional log level override
  * @returns Logger instance
  */
-export function getLogger(name: string, level?: LogLevel) {
+export function getLogger(name: string, _level?: LogLevel) {
+  // Note: Level parameter reserved for future logger configuration
   return getGlobalLogger(name);
 }
 
@@ -66,7 +67,7 @@ export function getLogger(name: string, level?: LogLevel) {
  */
 export function logInfo(
   message: string,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): void {
   const logger = getGlobalLogger('default');
   logger.info(message, context);
@@ -82,7 +83,7 @@ export function logInfo(
 export function logError(
   message: string,
   error?: Error,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): void {
   const logger = getGlobalLogger('default');
   logger.error(message, error, context);
@@ -96,7 +97,7 @@ export function logError(
  */
 export function logWarning(
   message: string,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): void {
   const logger = getGlobalLogger('default');
   logger.warn(message, context);
@@ -110,7 +111,7 @@ export function logWarning(
  */
 export function logDebug(
   message: string,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): void {
   const logger = getGlobalLogger('default');
   logger.debug(message, context);
@@ -125,7 +126,7 @@ export function logDebug(
  */
 export async function measurePerformance<T>(
   operationName: string,
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<T> {
   const logger = getGlobalLogger('performance');
   return logger.measurePerformance(operationName, fn);
@@ -140,7 +141,7 @@ export async function measurePerformance<T>(
  */
 export function createScopedLogger(
   baseName: string,
-  context: Record<string, unknown>
+  context: Record<string, unknown>,
 ) {
   const logger = getGlobalLogger(baseName);
   return logger.child(context);
@@ -158,7 +159,7 @@ export function createScopedLogger(
  */
 export function logExtractionStart(
   componentName: string,
-  sourcePath: string
+  sourcePath: string,
 ): void {
   const logger = getGlobalLogger('extractor');
   logger.info(`Starting extraction: ${componentName}`, { sourcePath });
@@ -174,7 +175,7 @@ export function logExtractionStart(
 export function logExtractionComplete(
   componentName: string,
   duration: number,
-  success: boolean
+  success: boolean,
 ): void {
   const logger = getGlobalLogger('extractor');
 
@@ -211,7 +212,7 @@ export function logTransformationStart(componentName: string): void {
 export function logTransformationComplete(
   componentName: string,
   duration: number,
-  transformationCount: number
+  transformationCount: number,
 ): void {
   const logger = getGlobalLogger('transformer');
   logger.info(`Transformation completed: ${componentName}`, {
@@ -240,7 +241,7 @@ export function logValidationStart(componentName: string): void {
 export function logValidationComplete(
   componentName: string,
   valid: boolean,
-  score: number
+  score: number,
 ): void {
   const logger = getGlobalLogger('validator');
 
@@ -259,7 +260,7 @@ export function logValidationComplete(
  */
 export function logPipelineStart(
   componentCount: number,
-  config: Record<string, unknown>
+  config: Record<string, unknown>,
 ): void {
   const logger = getGlobalLogger('pipeline');
   logger.info('Starting pipeline execution', { componentCount, config });
@@ -290,7 +291,7 @@ export function logPipelineComplete(results: {
 export function logFileOperation(
   operation: string,
   path: string,
-  success: boolean
+  success: boolean,
 ): void {
   const logger = getGlobalLogger('file-operations');
 

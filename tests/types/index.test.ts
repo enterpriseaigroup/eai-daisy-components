@@ -7,19 +7,19 @@
  * @fileoverview Type definition tests
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import type {
-  ComponentType,
-  ComponentDefinition,
-  PropDefinition,
   BusinessLogicDefinition,
   ComplexityLevel,
-  MigrationStatus,
-  ReactPattern,
-  ValidationResult,
+  ComponentDefinition,
+  ComponentType,
   ExtractionConfig,
   MigrationResult,
+  MigrationStatus,
+  PropDefinition,
   QualityAssessment,
+  ReactPattern,
+  ValidationResult,
 } from '@/types';
 
 describe('Type Definitions', () => {
@@ -108,7 +108,7 @@ describe('Type Definitions', () => {
 
       hookPatterns.forEach(pattern => {
         expect(pattern.startsWith('use') || pattern.includes('hook')).toBe(
-          true
+          true,
         );
       });
     });

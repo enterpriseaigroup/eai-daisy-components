@@ -8,12 +8,12 @@
  */
 
 import { promises as fs } from 'fs';
-import { join, dirname } from 'path';
+import { dirname, join } from 'path';
 import type {
   ComponentDefinition,
-  GeneratedFile,
-  GeneratedArtifacts,
   ExtractionConfig,
+  GeneratedArtifacts,
+  GeneratedFile,
 } from '@/types';
 import type { TransformationResult } from '@/pipeline/transformers/configurator-transformer';
 import { FileSystemManager } from '@/utils/filesystem';
@@ -48,17 +48,17 @@ export class V2ComponentGenerator {
   public async generate(
     transformationResult: TransformationResult,
     sourceCode: string,
-    options: GenerationOptions = {}
+    options: GenerationOptions = {},
   ): Promise<GenerationResult> {
     this.logger.info(
-      `Generating V2 component: ${transformationResult.transformed.name}`
+      `Generating V2 component: ${transformationResult.transformed.name}`,
     );
 
     const artifacts: GeneratedArtifacts = {
       component: await this.generateComponentFile(
         transformationResult,
         sourceCode,
-        options
+        options,
       ),
       types: options.generateTypes
         ? await this.generateTypeFiles(transformationResult)
@@ -79,7 +79,7 @@ export class V2ComponentGenerator {
       this.config.outputPath,
       'src',
       'components',
-      transformationResult.transformed.name
+      transformationResult.transformed.name,
     );
 
     await this.writeArtifacts(artifacts, outputPath);
@@ -96,7 +96,7 @@ export class V2ComponentGenerator {
   private async generateComponentFile(
     result: TransformationResult,
     _sourceCode: string,
-    options: GenerationOptions
+    options: GenerationOptions,
   ): Promise<GeneratedFile> {
     const { transformed } = result;
     const content = this.generateConfiguratorComponent(result, options);
@@ -112,7 +112,7 @@ export class V2ComponentGenerator {
 
   private generateConfiguratorComponent(
     result: TransformationResult,
-    options: GenerationOptions
+    options: GenerationOptions,
   ): string {
     const { transformed, transformations } = result;
     const doc =
@@ -162,7 +162,7 @@ export default ${transformed.name};
   }
 
   private async generateTypeFiles(
-    result: TransformationResult
+    result: TransformationResult,
   ): Promise<GeneratedFile[]> {
     const content = `export * from './${result.transformed.name}';`;
     return [
@@ -177,7 +177,7 @@ export default ${transformed.name};
   }
 
   private async generateTestFiles(
-    result: TransformationResult
+    result: TransformationResult,
   ): Promise<GeneratedFile[]> {
     const content = `import { render } from '@testing-library/react';
 import { ${result.transformed.name} } from './${result.transformed.name}';
@@ -202,7 +202,7 @@ describe('${result.transformed.name}', () => {
   }
 
   private async generateDocumentation(
-    result: TransformationResult
+    result: TransformationResult,
   ): Promise<GeneratedFile[]> {
     const content = `# ${result.transformed.name}
 
@@ -226,7 +226,7 @@ ${result.transformed.props.map(p => `- **${p.name}** (${p.type}): ${p.descriptio
   }
 
   private async generateExamples(
-    result: TransformationResult
+    result: TransformationResult,
   ): Promise<GeneratedFile[]> {
     const content = `import { ${result.transformed.name} } from './${result.transformed.name}';
 
@@ -246,7 +246,7 @@ export const Example = () => <${result.transformed.name} />;
 
   private async writeArtifacts(
     artifacts: GeneratedArtifacts,
-    outputPath: string
+    outputPath: string,
   ): Promise<void> {
     await this.fileManager.createDirectory(outputPath);
 
@@ -268,7 +268,7 @@ export const Example = () => <${result.transformed.name} />;
 }
 
 export function createV2Generator(
-  config: ExtractionConfig
+  config: ExtractionConfig,
 ): V2ComponentGenerator {
   return new V2ComponentGenerator(config);
 }

@@ -8,6 +8,9 @@ module.exports = {
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
     '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
     '^@/pipeline/(.*)$': '<rootDir>/src/pipeline/$1',
+    '^@/engine/(.*)$': '<rootDir>/src/engine/$1',
+    // Handle .js extensions in imports (for ESM compatibility)
+    '^(.+)\\.js$': '$1',
   },
 
   // Test file patterns

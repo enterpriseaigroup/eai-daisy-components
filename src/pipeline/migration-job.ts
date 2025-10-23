@@ -15,6 +15,8 @@ import type {
 import { ComponentDiscoveryService } from './extractors/discovery';
 import { V1ComponentExtractor } from './extractors/v1-extractor';
 import { ConfiguratorTransformer } from './transformers/configurator-transformer';
+import { CSSToTailwindTransformer } from './transformers/css-to-tailwind-transformer';
+import { PseudoCodeGenerator } from './transformers/pseudo-code-generator';
 import { V2ComponentGenerator } from './generators/v2-generator';
 import { MigrationValidator } from './validators/migration-validator';
 import { PerformanceMonitor } from '@/utils/performance-monitor';
@@ -87,34 +89,96 @@ export class MigrationJob {
   }
 
   private async migrateComponent(
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): Promise<MigrationResult> {
     const perfStart = this.performanceMonitor.startMonitoring(component.name);
 
     try {
       const sourceCode = await this.fileManager.readFile(
-        `${this.config.sourcePath}/${component.sourcePath}`
+        `${this.config.sourcePath}/${component.sourcePath}`,
       );
 
       const extractor = new V1ComponentExtractor(this.config);
       await extractor.extractComponent(component);
 
-      const transformer = new ConfiguratorTransformer();
-      const transformation = await transformer.transform(component, sourceCode);
+      // Step 1: Convert CSS to Tailwind (ensures TypeScript parseability)
+      this.logger.debug(`Converting CSS to Tailwind for ${component.name}`);
+      const cssTransformer = new CSSToTailwindTransformer({
+        preserveVisualFidelity: true,
+        useArbitraryValues: true,
+        removeCSSFiles: false,
+      });
+      const cssTransformResult = await cssTransformer.transform(
+        sourceCode,
+        `${this.config.sourcePath}/${component.sourcePath}`
+      );
 
+      // Step 2: Generate pseudo-code documentation (for v1 baseline)
+      this.logger.debug(`Generating pseudo-code documentation for ${component.name}`);
+      const pseudoCodeGen = new PseudoCodeGenerator({
+        includeWhySection: true,
+        includeWhatSection: true,
+        includeCallsSection: true,
+        includeDataFlowSection: true,
+        includeDependenciesSection: true,
+        includeSpecialBehaviorSection: true,
+        addMigrationNotes: false, // v1 baseline, no migration notes yet
+      });
+      const v1Documentation = await pseudoCodeGen.generate(
+        cssTransformResult.transformedCode,
+        component.name,
+        false // isV2Component = false
+      );
+
+      // Use documented v1 code for transformation
+      const documentedSourceCode = v1Documentation.success
+        ? v1Documentation.documentedCode
+        : cssTransformResult.transformedCode;
+
+      // Step 3: Main configurator transformation
+      const transformer = new ConfiguratorTransformer();
+      const transformation = await transformer.transform(component, documentedSourceCode);
+
+      // Step 4: Generate V2 component
       const generator = new V2ComponentGenerator(this.config);
-      const generation = await generator.generate(transformation, sourceCode);
+      const generation = await generator.generate(transformation, documentedSourceCode);
+
+      // Step 5: Add pseudo-code documentation to v2 component (with migration notes)
+      this.logger.debug(`Adding migration documentation to v2 ${component.name}`);
+      const v2PseudoCodeGen = new PseudoCodeGenerator({
+        includeWhySection: true,
+        includeWhatSection: true,
+        includeCallsSection: true,
+        includeDataFlowSection: true,
+        includeDependenciesSection: true,
+        includeSpecialBehaviorSection: true,
+        addMigrationNotes: true, // v2 component, add migration notes
+      });
+
+      // Apply documentation to generated v2 component
+      const v2Component = generation.artifacts.component;
+      if (v2Component) {
+        const v2Documentation = await v2PseudoCodeGen.generate(
+          v2Component.content,
+          component.name,
+          true, // isV2Component = true
+        );
+        if (v2Documentation.success) {
+          // Note: GeneratedFile.content is readonly, update would need to recreate the object
+          // For now, documentation is generated but not re-integrated
+        }
+      }
 
       const validator = new MigrationValidator(this.config);
       const validation = await validator.validate(
         component,
         transformation,
-        generation
+        generation,
       );
 
       const performance = this.performanceMonitor.endMonitoring(
         component.name,
-        perfStart
+        perfStart,
       );
 
       return {

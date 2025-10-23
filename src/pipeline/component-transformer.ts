@@ -10,15 +10,15 @@
  */
 
 import { promises as fs } from 'fs';
-import { createSimpleLogger, type Logger } from '../utils/logging.js';
+import { type Logger, createSimpleLogger } from '../utils/logging.js';
 import type {
-  ComponentDefinition,
-  ExtractionConfig,
-  ComponentType,
-  ReactPattern,
-  PropDefinition,
   BusinessLogicDefinition,
+  ComponentDefinition,
   ComponentDependency,
+  ComponentType,
+  ExtractionConfig,
+  PropDefinition,
+  ReactPattern,
 } from '../types/index.js';
 
 // Enhanced transformation types
@@ -220,7 +220,7 @@ export class ComponentTransformer {
    */
   async transformComponent(
     component: ComponentDefinition,
-    config: ExtractionConfig
+    config: ExtractionConfig,
   ): Promise<ComponentTransformationResult> {
     const startTime = Date.now();
 
@@ -239,7 +239,7 @@ export class ComponentTransformer {
       // Parse component structure with enhanced analysis
       const componentStructure = await this.parseComponentStructure(
         sourceCode,
-        component
+        component,
       );
 
       // Extract business logic with advanced patterns
@@ -250,7 +250,7 @@ export class ComponentTransformer {
       // Transform props interface with Configurator v2 integration
       const propsInterface = await this.transformPropsInterface(
         component.props,
-        config
+        config,
       );
 
       // Generate comprehensive Configurator v2 props
@@ -264,14 +264,14 @@ export class ComponentTransformer {
         component,
         businessLogic,
         configuratorIntegration,
-        config
+        config,
       );
 
       // Generate enhanced type definitions
       const typeDefinitions = await this.generateTypeDefinitions(
         component,
         propsInterface,
-        configuratorIntegration
+        configuratorIntegration,
       );
 
       // Generate optimized imports and exports
@@ -294,7 +294,7 @@ export class ComponentTransformer {
       const migrationEffort = this.assessMigrationEffort(
         component,
         originalMetrics,
-        transformedMetrics
+        transformedMetrics,
       );
 
       const result: ComponentTransformationResult = {
@@ -323,13 +323,13 @@ export class ComponentTransformer {
             transformedCount: component.props.length,
             addedConfiguratorProps: configuratorIntegration
               ? this.extractConfiguratorPropNames(
-                  configuratorIntegration.propsCode
+                  configuratorIntegration.propsCode,
                 )
               : [],
           },
           dependenciesTransformation: {
             internal: component.dependencies.filter(
-              dep => dep.type === 'internal'
+              dep => dep.type === 'internal',
             ),
             external: component.dependencies
               .filter(dep => dep.type === 'external')
@@ -354,11 +354,11 @@ export class ComponentTransformer {
           memoryUsage: process.memoryUsage().heapUsed,
           qualityImprovement: this.calculateQualityImprovement(
             originalMetrics,
-            transformedMetrics
+            transformedMetrics,
           ),
           bundleSizeImpact: this.estimateBundleSizeImpact(
             originalMetrics,
-            transformedMetrics
+            transformedMetrics,
           ),
         },
       };
@@ -380,7 +380,7 @@ export class ComponentTransformer {
         {
           component: component.name,
           sourcePath: component.sourcePath,
-        }
+        },
       );
 
       return this.createErrorResult(component, startTime, error);
@@ -398,7 +398,7 @@ export class ComponentTransformer {
       maxConcurrency?: number;
       prioritizeByComplexity?: boolean;
       groupBySimilarity?: boolean;
-    } = {}
+    } = {},
   ): Promise<ComponentTransformationResult[]> {
     const {
       parallel = true,
@@ -450,7 +450,7 @@ export class ComponentTransformer {
     const results: ComponentTransformationResult[] = [];
     const batches = this.createOptimizedBatches(
       sortedComponents,
-      maxConcurrency
+      maxConcurrency,
     );
 
     for (let i = 0; i < batches.length; i++) {
@@ -467,7 +467,7 @@ export class ComponentTransformer {
       });
 
       const batchResults = await Promise.all(
-        batch.map(component => this.transformComponent(component, config))
+        batch.map(component => this.transformComponent(component, config)),
       );
 
       results.push(...batchResults);
@@ -507,20 +507,24 @@ export class ComponentTransformer {
     let score = 100;
 
     // Deduct points for complex patterns
-    if (component.complexity === 'critical') score -= 30;
-    else if (component.complexity === 'complex') score -= 20;
-    else if (component.complexity === 'moderate') score -= 10;
+    if (component.complexity === 'critical') {
+score -= 30;
+} else if (component.complexity === 'complex') {
+score -= 20;
+} else if (component.complexity === 'moderate') {
+score -= 10;
+}
 
     // Deduct points for problematic patterns
     const problematicPatterns = ['render-props', 'children-as-function'];
     const problematicCount = component.reactPatterns.filter(p =>
-      problematicPatterns.includes(p)
+      problematicPatterns.includes(p),
     ).length;
     score -= problematicCount * 15;
 
     // Deduct points for external dependencies
     const externalDeps = component.dependencies.filter(
-      dep => dep.type === 'external'
+      dep => dep.type === 'external',
     ).length;
     score -= externalDeps * 5;
 
@@ -532,7 +536,7 @@ export class ComponentTransformer {
    */
   private async parseComponentStructure(
     sourceCode: string,
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): Promise<EnhancedComponentStructure> {
     return {
       name: component.name,
@@ -555,7 +559,7 @@ export class ComponentTransformer {
    */
   private async extractBusinessLogic(
     structure: EnhancedComponentStructure,
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): Promise<EnhancedBusinessLogicExtraction | undefined> {
     if (
       !this.options.extractBusinessLogic ||
@@ -570,7 +574,7 @@ export class ComponentTransformer {
     for (const businessLogic of component.businessLogic) {
       const hook = await this.createAdvancedCustomHook(
         businessLogic,
-        structure
+        structure,
       );
       if (hook) {
         hooks.push(hook);
@@ -600,7 +604,7 @@ export class ComponentTransformer {
    */
   private async generateConfiguratorIntegration(
     component: ComponentDefinition,
-    _config: ExtractionConfig
+    _config: ExtractionConfig,
   ): Promise<ConfiguratorIntegration> {
     const configId = `${component.name.toLowerCase()}-config`;
 
@@ -617,12 +621,12 @@ export class ComponentTransformer {
 
     const propsCode = this.generateConfiguratorPropsCode(
       component,
-      integration
+      integration,
     );
     const hookCode = this.generateConfiguratorHookCode(component, integration);
     const contextCode = this.generateConfiguratorContextCode(
       component,
-      integration
+      integration,
     );
 
     return {
@@ -642,7 +646,7 @@ export class ComponentTransformer {
     component: ComponentDefinition,
     businessLogic: EnhancedBusinessLogicExtraction | undefined,
     configuratorIntegration: ConfiguratorIntegration | undefined,
-    _config: ExtractionConfig
+    _config: ExtractionConfig,
   ): Promise<string> {
     let componentCode = '';
 
@@ -654,7 +658,7 @@ export class ComponentTransformer {
     // Generate component signature with full type safety
     componentCode += this.generateComponentSignature(
       component,
-      configuratorIntegration
+      configuratorIntegration,
     );
 
     // Add component body
@@ -662,7 +666,7 @@ export class ComponentTransformer {
       structure,
       component,
       businessLogic,
-      configuratorIntegration
+      configuratorIntegration,
     );
 
     // Add component metadata
@@ -676,23 +680,23 @@ export class ComponentTransformer {
    */
   private calculateQualityImprovement(
     original: CodeMetrics,
-    transformed: CodeMetrics
+    transformed: CodeMetrics,
   ): number {
     const complexityImprovement = Math.max(
       0,
-      original.complexity - transformed.complexity
+      original.complexity - transformed.complexity,
     );
     const locImprovement =
       original.loc > 0 ? (original.loc - transformed.loc) / original.loc : 0;
 
     return Math.round(
-      (complexityImprovement * 0.7 + locImprovement * 0.3) * 100
+      (complexityImprovement * 0.7 + locImprovement * 0.3) * 100,
     );
   }
 
   private estimateBundleSizeImpact(
     original: CodeMetrics,
-    transformed: CodeMetrics
+    transformed: CodeMetrics,
   ): number {
     // Estimate bundle size change as percentage
     const locDiff = transformed.loc - original.loc;
@@ -702,7 +706,7 @@ export class ComponentTransformer {
   private assessMigrationEffort(
     component: ComponentDefinition,
     originalMetrics: CodeMetrics,
-    _transformedMetrics: CodeMetrics
+    _transformedMetrics: CodeMetrics,
   ): 'low' | 'medium' | 'high' | 'critical' {
     const complexityFactor =
       component.complexity === 'critical'
@@ -731,16 +735,22 @@ export class ComponentTransformer {
 
     const totalScore = complexityFactor + sizeFactor + patternFactor;
 
-    if (totalScore >= 7) return 'critical';
-    if (totalScore >= 5) return 'high';
-    if (totalScore >= 3) return 'medium';
+    if (totalScore >= 7) {
+return 'critical';
+}
+    if (totalScore >= 5) {
+return 'high';
+}
+    if (totalScore >= 3) {
+return 'medium';
+}
     return 'low';
   }
 
   private createErrorResult(
     component: ComponentDefinition,
     startTime: number,
-    error: unknown
+    error: unknown,
   ): ComponentTransformationResult {
     return {
       success: false,
@@ -806,7 +816,7 @@ export class ComponentTransformer {
   }
   private createAdvancedCustomHook(
     _businessLogic: BusinessLogicDefinition,
-    _structure: EnhancedComponentStructure
+    _structure: EnhancedComponentStructure,
   ): Promise<ExtractedHook | undefined> {
     return Promise.resolve(undefined);
   }
@@ -830,36 +840,36 @@ export class ComponentTransformer {
   }
   private generateConfiguratorPropsCode(
     _component: ComponentDefinition,
-    _integration: ConfiguratorV2Integration
+    _integration: ConfiguratorV2Integration,
   ): string {
     return '';
   }
   private generateConfiguratorHookCode(
     _component: ComponentDefinition,
-    _integration: ConfiguratorV2Integration
+    _integration: ConfiguratorV2Integration,
   ): string {
     return '';
   }
   private generateConfiguratorContextCode(
     _component: ComponentDefinition,
-    _integration: ConfiguratorV2Integration
+    _integration: ConfiguratorV2Integration,
   ): string {
     return '';
   }
   private generateConfiguratorSetupCode(
     _component: ComponentDefinition,
-    _integration: ConfiguratorV2Integration
+    _integration: ConfiguratorV2Integration,
   ): string {
     return '';
   }
   private generateEnhancedJSDocComment(
-    _component: ComponentDefinition
+    _component: ComponentDefinition,
   ): string {
     return '';
   }
   private generateComponentSignature(
     _component: ComponentDefinition,
-    _configuratorIntegration?: ConfiguratorIntegration
+    _configuratorIntegration?: ConfiguratorIntegration,
   ): string {
     return '';
   }
@@ -867,7 +877,7 @@ export class ComponentTransformer {
     _structure: EnhancedComponentStructure,
     _component: ComponentDefinition,
     _businessLogic?: EnhancedBusinessLogicExtraction,
-    _configuratorIntegration?: ConfiguratorIntegration
+    _configuratorIntegration?: ConfiguratorIntegration,
   ): string {
     return '';
   }
@@ -876,23 +886,23 @@ export class ComponentTransformer {
   }
   private generateTestCode(
     _component: ComponentDefinition,
-    _transformedCode: string
+    _transformedCode: string,
   ): Promise<string> {
     return Promise.resolve('');
   }
   private generateStoryCode(
     _component: ComponentDefinition,
-    _transformedCode: string
+    _transformedCode: string,
   ): Promise<string> {
     return Promise.resolve('');
   }
   private sortByComplexity(
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): ComponentDefinition[] {
     return components;
   }
   private groupBySimilarity(
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): ComponentDefinition[] {
     return components;
   }
@@ -904,7 +914,7 @@ export class ComponentTransformer {
   private calculateCodeMetrics(code: string): CodeMetrics {
     const lines = code.split('\n');
     const loc = lines.filter(
-      line => line.trim() && !line.trim().startsWith('//')
+      line => line.trim() && !line.trim().startsWith('//'),
     ).length;
 
     const complexityPatterns = [
@@ -983,7 +993,7 @@ export class ComponentTransformer {
   }
 
   private calculateComplexityReduction(
-    businessLogic: BusinessLogicDefinition
+    businessLogic: BusinessLogicDefinition,
   ): number {
     return businessLogic.complexity === 'complex'
       ? 5
@@ -994,28 +1004,28 @@ export class ComponentTransformer {
 
   private async transformPropsInterface(
     _props: PropDefinition[],
-    _config: ExtractionConfig
+    _config: ExtractionConfig,
   ): Promise<string> {
-    return `export interface ComponentProps {\n  // Props interface\n}`;
+    return 'export interface ComponentProps {\n  // Props interface\n}';
   }
 
   private async generateTypeDefinitions(
     _component: ComponentDefinition,
     propsInterface: string,
-    _configuratorIntegration?: ConfiguratorIntegration
+    _configuratorIntegration?: ConfiguratorIntegration,
   ): Promise<string> {
     return propsInterface;
   }
 
   private async generateImports(
     _component: ComponentDefinition,
-    _config: ExtractionConfig
+    _config: ExtractionConfig,
   ): Promise<string[]> {
     return ["import React from 'react';"];
   }
 
   private async generateExports(
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): Promise<string[]> {
     return [
       `export { ${component.name} };`,
@@ -1031,7 +1041,7 @@ export class ComponentTransformer {
     return imports.filter(
       imp =>
         imp.includes('@elevenlabs/configurator') ||
-        imp.includes('configurator-sdk')
+        imp.includes('configurator-sdk'),
     );
   }
 }

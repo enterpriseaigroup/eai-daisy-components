@@ -4,15 +4,15 @@
  * Comprehensive tests for the component discovery service.
  */
 
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import {
   ComponentDiscoveryService,
   createDiscoveryService,
-  quickDiscover,
-  discoverComponentsByType,
   discoverComponentsByComplexity,
+  discoverComponentsByType,
+  quickDiscover,
 } from '@/pipeline/extractors/discovery';
-import type { ExtractionConfig, ComponentDefinition } from '@/types';
+import type { ComponentDefinition, ExtractionConfig } from '@/types';
 import { FileSystemError } from '@/utils/errors';
 
 // Mock dependencies
@@ -193,7 +193,7 @@ describe('ComponentDiscoveryService', () => {
       });
 
       await expect(service.discoverComponents()).rejects.toThrow(
-        FileSystemError
+        FileSystemError,
       );
     });
 
@@ -480,7 +480,7 @@ describe('Utility Functions', () => {
 
       const results = await discoverComponentsByType(
         mockExtractionConfig,
-        'functional'
+        'functional',
       );
       expect(results.length).toBeGreaterThanOrEqual(0);
     });
@@ -503,7 +503,7 @@ describe('Utility Functions', () => {
 
       const results = await discoverComponentsByComplexity(
         mockExtractionConfig,
-        'simple'
+        'simple',
       );
       expect(results.length).toBeGreaterThanOrEqual(0);
     });

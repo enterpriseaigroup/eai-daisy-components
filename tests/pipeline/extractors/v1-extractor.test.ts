@@ -2,7 +2,7 @@
  * V1 Component Extractor Tests
  */
 
-import { describe, it, expect, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import {
   V1ComponentExtractor,
   createV1Extractor,

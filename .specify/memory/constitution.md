@@ -1,14 +1,14 @@
 <!--
   Sync Impact Report:
-  Version change: 1.1.0 → 1.2.0
-  Modified principles: Component Independence - clarified API integration for embeddable UI components
-  Added sections: API version alignment (1:1 with Configurator major versions), fallback strategies
+  Version change: 1.2.0 → 1.3.0
+  Modified principles: Added Principle VI - Test Accuracy & Business Logic Validation
+  Added sections: Test accuracy standards, test fixture requirements, comprehensive pseudo-code documentation
   Removed sections: None
   Templates requiring updates:
-    ✅ plan-template.md - Updated Constitution Check and directory structure for migration approach
-    ✅ spec-template.md - Compatible with component migration specifications
-    ✅ tasks-template.md - Compatible with migration development tasks
-    ✅ checklist-template.md - Compatible with migration checklists
+    ✅ plan-template.md - Already compatible
+    ✅ spec-template.md - Already compatible
+    ✅ tasks-template.md - Updated with test infrastructure enhancements (T048-T051)
+    ✅ checklist-template.md - Already compatible
   Follow-up TODOs: Constitution ratification date needs to be confirmed with team
 -->
 
@@ -48,6 +48,25 @@ All components MUST pass automated testing including unit tests, integration tes
 
 **Rationale**: Public components have higher quality standards since bugs affect multiple external consumers.
 
+### VI. Test Accuracy & Business Logic Validation (2025-10-23)
+
+All production readiness tests MUST use real pipeline integration, not mocks or simulated values. Test fixtures MUST be parseable by the TypeScript compiler (no CSS imports that break AST analysis). Business logic preservation tests MUST use semantic function analysis, not count-only comparisons. Performance metrics MUST use actual perf_hooks measurements. Test fixtures MUST include comprehensive pseudo-code documentation explaining what/why/how for all business logic blocks.
+
+**Test Accuracy Standards**:
+- Migration success: Real TypeScript compilation (≥8/10 accuracy)
+- Business logic preservation: Semantic function analysis (10/10 accuracy)
+- Throughput: Real perf_hooks measurement (≥9/10 accuracy)
+- Bundle size: Webpack production builds with minification/gzip (≥9/10 accuracy)
+- Equivalency: AST-based analysis + visual regression (≥8/10 accuracy)
+
+**Test Fixture Requirements**:
+- All test components MUST use Tailwind CSS classes (no external CSS imports)
+- All business logic blocks MUST have documentation: WHY THIS EXISTS, WHAT IT DOES, WHAT IT CALLS, WHY IT CALLS THEM, DATA FLOW, DEPENDENCIES, SPECIAL BEHAVIOR
+- All helper functions MUST document their purpose and usage
+- Migration targets (v2 components) MUST have MIGRATION NOTE markers showing what changed vs what was preserved
+
+**Rationale**: Test accuracy directly impacts production deployment confidence. Tests that report 95% success but only have 20% real accuracy create false confidence and deployment risks. Real pipeline integration ensures tests measure actual production behavior. Comprehensive fixture documentation enables accurate business logic preservation measurement. CSS-free fixtures enable TypeScript AST parsing for compilation validation.
+
 ## Security & Compliance Requirements
 
 V2 component development MUST preserve DAISY v1 visual design patterns while creating visual-only implementations based on shadcn/elevenlabs foundation. Security considerations focus on NPM package integrity and visual component safety. Business logic security review is deferred to later phases when Configurator public API integration is added. All published NPM components MUST pass automated security scanning for visual component dependencies.
@@ -70,4 +89,4 @@ Constitution supersedes all other development practices. Amendments require desi
 
 Component API changes MUST be justified with user research or consumer feedback. Complexity in component interfaces MUST be justified with clear use cases and adoption metrics.
 
-**Version**: 1.2.0 | **Ratified**: TODO(RATIFICATION_DATE): Team confirmation needed | **Last Amended**: 2025-10-22
+**Version**: 1.3.0 | **Ratified**: TODO(RATIFICATION_DATE): Team confirmation needed | **Last Amended**: 2025-10-23

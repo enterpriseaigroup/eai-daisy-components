@@ -9,19 +9,19 @@
  */
 
 import { Command } from 'commander';
-import { resolve, basename } from 'path';
+import { basename, resolve } from 'path';
 import { existsSync } from 'fs';
-import { writeFile, readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import chalk from 'chalk';
 
 // Pipeline imports
 import { PipelineOrchestrator } from './orchestrator.js';
 import type {
   ExecutionMode,
+  PipelineEventHandler,
   PipelineOptions,
   PipelineProgress,
   PipelineResult,
-  PipelineEventHandler,
 } from './orchestrator.js';
 import type { ExtractionConfig } from '@/types';
 
@@ -72,7 +72,7 @@ export interface CLIOptions {
 export class ConsoleFormatter {
   constructor(
     private readonly verbose: boolean = false,
-    private readonly quiet: boolean = false
+    private readonly quiet: boolean = false,
   ) {}
 
   success(message: string): void {
@@ -104,11 +104,13 @@ export class ConsoleFormatter {
   }
 
   table(headers: string[], rows: string[][]): void {
-    if (this.quiet) return;
+    if (this.quiet) {
+return;
+}
 
     // Simple table formatting without external dependencies
     const maxWidths = headers.map((header, i) =>
-      Math.max(header.length, ...rows.map(row => (row[i] || '').length))
+      Math.max(header.length, ...rows.map(row => (row[i] || '').length)),
     );
 
     // Print header
@@ -129,19 +131,23 @@ export class ConsoleFormatter {
   }
 
   progress(progress: PipelineProgress): void {
-    if (this.quiet) return;
+    if (this.quiet) {
+return;
+}
 
     const phaseColor = this.getPhaseColor(progress.phase);
     const progressBar = this.createProgressBar(progress.overallProgress);
 
     console.log(
-      `${phaseColor(progress.phase.toUpperCase())} ${progressBar} ${progress.overallProgress.toFixed(1)}%`
+      `${phaseColor(progress.phase.toUpperCase())} ${progressBar} ${progress.overallProgress.toFixed(1)}%`,
     );
     console.log(chalk.gray(`  ${progress.currentOperation}`));
   }
 
   results(result: PipelineResult): void {
-    if (this.quiet && result.success) return;
+    if (this.quiet && result.success) {
+return;
+}
 
     const duration = (result.metrics.totalDuration / 1000).toFixed(2);
 
@@ -172,7 +178,7 @@ export class ConsoleFormatter {
               'Warnings Generated',
               result.progress.stats.warningsGenerated.toString(),
             ],
-          ]
+          ],
         );
       }
 
@@ -243,7 +249,7 @@ export class CLIApplication {
       await this.program.parseAsync(argv);
     } catch (error) {
       this.formatter.error(
-        error instanceof Error ? error.message : 'Unknown error occurred'
+        error instanceof Error ? error.message : 'Unknown error occurred',
       );
       process.exit(1);
     }
@@ -308,7 +314,7 @@ export class CLIApplication {
    */
   private async handleExtractCommand(
     source: string,
-    options: Partial<CLIOptions>
+    options: Partial<CLIOptions>,
   ): Promise<void> {
     // Setup formatter based on options
     this.formatter = new ConsoleFormatter(options.verbose, options.quiet);
@@ -344,7 +350,7 @@ export class CLIApplication {
       process.exit(result.success ? 0 : 1);
     } catch (error) {
       this.formatter.error(
-        error instanceof Error ? error.message : 'Pipeline execution failed'
+        error instanceof Error ? error.message : 'Pipeline execution failed',
       );
       process.exit(1);
     }
@@ -364,7 +370,7 @@ export class CLIApplication {
     } catch (error) {
       this.formatter.error('Failed to load configuration');
       this.formatter.error(
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? error.message : 'Unknown error',
       );
     }
   }
@@ -482,7 +488,7 @@ export class CLIApplication {
    */
   private async handleValidateCommand(
     source: string,
-    options: { config?: string }
+    options: { config?: string },
   ): Promise<void> {
     this.formatter.info('Validating configuration and source directory...');
 
@@ -510,12 +516,12 @@ export class CLIApplication {
           ['Preserve Baseline', config.preserveBaseline.toString()],
           ['Processing Mode', config.processing.mode],
           ['Memory Limit', `${config.performance.memoryLimit}MB`],
-        ]
+        ],
       );
     } catch (error) {
       this.formatter.error('Configuration validation failed');
       this.formatter.error(
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? error.message : 'Unknown error',
       );
       process.exit(1);
     }
@@ -526,7 +532,7 @@ export class CLIApplication {
    */
   private async loadConfiguration(
     configPath?: string,
-    sourcePath?: string
+    sourcePath?: string,
   ): Promise<ExtractionConfig> {
     if (configPath) {
       if (!existsSync(configPath)) {
@@ -629,7 +635,7 @@ export class CLIApplication {
    * Convert CLI options to pipeline options
    */
   private convertToPipelineOptions(
-    options: Partial<CLIOptions>
+    options: Partial<CLIOptions>,
   ): PipelineOptions {
     return {
       mode: (options.mode as ExecutionMode) || 'full-pipeline',
@@ -649,7 +655,7 @@ export class CLIApplication {
    */
   private async runPipeline(
     config: ExtractionConfig,
-    options: PipelineOptions
+    options: PipelineOptions,
   ): Promise<PipelineResult> {
     const orchestrator = new PipelineOrchestrator();
 
@@ -677,7 +683,7 @@ export class CLIApplication {
 
       onComponentProcessed: (path, result) => {
         this.formatter.debug(
-          `Processed: ${basename(path)} - ${result.success ? 'Success' : 'Failed'}`
+          `Processed: ${basename(path)} - ${result.success ? 'Success' : 'Failed'}`,
         );
       },
     };
@@ -692,7 +698,7 @@ export class CLIApplication {
    */
   private async handleOutput(
     result: PipelineResult,
-    options: Partial<CLIOptions>
+    options: Partial<CLIOptions>,
   ): Promise<void> {
     // Display results
     this.formatter.results(result);
@@ -701,7 +707,7 @@ export class CLIApplication {
     if (options.json !== false && result.success) {
       const jsonPath = resolve(
         options.output || './output',
-        'pipeline-result.json'
+        'pipeline-result.json',
       );
       await writeFile(jsonPath, JSON.stringify(result, null, 2));
       this.formatter.debug(`JSON results saved to: ${jsonPath}`);
@@ -714,25 +720,25 @@ export class CLIApplication {
   private showBanner(): void {
     console.log('');
     console.log(
-      chalk.cyan('╔══════════════════════════════════════════════════════════╗')
+      chalk.cyan('╔══════════════════════════════════════════════════════════╗'),
     );
     console.log(
       chalk.cyan('║') +
         chalk.white('                 DAISY EXTRACT                        ') +
-        chalk.cyan('║')
+        chalk.cyan('║'),
     );
     console.log(
       chalk.cyan('║') +
         chalk.gray('         Component Extraction Pipeline                ') +
-        chalk.cyan('║')
+        chalk.cyan('║'),
     );
     console.log(
       chalk.cyan('║') +
         chalk.gray('       Transform DAISY v1 to Configurator v2         ') +
-        chalk.cyan('║')
+        chalk.cyan('║'),
     );
     console.log(
-      chalk.cyan('╚══════════════════════════════════════════════════════════╝')
+      chalk.cyan('╚══════════════════════════════════════════════════════════╝'),
     );
     console.log('');
   }

@@ -11,7 +11,7 @@ import { Command } from 'commander';
 import { initializeRepositoryConfig } from '@/config/repository-config';
 import { createDefaultPipelineConfig } from '@/config/pipeline-config';
 import { createMigrationJob } from '@/pipeline/migration-job';
-import { initializeLogging, getGlobalLogger } from '@/utils/logging';
+import { getGlobalLogger, initializeLogging } from '@/utils/logging';
 import { initializeErrorHandling } from '@/utils/errors';
 
 export async function runMigrationCLI(): Promise<void> {

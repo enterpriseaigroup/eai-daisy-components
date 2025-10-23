@@ -8,20 +8,20 @@
  * @version 1.0.0
  */
 
-import { resolve, basename, extname } from 'path';
+import { basename, extname, resolve } from 'path';
 import type {
-  ComponentDefinition,
-  ComponentType,
-  ComponentMetadata,
-  PropDefinition,
   BusinessLogicDefinition,
-  ComponentDependency,
   ComplexityLevel,
-  ReactPattern,
-  ParameterDefinition,
+  ComponentDefinition,
+  ComponentDependency,
+  ComponentMetadata,
+  ComponentType,
   MigrationStatus,
+  ParameterDefinition,
+  PropDefinition,
+  ReactPattern,
 } from '@/types';
-import { FileSystemManager, type ComponentFileInfo } from '@/utils/filesystem';
+import { type ComponentFileInfo, FileSystemManager } from '@/utils/filesystem';
 import { getGlobalLogger } from '@/utils/logging';
 
 // ============================================================================
@@ -88,7 +88,7 @@ export class ComponentExtractor {
    */
   public async extractComponent(
     filePath: string,
-    options: ExtractorOptions = {}
+    options: ExtractorOptions = {},
   ): Promise<ExtractionResult> {
     const startTime = Date.now();
     const warnings: string[] = [];
@@ -138,7 +138,7 @@ export class ComponentExtractor {
       const complexity = this.calculateComplexity(
         content,
         businessLogic,
-        reactPatterns
+        reactPatterns,
       );
 
       // Extract metadata
@@ -183,7 +183,7 @@ export class ComponentExtractor {
 
       this.logger.error(
         `Failed to extract component from ${filePath}`,
-        error as Error
+        error as Error,
       );
 
       // Return minimal component definition for failed extraction
@@ -223,7 +223,7 @@ export class ComponentExtractor {
    */
   public async extractFromDirectory(
     directoryPath: string,
-    options: ExtractorOptions = {}
+    options: ExtractorOptions = {},
   ): Promise<ExtractionResult[]> {
     this.logger.info(`Extracting components from directory ${directoryPath}`);
 
@@ -241,7 +241,7 @@ export class ComponentExtractor {
 
     const successCount = results.filter(r => r.success).length;
     this.logger.info(
-      `Extracted ${successCount}/${componentFiles.length} components successfully`
+      `Extracted ${successCount}/${componentFiles.length} components successfully`,
     );
 
     return results;
@@ -280,7 +280,7 @@ export class ComponentExtractor {
   private extractComponentName(content: string, fileName: string): string {
     // Try export default
     const defaultExportMatch = content.match(
-      /export\s+default\s+(?:function\s+)?([A-Z][a-zA-Z0-9]*)/
+      /export\s+default\s+(?:function\s+)?([A-Z][a-zA-Z0-9]*)/,
     );
     if (defaultExportMatch?.[1]) {
       return defaultExportMatch[1];
@@ -288,7 +288,7 @@ export class ComponentExtractor {
 
     // Try named export
     const namedExportMatch = content.match(
-      /export\s+(?:const|function|class)\s+([A-Z][a-zA-Z0-9]*)/
+      /export\s+(?:const|function|class)\s+([A-Z][a-zA-Z0-9]*)/,
     );
     if (namedExportMatch?.[1]) {
       return namedExportMatch[1];
@@ -296,7 +296,7 @@ export class ComponentExtractor {
 
     // Try function/class declaration
     const declarationMatch = content.match(
-      /(?:function|class)\s+([A-Z][a-zA-Z0-9]*)/
+      /(?:function|class)\s+([A-Z][a-zA-Z0-9]*)/,
     );
     if (declarationMatch?.[1]) {
       return declarationMatch[1];
@@ -354,7 +354,7 @@ export class ComponentExtractor {
         .split('\n')
         .map(line => line.trim())
         .filter(
-          line => line && !line.startsWith('//') && !line.startsWith('/*')
+          line => line && !line.startsWith('//') && !line.startsWith('/*'),
         );
 
       for (const line of propLines) {
@@ -362,7 +362,9 @@ export class ComponentExtractor {
         if (propMatch) {
           const [, name, optional, typeStr] = propMatch;
 
-          if (!name || !typeStr) continue;
+          if (!name || !typeStr) {
+continue;
+}
 
           const description = this.extractPropDescription(content, name);
 
@@ -386,7 +388,7 @@ export class ComponentExtractor {
    */
   private extractPropDescription(
     content: string,
-    propName: string
+    propName: string,
   ): string | undefined {
     const regex = new RegExp(`\\*\\s*@param\\s+${propName}\\s+-?\\s*(.+)`, 'i');
     const match = content.match(regex);
@@ -407,7 +409,9 @@ export class ComponentExtractor {
     while ((match = functionRegex.exec(content)) !== null) {
       const functionName = match[1];
 
-      if (!functionName) continue;
+      if (!functionName) {
+continue;
+}
 
       // Skip React lifecycle methods and hooks
       if (this.isReactMethod(functionName)) {
@@ -428,7 +432,7 @@ export class ComponentExtractor {
         complexity,
         externalDependencies: this.extractExternalDependencies(
           content,
-          functionName
+          functionName,
         ),
       });
     }
@@ -457,11 +461,11 @@ export class ComponentExtractor {
    */
   private extractFunctionSignature(
     content: string,
-    functionName: string
+    functionName: string,
   ): string {
     const regex = new RegExp(
       `(?:const|function)\\s+${functionName}\\s*=?\\s*(?:async\\s*)?\\([^)]*\\)(?:\\s*:\\s*[^{]+)?`,
-      'g'
+      'g',
     );
     const match = regex.exec(content);
     return match?.[0] || `function ${functionName}()`;
@@ -472,7 +476,9 @@ export class ComponentExtractor {
    */
   private extractParameters(signature: string): ParameterDefinition[] {
     const paramsMatch = signature.match(/\(([^)]*)\)/);
-    if (!paramsMatch?.[1]) return [];
+    if (!paramsMatch?.[1]) {
+return [];
+}
 
     const params = paramsMatch[1]
       .split(',')
@@ -515,11 +521,11 @@ export class ComponentExtractor {
    */
   private extractFunctionPurpose(
     content: string,
-    functionName: string
+    functionName: string,
   ): string {
     const regex = new RegExp(
       `\\/\\*\\*([^*]*(?:\\*(?!\\/)[^*]*)*)\\*\\/\\s*(?:const|function)\\s+${functionName}`,
-      's'
+      's',
     );
     const match = content.match(regex);
 
@@ -540,15 +546,17 @@ export class ComponentExtractor {
    */
   private estimateFunctionComplexity(
     content: string,
-    functionName: string
+    functionName: string,
   ): ComplexityLevel {
     const functionRegex = new RegExp(
       `(?:const|function)\\s+${functionName}[\\s\\S]*?(?=\\n(?:const|function|export|$))`,
-      'g'
+      'g',
     );
     const functionMatch = content.match(functionRegex);
 
-    if (!functionMatch) return 'simple';
+    if (!functionMatch) {
+return 'simple';
+}
 
     const functionBody = functionMatch[0];
     const lines = functionBody.split('\n').length;
@@ -556,9 +564,15 @@ export class ComponentExtractor {
       functionBody.match(/if|else|while|for|switch|case|\?|&&|\|\|/g) || []
     ).length;
 
-    if (lines > 50 || cyclomaticComplexity > 10) return 'critical';
-    if (lines > 30 || cyclomaticComplexity > 5) return 'complex';
-    if (lines > 15 || cyclomaticComplexity > 2) return 'moderate';
+    if (lines > 50 || cyclomaticComplexity > 10) {
+return 'critical';
+}
+    if (lines > 30 || cyclomaticComplexity > 5) {
+return 'complex';
+}
+    if (lines > 15 || cyclomaticComplexity > 2) {
+return 'moderate';
+}
     return 'simple';
   }
 
@@ -567,7 +581,7 @@ export class ComponentExtractor {
    */
   private extractExternalDependencies(
     content: string,
-    _functionName: string
+    _functionName: string,
   ): string[] {
     const dependencies: string[] = [];
 
@@ -589,18 +603,33 @@ export class ComponentExtractor {
   private detectReactPatterns(content: string): ReactPattern[] {
     const patterns: ReactPattern[] = [];
 
-    if (content.includes('useState')) patterns.push('useState');
-    if (content.includes('useEffect')) patterns.push('useEffect');
-    if (content.includes('useContext')) patterns.push('useContext');
-    if (content.includes('useReducer')) patterns.push('useReducer');
-    if (content.includes('useMemo')) patterns.push('useMemo');
-    if (content.includes('useCallback')) patterns.push('useCallback');
-    if (/use[A-Z]\w+/.test(content) && !patterns.length)
-      patterns.push('custom-hook');
-    if (content.includes('render={(') || content.includes('render={function'))
-      patterns.push('render-props');
-    if (content.includes('children(') || content.includes('children:{'))
-      patterns.push('children-as-function');
+    if (content.includes('useState')) {
+patterns.push('useState');
+}
+    if (content.includes('useEffect')) {
+patterns.push('useEffect');
+}
+    if (content.includes('useContext')) {
+patterns.push('useContext');
+}
+    if (content.includes('useReducer')) {
+patterns.push('useReducer');
+}
+    if (content.includes('useMemo')) {
+patterns.push('useMemo');
+}
+    if (content.includes('useCallback')) {
+patterns.push('useCallback');
+}
+    if (/use[A-Z]\w+/.test(content) && !patterns.length) {
+patterns.push('custom-hook');
+}
+    if (content.includes('render={(') || content.includes('render={function')) {
+patterns.push('render-props');
+}
+    if (content.includes('children(') || content.includes('children:{')) {
+patterns.push('children-as-function');
+}
 
     return patterns;
   }
@@ -617,7 +646,9 @@ export class ComponentExtractor {
     while ((match = importRegex.exec(content)) !== null) {
       const importPath = match[1];
 
-      if (!importPath) continue;
+      if (!importPath) {
+continue;
+}
 
       const name = importPath.split('/').pop() || importPath;
 
@@ -636,12 +667,15 @@ export class ComponentExtractor {
    * Classify dependency type
    */
   private classifyDependency(
-    importPath: string
+    importPath: string,
   ): 'component' | 'utility' | 'service' | 'external' {
     if (importPath.startsWith('.') || importPath.startsWith('/')) {
-      if (importPath.includes('component')) return 'component';
-      if (importPath.includes('service') || importPath.includes('api'))
-        return 'service';
+      if (importPath.includes('component')) {
+return 'component';
+}
+      if (importPath.includes('service') || importPath.includes('api')) {
+return 'service';
+}
       return 'utility';
     }
     return 'external';
@@ -661,20 +695,23 @@ export class ComponentExtractor {
   private calculateComplexity(
     content: string,
     businessLogic: BusinessLogicDefinition[],
-    reactPatterns: ReactPattern[]
+    reactPatterns: ReactPattern[],
   ): ComplexityLevel {
     const lines = content.split('\n').length;
     const logicComplexity = businessLogic.filter(
-      bl => bl.complexity === 'complex' || bl.complexity === 'critical'
+      bl => bl.complexity === 'complex' || bl.complexity === 'critical',
     ).length;
     const patternCount = reactPatterns.length;
 
-    if (lines > 300 || logicComplexity > 3 || patternCount > 5)
-      return 'critical';
-    if (lines > 200 || logicComplexity > 1 || patternCount > 3)
-      return 'complex';
-    if (lines > 100 || logicComplexity > 0 || patternCount > 1)
-      return 'moderate';
+    if (lines > 300 || logicComplexity > 3 || patternCount > 5) {
+return 'critical';
+}
+    if (lines > 200 || logicComplexity > 1 || patternCount > 3) {
+return 'complex';
+}
+    if (lines > 100 || logicComplexity > 0 || patternCount > 1) {
+return 'moderate';
+}
     return 'simple';
   }
 
@@ -684,7 +721,7 @@ export class ComponentExtractor {
   private extractMetadata(
     content: string,
     fileInfo: { size: number; modifiedAt: Date; createdAt: Date },
-    extractDocs: boolean
+    extractDocs: boolean,
   ): ComponentMetadata {
     const author = this.extractAuthor(content);
     const documentation = extractDocs
@@ -745,7 +782,7 @@ export function createExtractor(): ComponentExtractor {
  */
 export async function extractComponent(
   filePath: string,
-  options?: ExtractorOptions
+  options?: ExtractorOptions,
 ): Promise<ExtractionResult> {
   const extractor = createExtractor();
   return extractor.extractComponent(filePath, options);
@@ -756,7 +793,7 @@ export async function extractComponent(
  */
 export async function extractFromDirectory(
   directoryPath: string,
-  options?: ExtractorOptions
+  options?: ExtractorOptions,
 ): Promise<ExtractionResult[]> {
   const extractor = createExtractor();
   return extractor.extractFromDirectory(directoryPath, options);

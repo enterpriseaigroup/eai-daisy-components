@@ -11,7 +11,14 @@
       "Bash(npm test:*)",
       "Bash(npm run measure:baseline:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(npm install:*)",
+      "Bash(npx playwright install chromium)",
+      "Bash(npm run test:*)",
+      "Bash(npm run test:production:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": [],
     "ask": []

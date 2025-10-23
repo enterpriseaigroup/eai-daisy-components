@@ -1,0 +1,84 @@
+/* DAISY v1 Button Styles */
+
+.daisy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-height: 40px;
+}
+
+/* Variants */
+.daisy-button--primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.daisy-button--secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.daisy-button--danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Sizes */
+.daisy-button--small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  min-height: 32px;
+}
+
+.daisy-button--large {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.125rem;
+  min-height: 48px;
+}
+
+/* States */
+.daisy-button--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.daisy-button--loading {
+  cursor: wait;
+}
+
+.daisy-button--hovered {
+  filter: brightness(1.1);
+}
+
+.daisy-button--full-width {
+  width: 100%;
+}
+
+/* Elements */
+.daisy-button__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 8px;
+}
+
+.daisy-button__icon {
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

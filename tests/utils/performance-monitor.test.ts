@@ -2,7 +2,7 @@
  * Performance Monitor Tests
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 import {
   PerformanceMonitor,
   createPerformanceMonitor,

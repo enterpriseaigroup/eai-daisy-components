@@ -230,7 +230,9 @@ export function isFilePath(value: unknown): value is string {
  * @returns Whether value is a valid component name
  */
 export function isComponentName(value: unknown): value is string {
-  if (typeof value !== 'string') return false;
+  if (typeof value !== 'string') {
+return false;
+}
 
   // Component names should start with uppercase letter
   return /^[A-Z][a-zA-Z0-9]*$/.test(value);
@@ -243,7 +245,9 @@ export function isComponentName(value: unknown): value is string {
  * @returns Whether value is a directory path
  */
 export function isDirectoryPath(value: unknown): value is string {
-  if (typeof value !== 'string') return false;
+  if (typeof value !== 'string') {
+return false;
+}
 
   // Basic directory path validation
   return value.length > 0 && !value.includes('\0');
@@ -260,7 +264,9 @@ export function isDirectoryPath(value: unknown): value is string {
  * @returns Formatted file size
  */
 export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 Bytes';
+  if (bytes === 0) {
+return '0 Bytes';
+}
 
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -309,9 +315,11 @@ export function formatDuration(milliseconds: number): string {
 export function formatPercentage(
   value: number,
   total: number,
-  decimals: number = 1
+  decimals: number = 1,
 ): string {
-  if (total === 0) return '0%';
+  if (total === 0) {
+return '0%';
+}
 
   const percentage = (value / total) * 100;
   return `${percentage.toFixed(decimals)}%`;
@@ -454,7 +462,7 @@ export function isEmptyObject(obj: Record<string, unknown>): boolean {
  */
 export function pick<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
-  keys: K[]
+  keys: K[],
 ): Pick<T, K> {
   const result = {} as Pick<T, K>;
 
@@ -476,7 +484,7 @@ export function pick<T extends Record<string, unknown>, K extends keyof T>(
  */
 export function omit<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
-  keys: K[]
+  keys: K[],
 ): Omit<T, K> {
   const result = { ...obj };
 

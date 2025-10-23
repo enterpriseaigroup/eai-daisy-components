@@ -43,6 +43,33 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
+// Mock logging utilities
+jest.mock('@/utils/logging', () => ({
+  getGlobalLogger: jest.fn().mockReturnValue({
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    success: jest.fn(),
+  }),
+  initializeLogging: jest.fn(),
+  shutdownLogging: jest.fn(),
+  createLogger: jest.fn().mockReturnValue({
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    success: jest.fn(),
+  }),
+  createSimpleLogger: jest.fn().mockReturnValue({
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    success: jest.fn(),
+  }),
+}));
+
 // Set up testing environment
 beforeEach(() => {
   // Clear all mocks before each test
@@ -58,7 +85,7 @@ afterEach(() => {
 expect.extend({
   toBeTypeOf(
     received: unknown,
-    expectedType: string
+    expectedType: string,
   ): jest.CustomMatcherResult {
     const actualType = typeof received;
     const pass = actualType === expectedType;
@@ -95,7 +122,7 @@ export const createMockComponent = (name: string) => {
 };
 
 export const createMockFunction = <T extends (...args: any[]) => any>(
-  returnValue?: ReturnType<T>
+  returnValue?: ReturnType<T>,
 ) => {
   return jest.fn().mockReturnValue(returnValue);
 };

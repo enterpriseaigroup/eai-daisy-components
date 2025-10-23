@@ -9,23 +9,23 @@
  */
 
 import { z } from 'zod';
-import { resolve, isAbsolute } from 'path';
-import { existsSync, accessSync, constants } from 'fs';
+import { isAbsolute, resolve } from 'path';
+import { accessSync, constants, existsSync } from 'fs';
 import type {
+  ComplexityLevel,
+  ComponentFilters,
+  ComponentType,
   ExtractionConfig,
-  ProcessingConfig,
-  PerformanceConfig,
-  ValidationConfig,
+  LogOutput,
+  LoggingConfig,
+  NamingConventions,
   OutputConfig,
   OutputFormat,
-  NamingConventions,
+  PerformanceConfig,
+  ProcessingConfig,
   RetryConfig,
-  ComponentFilters,
-  LoggingConfig,
   RetryableOperation,
-  LogOutput,
-  ComponentType,
-  ComplexityLevel,
+  ValidationConfig,
 } from '@/types';
 
 // ============================================================================
@@ -351,7 +351,7 @@ export class ConfigurationManager {
       if (error instanceof z.ZodError) {
         throw new ConfigurationError(
           'Configuration validation failed',
-          this.formatZodErrors(error)
+          this.formatZodErrors(error),
         );
       }
       throw new ConfigurationError('Configuration loading failed', [
@@ -375,7 +375,7 @@ export class ConfigurationManager {
     } catch (error) {
       throw new ConfigurationError(
         `Failed to load configuration from file: ${filePath}`,
-        [error as Error]
+        [error as Error],
       );
     }
   }
@@ -391,7 +391,7 @@ export class ConfigurationManager {
   public createMinimal(
     sourcePath: string,
     outputPath: string,
-    overrides: Partial<ExtractionConfig> = {}
+    overrides: Partial<ExtractionConfig> = {},
   ): ExtractionConfig {
     const minimalConfig = {
       sourcePath: resolve(sourcePath),
@@ -443,7 +443,7 @@ export class ConfigurationManager {
     if (errors.length > 0) {
       throw new ConfigurationError(
         'Path validation failed',
-        errors.map(msg => new Error(msg))
+        errors.map(msg => new Error(msg)),
       );
     }
   }
@@ -543,7 +543,7 @@ export class ConfigurationManager {
    */
   public validateSection<T extends keyof ExtractionConfig>(
     section: T,
-    data: unknown
+    data: unknown,
   ): ExtractionConfig[T] {
     const sectionSchemas = {
       processing: ProcessingConfigSchema,
@@ -557,7 +557,7 @@ export class ConfigurationManager {
     if (!schema) {
       throw new ConfigurationError(
         `Unknown configuration section: ${String(section)}`,
-        []
+        [],
       );
     }
 
@@ -567,7 +567,7 @@ export class ConfigurationManager {
       if (error instanceof z.ZodError) {
         throw new ConfigurationError(
           `Validation failed for section: ${String(section)}`,
-          this.formatZodErrors(error)
+          this.formatZodErrors(error),
         );
       }
       throw error;
@@ -640,7 +640,7 @@ export function createConfigurationManager(): ConfigurationManager {
 export function createQuickConfig(
   sourcePath: string,
   outputPath: string,
-  options: Partial<ExtractionConfig> = {}
+  options: Partial<ExtractionConfig> = {},
 ): ExtractionConfig {
   const manager = createConfigurationManager();
   return manager.createMinimal(sourcePath, outputPath, options);
@@ -684,7 +684,7 @@ export function validateConfiguration(configData: unknown): {
  */
 export function mergeConfigurations(
   base: Partial<ExtractionConfig>,
-  override: Partial<ExtractionConfig>
+  override: Partial<ExtractionConfig>,
 ): ExtractionConfig {
   const merged = {
     ...base,
@@ -753,7 +753,7 @@ export function createDefaultConfig(): Partial<ExtractionConfig> {
  * Load configuration from file (async wrapper)
  */
 export async function loadConfigFromFile(
-  filePath: string
+  filePath: string,
 ): Promise<ExtractionConfig> {
   const manager = createConfigurationManager();
   return manager.loadFromFile(filePath);

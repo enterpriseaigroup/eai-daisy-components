@@ -8,7 +8,7 @@
  * @version 1.0.0
  */
 
-import { resolve, join, isAbsolute } from 'path';
+import { isAbsolute, join, resolve } from 'path';
 import { promises as fs } from 'fs';
 import { ConfigurationError } from '@/utils/errors';
 
@@ -141,7 +141,7 @@ export class RepositoryConfigManager {
    */
   public async resolvePath(
     relativePath: string,
-    options: PathResolutionOptions = {}
+    options: PathResolutionOptions = {},
   ): Promise<string> {
     const {
       verify = false,
@@ -162,7 +162,7 @@ export class RepositoryConfigManager {
         if (mustBeDirectory && !stats.isDirectory()) {
           throw new ConfigurationError(
             `Path is not a directory: ${absolutePath}`,
-            { filePath: absolutePath }
+            { filePath: absolutePath },
           );
         }
 
@@ -172,7 +172,7 @@ export class RepositoryConfigManager {
           } catch {
             throw new ConfigurationError(
               `Path is not readable: ${absolutePath}`,
-              { filePath: absolutePath }
+              { filePath: absolutePath },
             );
           }
         }
@@ -214,7 +214,7 @@ export class RepositoryConfigManager {
     if (!this.isWithinRepository(absolutePath)) {
       throw new ConfigurationError(
         `Path is outside repository: ${absolutePath}`,
-        { filePath: absolutePath }
+        { filePath: absolutePath },
       );
     }
 
@@ -246,7 +246,7 @@ export class RepositoryConfigManager {
       if (!stats.isDirectory()) {
         throw new ConfigurationError(
           `Repository path is not a directory: ${repoPath}`,
-          { filePath: repoPath }
+          { filePath: repoPath },
         );
       }
 
@@ -261,7 +261,7 @@ export class RepositoryConfigManager {
         throw new ConfigurationError(
           `Source directory not found: ${sourcePath}`,
           { filePath: sourcePath },
-          error as Error
+          error as Error,
         );
       }
     } catch (error) {
@@ -269,7 +269,7 @@ export class RepositoryConfigManager {
         throw new ConfigurationError(
           `Repository path does not exist: ${repoPath}`,
           { filePath: repoPath },
-          error as Error
+          error as Error,
         );
       }
       throw error;
@@ -325,7 +325,7 @@ export class RepositoryConfigManager {
     if (!this.initialized) {
       throw new ConfigurationError(
         'Repository configuration not initialized. Call initialize() first.',
-        { operation: 'ensureInitialized' }
+        { operation: 'ensureInitialized' },
       );
     }
   }
@@ -342,7 +342,7 @@ export class RepositoryConfigManager {
  * @returns Repository configuration manager instance
  */
 export function createRepositoryConfig(
-  repositoryPath?: string
+  repositoryPath?: string,
 ): RepositoryConfigManager {
   return new RepositoryConfigManager(repositoryPath);
 }
@@ -361,7 +361,7 @@ export function getDefaultRepositoryPath(): string {
  * @returns Whether path is valid
  */
 export async function validateRepositoryPath(
-  repositoryPath: string
+  repositoryPath: string,
 ): Promise<boolean> {
   try {
     const stats = await fs.stat(repositoryPath);
@@ -383,7 +383,7 @@ export async function validateRepositoryPath(
  * @returns Array of component directory paths
  */
 export async function findComponentDirectories(
-  repositoryPath: string
+  repositoryPath: string,
 ): Promise<string[]> {
   const srcPath = join(repositoryPath, 'src');
   const componentDirs: string[] = [];
@@ -406,7 +406,7 @@ export async function findComponentDirectories(
     throw new ConfigurationError(
       `Failed to scan component directories: ${srcPath}`,
       { filePath: srcPath },
-      error as Error
+      error as Error,
     );
   }
 
@@ -444,7 +444,7 @@ let globalRepositoryConfig: RepositoryConfigManager | null = null;
  * @param repositoryPath - Repository path (optional)
  */
 export async function initializeRepositoryConfig(
-  repositoryPath?: string
+  repositoryPath?: string,
 ): Promise<void> {
   globalRepositoryConfig = createRepositoryConfig(repositoryPath);
   await globalRepositoryConfig.initialize();
@@ -457,7 +457,7 @@ export function getRepositoryConfig(): RepositoryConfigManager {
   if (!globalRepositoryConfig) {
     throw new ConfigurationError(
       'Repository configuration not initialized. Call initializeRepositoryConfig() first.',
-      { operation: 'getRepositoryConfig' }
+      { operation: 'getRepositoryConfig' },
     );
   }
   return globalRepositoryConfig;

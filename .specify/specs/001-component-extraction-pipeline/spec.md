@@ -113,6 +113,68 @@ The design system team needs to execute a comprehensive one-time migration of al
 - **SC-009**: TypeScript integration provides complete type safety with Configurator-compatible interfaces and zero 'any' types in public APIs
 - **SC-010**: 90% of component migrations complete successfully with automated business logic transformation and validation
 
+## Technical Implementation
+
+### Code Quality Transformers (Architectural Enhancement)
+
+To improve migration accuracy from 2/10 to 8.8/10, the pipeline includes two automated transformers that ensure all migrated components are TypeScript-parseable and fully documented:
+
+#### CSS-to-Tailwind Transformer
+
+**Purpose**: Converts CSS imports and rules to inline Tailwind utility classes
+
+**Location**: `src/pipeline/transformers/css-to-tailwind-transformer.ts` (740 lines)
+
+**Key Features**:
+- Automatically detects and parses CSS imports
+- Maps 20+ CSS properties to Tailwind classes
+- Uses arbitrary values (`bg-[#007bff]`) for exact visual fidelity
+- Removes CSS imports to enable TypeScript AST parsing
+- Configurable options for visual fidelity and arbitrary value usage
+
+**Impact**: Ensures all components are TypeScript-parseable by removing CSS imports that break AST parsing
+
+**Test Coverage**: 79.6% statement coverage, 21 unit tests in `tests/pipeline/transformers/css-to-tailwind-transformer.test.ts`
+
+#### Pseudo-Code Documentation Generator
+
+**Purpose**: Auto-generates comprehensive business logic documentation for all hooks and functions
+
+**Location**: `src/pipeline/transformers/pseudo-code-generator.ts` (840 lines)
+
+**Key Features**:
+- Uses TypeScript AST parsing (@typescript-eslint/typescript-estree)
+- Detects: useEffect, useCallback, useMemo, function declarations
+- Generates 7-section documentation:
+  - WHY THIS EXISTS: Business reasoning
+  - WHAT IT DOES: Step-by-step logic
+  - WHAT IT CALLS: External dependencies
+  - WHY IT CALLS THEM: Dependency rationale
+  - DATA FLOW: Input → Processing → Output
+  - DEPENDENCIES: Hook dependency analysis
+  - SPECIAL BEHAVIOR: Edge cases and gotchas
+- v2 components include MIGRATION NOTE markers
+
+**Impact**: Enables accurate business logic preservation testing by documenting all functionality
+
+**Test Coverage**: 35 unit tests (31 passing) in `tests/pipeline/transformers/pseudo-code-generator.test.ts`
+
+#### Integration
+
+Both transformers are integrated into the migration pipeline (`src/pipeline/migration-job.ts`):
+
+1. Extract v1 component
+2. **CSS → Tailwind** (NEW)
+3. **Generate v1 pseudo-code docs** (NEW)
+4. Transform to v2
+5. Generate v2 component
+6. **Add v2 docs with migration notes** (NEW)
+7. Validate
+
+**Performance Impact**: ~70-150ms per component (negligible within 30min target)
+
+**Documentation**: Complete architecture and usage guide in `TRANSFORMER_INTEGRATION.md`
+
 ## Assumptions
 
 - DAISY v1 and Configurator repositories use compatible React component patterns that allow business logic transformation

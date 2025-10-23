@@ -24,17 +24,16 @@ export interface MigrationValidationResult extends ValidationResult {
 }
 
 export class MigrationValidator {
-  private readonly config: ExtractionConfig;
   private readonly logger = getGlobalLogger('MigrationValidator');
 
-  constructor(config: ExtractionConfig) {
-    this.config = config;
+  constructor(_config: ExtractionConfig) {
+    // Config reserved for future validation enhancements
   }
 
   public async validate(
     component: ComponentDefinition,
     transformation: TransformationResult,
-    generation: GenerationResult
+    generation: GenerationResult,
   ): Promise<MigrationValidationResult> {
     this.logger.debug(`Validating migration: ${component.name}`);
 
@@ -63,7 +62,7 @@ export class MigrationValidator {
       transformation,
       generation,
       errors,
-      warnings
+      warnings,
     );
 
     return {
@@ -80,9 +79,9 @@ export class MigrationValidator {
 
   private calculateScore(
     transformation: TransformationResult,
-    generation: GenerationResult,
+    _generation: GenerationResult,
     errors: ValidationResult['errors'],
-    warnings: ValidationResult['warnings']
+    warnings: ValidationResult['warnings'],
   ): number {
     let score = 100;
 
@@ -102,7 +101,7 @@ export class MigrationValidator {
 }
 
 export function createMigrationValidator(
-  config: ExtractionConfig
+  config: ExtractionConfig,
 ): MigrationValidator {
   return new MigrationValidator(config);
 }

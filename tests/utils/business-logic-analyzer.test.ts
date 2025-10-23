@@ -2,11 +2,11 @@
  * Business Logic Analyzer Tests
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import {
   BusinessLogicAnalyzer,
-  createBusinessLogicAnalyzer,
   analyzeBusinessLogic,
+  createBusinessLogicAnalyzer,
   isBusinessLogicPreserved,
 } from '@/utils/business-logic-analyzer';
 import type { ComponentDefinition } from '@/types';
@@ -58,27 +58,27 @@ describe('BusinessLogicAnalyzer', () => {
     });
 
     it('should detect useReducer patterns', () => {
-      const code = `const [state, dispatch] = useReducer(reducer, initialState);`;
+      const code = 'const [state, dispatch] = useReducer(reducer, initialState);';
       const result = analyzer.analyzeComponent(mockComponent, code);
       expect(result.stateManagement.some(s => s.type === 'useReducer')).toBe(
-        true
+        true,
       );
     });
 
     it('should detect useEffect patterns', () => {
-      const code = `useEffect(() => { fetchData(); }, [dependency]);`;
+      const code = 'useEffect(() => { fetchData(); }, [dependency]);';
       const result = analyzer.analyzeComponent(mockComponent, code);
       expect(result.sideEffects.length).toBeGreaterThan(0);
     });
 
     it('should detect event handlers', () => {
-      const code = `const handleClick = () => { console.log('clicked'); };`;
+      const code = 'const handleClick = () => { console.log(\'clicked\'); };';
       const result = analyzer.analyzeComponent(mockComponent, code);
       expect(result.eventHandlers.length).toBeGreaterThan(0);
     });
 
     it('should detect data transformations', () => {
-      const code = `const mapped = data.map(x => x * 2);`;
+      const code = 'const mapped = data.map(x => x * 2);';
       const result = analyzer.analyzeComponent(mockComponent, code);
       expect(result.dataTransformations.length).toBeGreaterThan(0);
     });
@@ -113,7 +113,7 @@ describe('Utility Functions', () => {
   });
 
   it('should analyze via helper function', () => {
-    const code = `const [state, setState] = useState(0);`;
+    const code = 'const [state, setState] = useState(0);';
     const result = analyzeBusinessLogic(mockComponent, code);
     expect(result).toBeDefined();
   });

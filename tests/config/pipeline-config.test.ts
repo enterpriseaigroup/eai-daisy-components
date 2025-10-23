@@ -2,7 +2,7 @@
  * Pipeline Configuration Tests
  */
 
-import { describe, it, expect, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import {
   createDefaultPipelineConfig,
   loadPipelineConfig,

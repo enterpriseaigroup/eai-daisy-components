@@ -10,8 +10,8 @@
  */
 
 import { join } from 'path';
-import { writeFile, mkdir } from 'fs/promises';
-import { createSimpleLogger, type Logger } from '../utils/logging.js';
+import { mkdir, writeFile } from 'fs/promises';
+import { type Logger, createSimpleLogger } from '../utils/logging.js';
 import type { ComponentDefinition, ExtractionConfig } from '@/types';
 import type { DiscoveryResult } from './discovery.js';
 import type { ParseResult } from './parser.js';
@@ -285,7 +285,7 @@ export class ComponentInventoryGenerator {
     discovery: DiscoveryResult,
     parsing: Map<string, ParseResult>,
     dependencies: DependencyAnalysisResult,
-    extractionConfig: ExtractionConfig
+    extractionConfig: ExtractionConfig,
   ): Promise<ComponentInventory> {
     try {
       this.logger.info('Generating component inventory...');
@@ -296,13 +296,13 @@ export class ComponentInventoryGenerator {
       const readiness = this.assessComponentReadiness(
         discovery,
         parsing,
-        dependencies
+        dependencies,
       );
 
       // Step 2: Create inventory sections
       const sections = this.createInventorySections(
         discovery.components,
-        readiness
+        readiness,
       );
 
       // Step 3: Generate migration roadmap
@@ -312,7 +312,7 @@ export class ComponentInventoryGenerator {
       const summary = this.createExecutiveSummary(
         discovery,
         readiness,
-        dependencies
+        dependencies,
       );
 
       // Step 5: Compile complete inventory
@@ -340,7 +340,7 @@ export class ComponentInventoryGenerator {
     } catch (error) {
       this.logger.error(
         'Failed to generate inventory:',
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
       throw error;
     }
@@ -375,7 +375,7 @@ export class ComponentInventoryGenerator {
     } catch (error) {
       this.logger.error(
         'Failed to export inventory:',
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
       throw error;
     }
@@ -387,18 +387,18 @@ export class ComponentInventoryGenerator {
   private assessComponentReadiness(
     discovery: DiscoveryResult,
     parsing: Map<string, ParseResult>,
-    dependencies: DependencyAnalysisResult
+    dependencies: DependencyAnalysisResult,
   ): ComponentReadiness[] {
     return discovery.components.map(component => {
       const parseResult = parsing.get(component.sourcePath);
       const componentDeps = dependencies.dependencies.filter(
-        d => d.source === component.sourcePath
+        d => d.source === component.sourcePath,
       );
 
       const criteria = this.calculateReadinessCriteria(
         component,
         parseResult,
-        componentDeps
+        componentDeps,
       );
       const readinessScore = this.calculateOverallReadiness(criteria);
       const readinessLevel = this.classifyReadinessLevel(readinessScore);
@@ -406,7 +406,7 @@ export class ComponentInventoryGenerator {
       const blockers = this.identifyBlockers(
         component,
         parseResult,
-        componentDeps
+        componentDeps,
       );
       const prerequisites = this.generatePrerequisites(blockers, criteria);
 
@@ -431,7 +431,7 @@ export class ComponentInventoryGenerator {
     component: ComponentDefinition,
     parseResult?: ParseResult,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _dependencies: any[] = []
+    _dependencies: any[] = [],
   ): ReadinessCriteria {
     // Code quality based on complexity and parsing success
     const codeQuality = parseResult?.success
@@ -447,7 +447,7 @@ export class ComponentInventoryGenerator {
     // Dependency complexity (lower complexity = higher score)
     const dependencyComplexity = Math.max(
       0,
-      100 - component.dependencies.length * 10
+      100 - component.dependencies.length * 10,
     );
 
     // Props clarity based on prop definitions
@@ -497,7 +497,7 @@ export class ComponentInventoryGenerator {
       Object.entries(criteria).reduce((total, [key, value]) => {
         const weight = weights[key as keyof ReadinessCriteria] || 0;
         return total + value * weight;
-      }, 0)
+      }, 0),
     );
   }
 
@@ -505,11 +505,17 @@ export class ComponentInventoryGenerator {
    * Classify readiness level based on score
    */
   private classifyReadinessLevel(
-    score: number
+    score: number,
   ): ComponentReadiness['readinessLevel'] {
-    if (score >= this.config.readinessThreshold) return 'ready';
-    if (score >= 60) return 'needs-work';
-    if (score >= 40) return 'complex';
+    if (score >= this.config.readinessThreshold) {
+return 'ready';
+}
+    if (score >= 60) {
+return 'needs-work';
+}
+    if (score >= 40) {
+return 'complex';
+}
     return 'high-risk';
   }
 
@@ -520,16 +526,28 @@ export class ComponentInventoryGenerator {
     let score = 80; // Base score
 
     // Functional components are easier to migrate
-    if (component.type === 'functional') score += 10;
-    if (component.type === 'class') score -= 10;
+    if (component.type === 'functional') {
+score += 10;
+}
+    if (component.type === 'class') {
+score -= 10;
+}
 
     // Modern React patterns are good
-    if (component.reactPatterns.includes('useState')) score += 5;
-    if (component.reactPatterns.includes('useEffect')) score += 5;
+    if (component.reactPatterns.includes('useState')) {
+score += 5;
+}
+    if (component.reactPatterns.includes('useEffect')) {
+score += 5;
+}
 
     // High complexity is problematic
-    if (component.complexity === 'complex') score -= 15;
-    if (component.complexity === 'critical') score -= 25;
+    if (component.complexity === 'complex') {
+score -= 15;
+}
+    if (component.complexity === 'critical') {
+score -= 25;
+}
 
     return Math.max(0, Math.min(100, score));
   }
@@ -541,7 +559,7 @@ export class ComponentInventoryGenerator {
     component: ComponentDefinition,
     parseResult?: ParseResult,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _dependencies: any[] = []
+    _dependencies: any[] = [],
   ): string[] {
     const blockers: string[] = [];
 
@@ -578,7 +596,7 @@ export class ComponentInventoryGenerator {
    */
   private generatePrerequisites(
     blockers: string[],
-    criteria: ReadinessCriteria
+    criteria: ReadinessCriteria,
   ): string[] {
     const prerequisites: string[] = [];
 
@@ -612,19 +630,31 @@ export class ComponentInventoryGenerator {
     component: ComponentDefinition,
     parseResult?: ParseResult,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _dependencies: any[] = []
+    _dependencies: any[] = [],
   ): ComponentReadiness['effort'] {
     let effort = 0;
 
     // Base effort by component type
-    if (component.type === 'functional') effort += 1;
-    if (component.type === 'class') effort += 2;
-    if (component.type === 'higher-order') effort += 3;
+    if (component.type === 'functional') {
+effort += 1;
+}
+    if (component.type === 'class') {
+effort += 2;
+}
+    if (component.type === 'higher-order') {
+effort += 3;
+}
 
     // Complexity impact
-    if (component.complexity === 'moderate') effort += 1;
-    if (component.complexity === 'complex') effort += 2;
-    if (component.complexity === 'critical') effort += 3;
+    if (component.complexity === 'moderate') {
+effort += 1;
+}
+    if (component.complexity === 'complex') {
+effort += 2;
+}
+    if (component.complexity === 'critical') {
+effort += 3;
+}
 
     // Dependencies impact
     effort += Math.min(2, Math.floor(component.dependencies.length / 3));
@@ -636,14 +666,20 @@ export class ComponentInventoryGenerator {
     if (parseResult?.complexity.cyclomaticComplexity) {
       effort += Math.min(
         2,
-        Math.floor(parseResult.complexity.cyclomaticComplexity / 10)
+        Math.floor(parseResult.complexity.cyclomaticComplexity / 10),
       );
     }
 
     // Convert to effort level
-    if (effort <= 2) return 'low';
-    if (effort <= 4) return 'medium';
-    if (effort <= 6) return 'high';
+    if (effort <= 2) {
+return 'low';
+}
+    if (effort <= 4) {
+return 'medium';
+}
+    if (effort <= 6) {
+return 'high';
+}
     return 'very-high';
   }
 
@@ -653,24 +689,35 @@ export class ComponentInventoryGenerator {
   private assessRisk(
     component: ComponentDefinition,
     parseResult?: ParseResult,
-    dependencies: any[] = []
+    dependencies: any[] = [],
   ): ComponentReadiness['risk'] {
     let risk = 0;
 
     // Critical complexity is high risk
-    if (component.complexity === 'critical') risk += 3;
-    if (component.complexity === 'complex') risk += 2;
+    if (component.complexity === 'critical') {
+risk += 3;
+}
+    if (component.complexity === 'complex') {
+risk += 2;
+}
 
     // Many dependencies increase risk
-    if (dependencies.length > 5) risk += 2;
-    if (dependencies.length > 10) risk += 3;
+    if (dependencies.length > 5) {
+risk += 2;
+}
+    if (dependencies.length > 10) {
+risk += 3;
+}
 
     // Parse failures are risky
-    if (parseResult && !parseResult.success) risk += 2;
+    if (parseResult && !parseResult.success) {
+risk += 2;
+}
 
     // High cyclomatic complexity
-    if (parseResult && parseResult.complexity.cyclomaticComplexity > 20)
-      risk += 3;
+    if (parseResult && parseResult.complexity.cyclomaticComplexity > 20) {
+risk += 3;
+}
 
     // Missing tests increase risk
     if (
@@ -681,9 +728,15 @@ export class ComponentInventoryGenerator {
     }
 
     // Convert to risk level
-    if (risk <= 2) return 'low';
-    if (risk <= 4) return 'medium';
-    if (risk <= 6) return 'high';
+    if (risk <= 2) {
+return 'low';
+}
+    if (risk <= 4) {
+return 'medium';
+}
+    if (risk <= 6) {
+return 'high';
+}
     return 'critical';
   }
 
@@ -692,7 +745,7 @@ export class ComponentInventoryGenerator {
    */
   private createInventorySections(
     components: ComponentDefinition[],
-    readiness: ComponentReadiness[]
+    readiness: ComponentReadiness[],
   ): InventorySection[] {
     const sections: InventorySection[] = [];
 
@@ -701,15 +754,15 @@ export class ComponentInventoryGenerator {
 
     Object.entries(readinessGroups).forEach(([level, readinessItems]) => {
       const sectionComponents = components.filter(c =>
-        readinessItems.some(r => r.componentId === c.id)
+        readinessItems.some(r => r.componentId === c.id),
       );
 
       sections.push({
         title: this.getReadinessTitle(
-          level as ComponentReadiness['readinessLevel']
+          level as ComponentReadiness['readinessLevel'],
         ),
         description: this.getReadinessDescription(
-          level as ComponentReadiness['readinessLevel']
+          level as ComponentReadiness['readinessLevel'],
         ),
         components: sectionComponents,
         metrics: {
@@ -719,7 +772,7 @@ export class ComponentInventoryGenerator {
             readinessItems.length,
         },
         recommendations: this.getReadinessRecommendations(
-          level as ComponentReadiness['readinessLevel']
+          level as ComponentReadiness['readinessLevel'],
         ),
       });
     });
@@ -732,7 +785,7 @@ export class ComponentInventoryGenerator {
    */
   private groupBy<T, K extends string | number>(
     array: T[],
-    keyFn: (item: T) => K
+    keyFn: (item: T) => K,
   ): Record<K, T[]> {
     return array.reduce(
       (groups, item) => {
@@ -741,7 +794,7 @@ export class ComponentInventoryGenerator {
         groups[key].push(item);
         return groups;
       },
-      {} as Record<K, T[]>
+      {} as Record<K, T[]>,
     );
   }
 
@@ -749,7 +802,7 @@ export class ComponentInventoryGenerator {
    * Get title for readiness level
    */
   private getReadinessTitle(
-    level: ComponentReadiness['readinessLevel']
+    level: ComponentReadiness['readinessLevel'],
   ): string {
     const titles = {
       ready: 'Ready for Extraction',
@@ -764,7 +817,7 @@ export class ComponentInventoryGenerator {
    * Get description for readiness level
    */
   private getReadinessDescription(
-    level: ComponentReadiness['readinessLevel']
+    level: ComponentReadiness['readinessLevel'],
   ): string {
     const descriptions = {
       ready:
@@ -782,7 +835,7 @@ export class ComponentInventoryGenerator {
    * Get recommendations for readiness level
    */
   private getReadinessRecommendations(
-    level: ComponentReadiness['readinessLevel']
+    level: ComponentReadiness['readinessLevel'],
   ): string[] {
     const recommendations = {
       ready: [
@@ -815,11 +868,11 @@ export class ComponentInventoryGenerator {
   private generateMigrationRoadmap(
     readiness: ComponentReadiness[],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _dependencies: DependencyAnalysisResult
+    _dependencies: DependencyAnalysisResult,
   ): MigrationRoadmap {
     // Sort components by readiness for phased approach
     const sortedComponents = readiness.sort(
-      (a, b) => b.readinessScore - a.readinessScore
+      (a, b) => b.readinessScore - a.readinessScore,
     );
 
     const phases: MigrationPhase[] = [];
@@ -830,7 +883,7 @@ export class ComponentInventoryGenerator {
       if (currentPhaseComponents.length >= this.config.maxComponentsPerPhase) {
         // Create phase
         phases.push(
-          this.createMigrationPhase(currentPhase, currentPhaseComponents)
+          this.createMigrationPhase(currentPhase, currentPhaseComponents),
         );
         currentPhase++;
         currentPhaseComponents = [];
@@ -841,7 +894,7 @@ export class ComponentInventoryGenerator {
     // Add remaining components to final phase
     if (currentPhaseComponents.length > 0) {
       phases.push(
-        this.createMigrationPhase(currentPhase, currentPhaseComponents)
+        this.createMigrationPhase(currentPhase, currentPhaseComponents),
       );
     }
 
@@ -868,7 +921,7 @@ export class ComponentInventoryGenerator {
    */
   private createMigrationPhase(
     phase: number,
-    components: string[]
+    components: string[],
   ): MigrationPhase {
     return {
       phase,
@@ -894,8 +947,12 @@ export class ComponentInventoryGenerator {
    * Get phase name
    */
   private getPhaseName(phase: number): string {
-    if (phase === 1) return 'Foundation';
-    if (phase === 2) return 'Core Components';
+    if (phase === 1) {
+return 'Foundation';
+}
+    if (phase === 2) {
+return 'Core Components';
+}
     return 'Advanced Components';
   }
 
@@ -903,9 +960,12 @@ export class ComponentInventoryGenerator {
    * Get phase description
    */
   private getPhaseDescription(phase: number): string {
-    if (phase === 1)
-      return 'Extract ready components to establish migration foundation';
-    if (phase === 2) return 'Migrate core functionality components';
+    if (phase === 1) {
+return 'Extract ready components to establish migration foundation';
+}
+    if (phase === 2) {
+return 'Migrate core functionality components';
+}
     return 'Handle complex and high-risk components';
   }
 
@@ -916,8 +976,12 @@ export class ComponentInventoryGenerator {
     const weeksPerComponent = 0.5; // Average 2-3 days per component
     const totalWeeks = Math.ceil(componentCount * weeksPerComponent);
 
-    if (totalWeeks <= 1) return '1 week';
-    if (totalWeeks <= 4) return `${totalWeeks} weeks`;
+    if (totalWeeks <= 1) {
+return '1 week';
+}
+    if (totalWeeks <= 4) {
+return `${totalWeeks} weeks`;
+}
     return `${Math.ceil(totalWeeks / 4)} months`;
   }
 
@@ -930,7 +994,9 @@ export class ComponentInventoryGenerator {
     const averagePhaseWeeks = 3;
     const totalWeeks = Math.ceil(totalPhases * averagePhaseWeeks * 0.8); // 20% overlap
 
-    if (totalWeeks <= 4) return `${totalWeeks} weeks`;
+    if (totalWeeks <= 4) {
+return `${totalWeeks} weeks`;
+}
     return `${Math.ceil(totalWeeks / 4)} months`;
   }
 
@@ -940,16 +1006,16 @@ export class ComponentInventoryGenerator {
   private createExecutiveSummary(
     discovery: DiscoveryResult,
     readiness: ComponentReadiness[],
-    dependencies: DependencyAnalysisResult
+    dependencies: DependencyAnalysisResult,
   ): InventorySummary {
     const componentsByReadiness = this.groupBy(
       readiness,
-      r => r.readinessLevel
+      r => r.readinessLevel,
     );
     const componentsByType = this.groupBy(discovery.components, c => c.type);
     const componentsByComplexity = this.groupBy(
       discovery.components,
-      c => c.complexity
+      c => c.complexity,
     );
 
     const averageReadiness =
@@ -971,7 +1037,7 @@ export class ComponentInventoryGenerator {
           effortMultipliers[effort as ComponentReadiness['effort']] || 1;
         return total + components.length * multiplier;
       },
-      0
+      0,
     );
 
     const totalEstimatedEffort = `${Math.ceil(totalEffort / 4)} person-months`;
@@ -982,25 +1048,25 @@ export class ComponentInventoryGenerator {
         Object.entries(componentsByReadiness).map(([key, value]) => [
           key,
           value.length,
-        ])
+        ]),
       ) as Record<ComponentReadiness['readinessLevel'], number>,
       componentsByType: Object.fromEntries(
         Object.entries(componentsByType).map(([key, value]) => [
           key,
           value.length,
-        ])
+        ]),
       ),
       componentsByComplexity: Object.fromEntries(
         Object.entries(componentsByComplexity).map(([key, value]) => [
           key,
           value.length,
-        ])
+        ]),
       ),
       averageReadiness: Math.round(averageReadiness),
       totalEstimatedEffort,
       keyRecommendations: this.generateKeyRecommendations(
         readiness,
-        dependencies
+        dependencies,
       ),
       criticalRisks: this.identifyCriticalRisks(readiness, dependencies),
     };
@@ -1012,44 +1078,44 @@ export class ComponentInventoryGenerator {
   private generateKeyRecommendations(
     readiness: ComponentReadiness[],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _dependencies: DependencyAnalysisResult
+    _dependencies: DependencyAnalysisResult,
   ): string[] {
     const recommendations: string[] = [];
 
     const readyCount = readiness.filter(
-      r => r.readinessLevel === 'ready'
+      r => r.readinessLevel === 'ready',
     ).length;
     const highRiskCount = readiness.filter(
-      r => r.readinessLevel === 'high-risk'
+      r => r.readinessLevel === 'high-risk',
     ).length;
 
     if (readyCount > 0) {
       recommendations.push(
-        `Start with ${readyCount} ready components to establish migration process`
+        `Start with ${readyCount} ready components to establish migration process`,
       );
     }
 
     if (highRiskCount > 0) {
       recommendations.push(
-        `${highRiskCount} high-risk components require significant refactoring`
+        `${highRiskCount} high-risk components require significant refactoring`,
       );
     }
 
     const lowTestCoverage = readiness.filter(
-      r => r.criteria.testCoverage < 50
+      r => r.criteria.testCoverage < 50,
     ).length;
     if (lowTestCoverage > readiness.length * 0.3) {
       recommendations.push(
-        'Improve test coverage across the codebase before migration'
+        'Improve test coverage across the codebase before migration',
       );
     }
 
     const complexComponents = readiness.filter(
-      r => r.criteria.dependencyComplexity < 50
+      r => r.criteria.dependencyComplexity < 50,
     ).length;
     if (complexComponents > 0) {
       recommendations.push(
-        'Simplify dependency structures for easier extraction'
+        'Simplify dependency structures for easier extraction',
       );
     }
 
@@ -1061,34 +1127,34 @@ export class ComponentInventoryGenerator {
    */
   private identifyCriticalRisks(
     readiness: ComponentReadiness[],
-    dependencies: DependencyAnalysisResult
+    dependencies: DependencyAnalysisResult,
   ): string[] {
     const risks: string[] = [];
 
     const criticalRiskComponents = readiness.filter(
-      r => r.risk === 'critical'
+      r => r.risk === 'critical',
     ).length;
     if (criticalRiskComponents > 0) {
       risks.push(
-        `${criticalRiskComponents} components have critical extraction risks`
+        `${criticalRiskComponents} components have critical extraction risks`,
       );
     }
 
     if (dependencies.graph.cycles.length > 0) {
       risks.push(
-        `${dependencies.graph.cycles.length} circular dependencies detected`
+        `${dependencies.graph.cycles.length} circular dependencies detected`,
       );
     }
 
     const noTestComponents = readiness.filter(
-      r => r.criteria.testCoverage === 0
+      r => r.criteria.testCoverage === 0,
     ).length;
     if (noTestComponents > readiness.length * 0.5) {
       risks.push('Over 50% of components lack test coverage');
     }
 
     const undocumentedComponents = readiness.filter(
-      r => r.criteria.documentation < 30
+      r => r.criteria.documentation < 30,
     ).length;
     if (undocumentedComponents > readiness.length * 0.4) {
       risks.push('Significant portion of components lack proper documentation');
@@ -1137,7 +1203,7 @@ export class ComponentInventoryGenerator {
     md.push(`- **Total Components**: ${inventory.summary.totalComponents}`);
     md.push(`- **Average Readiness**: ${inventory.summary.averageReadiness}%`);
     md.push(
-      `- **Estimated Effort**: ${inventory.summary.totalEstimatedEffort}`
+      `- **Estimated Effort**: ${inventory.summary.totalEstimatedEffort}`,
     );
     md.push('');
 
@@ -1147,7 +1213,7 @@ export class ComponentInventoryGenerator {
     Object.entries(inventory.summary.componentsByReadiness).forEach(
       ([level, count]) => {
         md.push(`- **${level}**: ${count} components`);
-      }
+      },
     );
     md.push('');
 
@@ -1202,7 +1268,7 @@ export class ComponentInventoryGenerator {
       md.push(`**Count**: ${section.metrics['count']}`);
       if (section.metrics['averageScore']) {
         md.push(
-          `**Average Score**: ${Math.round(section.metrics['averageScore'] as number)}%`
+          `**Average Score**: ${Math.round(section.metrics['averageScore'])}%`,
         );
       }
       md.push('');
@@ -1210,7 +1276,7 @@ export class ComponentInventoryGenerator {
       // Component list
       section.components.forEach(component => {
         const readinessInfo = inventory.readiness.find(
-          r => r.componentId === component.id
+          r => r.componentId === component.id,
         );
         const score = readinessInfo
           ? ` (${readinessInfo.readinessScore}%)`

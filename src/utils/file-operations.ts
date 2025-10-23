@@ -9,14 +9,10 @@
  * @version 1.0.0
  */
 
-import { readFile, writeFile, copyFile, mkdir, rm, stat } from 'fs/promises';
-import { resolve, join, dirname, basename, extname } from 'path';
+import { copyFile, mkdir, rm, stat, writeFile } from 'fs/promises';
+import { basename, dirname, extname, join, resolve } from 'path';
 import type { ComponentDefinition, GeneratedFile } from '@/types';
-import {
-  FileSystemManager,
-  type FileInfo,
-  type DirectoryScanResult,
-} from './filesystem';
+import { FileSystemManager } from './filesystem';
 import { getGlobalLogger } from './logging';
 
 // ============================================================================
@@ -120,7 +116,7 @@ export class FileOperations {
   public async copyToBaseline(
     sourcePath: string,
     baselineDir: string,
-    options: CopyOptions = {}
+    options: CopyOptions = {},
   ): Promise<string> {
     this.logger.info(`Copying component to baseline: ${sourcePath}`);
 
@@ -154,7 +150,7 @@ export class FileOperations {
     } catch (error) {
       this.logger.error(
         `Failed to copy to baseline: ${sourcePath}`,
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -171,7 +167,7 @@ export class FileOperations {
   public async saveMigratedComponent(
     component: ComponentDefinition,
     code: string,
-    outputDir: string
+    outputDir: string,
   ): Promise<string> {
     this.logger.info(`Saving migrated component: ${component.name}`);
 
@@ -187,7 +183,7 @@ export class FileOperations {
     } catch (error) {
       this.logger.error(
         `Failed to save migrated component: ${component.name}`,
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -204,10 +200,10 @@ export class FileOperations {
   public async batchCopy(
     files: string[],
     destinationDir: string,
-    options: CopyOptions = {}
+    options: CopyOptions = {},
   ): Promise<BatchOperationResult> {
     this.logger.info(
-      `Batch copying ${files.length} files to ${destinationDir}`
+      `Batch copying ${files.length} files to ${destinationDir}`,
     );
 
     const startTime = Date.now();
@@ -246,7 +242,7 @@ export class FileOperations {
 
     const duration = Date.now() - startTime;
 
-    this.logger.info(`Batch copy completed`, {
+    this.logger.info('Batch copy completed', {
       total: files.length,
       successful: successCount,
       failed: failCount,
@@ -271,7 +267,7 @@ export class FileOperations {
    */
   public async createBackup(
     sourcePath: string,
-    options: BackupOptions
+    options: BackupOptions,
   ): Promise<string> {
     this.logger.info(`Creating backup of ${sourcePath}`);
 
@@ -300,7 +296,7 @@ export class FileOperations {
     } catch (error) {
       this.logger.error(
         `Failed to create backup: ${sourcePath}`,
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -326,13 +322,13 @@ export class FileOperations {
       } catch (error) {
         this.logger.error(
           `Failed to save artifact: ${artifact.path}`,
-          error as Error
+          error as Error,
         );
       }
     }
 
     this.logger.info(
-      `Successfully saved ${savedPaths.length}/${artifacts.length} artifacts`
+      `Successfully saved ${savedPaths.length}/${artifacts.length} artifacts`,
     );
     return savedPaths;
   }
@@ -345,7 +341,7 @@ export class FileOperations {
    */
   public async cleanOutputDirectory(
     outputDir: string,
-    options: { preserveBaseline?: boolean } = {}
+    options: { preserveBaseline?: boolean } = {},
   ): Promise<void> {
     this.logger.info(`Cleaning output directory: ${outputDir}`);
 
@@ -377,7 +373,7 @@ export class FileOperations {
     } catch (error) {
       this.logger.error(
         `Failed to clean output directory: ${outputDir}`,
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -397,7 +393,7 @@ export class FileOperations {
       } catch (error) {
         this.logger.error(
           `Failed to create directory: ${path}`,
-          error as Error
+          error as Error,
         );
         throw error;
       }
@@ -463,7 +459,7 @@ export class FileOperations {
     } catch (error) {
       this.logger.error(
         `Failed to read component source: ${filePath}`,
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -478,7 +474,7 @@ export class FileOperations {
    */
   public async findComponentFiles(
     directory: string,
-    recursive: boolean = true
+    recursive: boolean = true,
   ): Promise<string[]> {
     this.logger.debug(`Finding component files in ${directory}`);
 
@@ -509,7 +505,7 @@ export function createFileOperations(): FileOperations {
 export async function copyToBaseline(
   sourcePath: string,
   baselineDir: string,
-  options?: CopyOptions
+  options?: CopyOptions,
 ): Promise<string> {
   const ops = createFileOperations();
   return ops.copyToBaseline(sourcePath, baselineDir, options);
@@ -521,7 +517,7 @@ export async function copyToBaseline(
 export async function saveMigratedComponent(
   component: ComponentDefinition,
   code: string,
-  outputDir: string
+  outputDir: string,
 ): Promise<string> {
   const ops = createFileOperations();
   return ops.saveMigratedComponent(component, code, outputDir);
@@ -533,7 +529,7 @@ export async function saveMigratedComponent(
 export async function batchCopyFiles(
   files: string[],
   destinationDir: string,
-  options?: CopyOptions
+  options?: CopyOptions,
 ): Promise<BatchOperationResult> {
   const ops = createFileOperations();
   return ops.batchCopy(files, destinationDir, options);

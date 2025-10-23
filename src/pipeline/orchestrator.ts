@@ -9,10 +9,10 @@
  * @author DAISY Component Extraction Pipeline
  */
 
-import { resolve, join } from 'path';
-import { createSimpleLogger, type Logger } from '../utils/logging.js';
+import { join, resolve } from 'path';
+import { type Logger, createSimpleLogger } from '../utils/logging.js';
 import { FileSystemManager } from '../utils/filesystem.js';
-import type { ExtractionConfig, ComponentDefinition } from '@/types';
+import type { ComponentDefinition, ExtractionConfig } from '@/types';
 
 // Import our analysis engines
 import {
@@ -21,12 +21,12 @@ import {
 } from '../engine/discovery.js';
 import { ComponentParser, type ParseResult } from '../engine/parser.js';
 import {
-  DependencyAnalyzer,
   type DependencyAnalysisResult,
+  DependencyAnalyzer,
 } from '../engine/analyzer.js';
 import {
-  ComponentInventoryGenerator,
   type ComponentInventory,
+  ComponentInventoryGenerator,
 } from '../engine/inventory.js';
 
 /**
@@ -299,7 +299,7 @@ export class PipelineOrchestrator {
    */
   async execute(
     config: ExtractionConfig,
-    options: Partial<PipelineOptions> = {}
+    options: Partial<PipelineOptions> = {},
   ): Promise<PipelineResult> {
     if (this.isRunning) {
       throw new Error('Pipeline is already running');
@@ -332,11 +332,11 @@ export class PipelineOrchestrator {
     } catch (error) {
       this.logger.error(
         'Pipeline execution failed:',
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
 
       return this.createErrorResult(
-        error instanceof Error ? error : new Error('Unknown pipeline error')
+        error instanceof Error ? error : new Error('Unknown pipeline error'),
       );
     } finally {
       this.isRunning = false;
@@ -373,7 +373,7 @@ export class PipelineOrchestrator {
    */
   private async initializeContext(
     config: ExtractionConfig,
-    options: Partial<PipelineOptions>
+    options: Partial<PipelineOptions>,
   ): Promise<PipelineContext> {
     // Basic configuration validation
     if (!config || typeof config !== 'object') {
@@ -436,7 +436,7 @@ export class PipelineOrchestrator {
    * Execute pipeline phases based on mode
    */
   private async executePipeline(
-    context: PipelineContext
+    context: PipelineContext,
   ): Promise<PipelineResult> {
     const startTime = Date.now();
     const errors: PipelineError[] = [];
@@ -478,7 +478,7 @@ export class PipelineOrchestrator {
       ) {
         dependencies = await this.executeDependencyAnalysisPhase(
           context,
-          discovery.components
+          discovery.components,
         );
 
         if (this.shouldCancel) {
@@ -497,7 +497,7 @@ export class PipelineOrchestrator {
           context,
           discovery,
           parsing,
-          dependencies
+          dependencies,
         );
 
         if (context.options.generateReports && !context.options.dryRun) {
@@ -563,7 +563,7 @@ export class PipelineOrchestrator {
    * Execute component discovery phase
    */
   private async executeDiscoveryPhase(
-    context: PipelineContext
+    context: PipelineContext,
   ): Promise<DiscoveryResult> {
     this.updatePhase('discovery', 'Discovering components...');
 
@@ -575,7 +575,7 @@ export class PipelineOrchestrator {
         {
           parallel: context.options.parallel,
           workers: context.options.maxWorkers,
-        }
+        },
       );
     }
 
@@ -604,7 +604,7 @@ export class PipelineOrchestrator {
    */
   private async executeParsingPhase(
     context: PipelineContext,
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): Promise<Map<string, ParseResult>> {
     this.updatePhase('parsing', 'Parsing component structures...');
 
@@ -622,7 +622,9 @@ export class PipelineOrchestrator {
     let processed = 0;
 
     for (const component of components) {
-      if (this.shouldCancel) break;
+      if (this.shouldCancel) {
+break;
+}
 
       try {
         this.updateProgress({
@@ -632,7 +634,7 @@ export class PipelineOrchestrator {
 
         const parseResult = await this.parser.parseComponent(
           component.sourcePath,
-          component
+          component,
         );
         results.set(component.sourcePath, parseResult);
 
@@ -675,7 +677,7 @@ export class PipelineOrchestrator {
    */
   private async executeDependencyAnalysisPhase(
     _context: PipelineContext,
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): Promise<DependencyAnalysisResult> {
     this.updatePhase('dependency-analysis', 'Analyzing dependencies...');
 
@@ -717,11 +719,11 @@ export class PipelineOrchestrator {
     context: PipelineContext,
     discovery: DiscoveryResult,
     parsing: Map<string, ParseResult>,
-    dependencies: DependencyAnalysisResult
+    dependencies: DependencyAnalysisResult,
   ): Promise<ComponentInventory> {
     this.updatePhase(
       'inventory-generation',
-      'Generating component inventory...'
+      'Generating component inventory...',
     );
 
     // Initialize inventory generator if needed
@@ -744,7 +746,7 @@ export class PipelineOrchestrator {
       discovery,
       parsing,
       dependencies,
-      context.config
+      context.config,
     );
 
     this.updateProgress({
@@ -760,7 +762,7 @@ export class PipelineOrchestrator {
    * Generate output reports
    */
   private async generateReports(
-    inventory: ComponentInventory
+    inventory: ComponentInventory,
   ): Promise<string[]> {
     if (!this.inventoryGenerator) {
       throw new Error('Inventory generator not initialized');
@@ -841,7 +843,7 @@ export class PipelineOrchestrator {
 
       this.progress.overallProgress = Math.min(
         100,
-        completedWeight + currentPhaseProgress
+        completedWeight + currentPhaseProgress,
       );
 
       this.emitProgress(this.progress);
@@ -852,7 +854,9 @@ export class PipelineOrchestrator {
    * Check if phase is complete
    */
   private isPhaseComplete(phase: PipelinePhase): boolean {
-    if (!this.progress) return false;
+    if (!this.progress) {
+return false;
+}
 
     const phaseOrder: PipelinePhase[] = [
       'initialization',
@@ -875,7 +879,7 @@ export class PipelineOrchestrator {
    */
   private calculateMetrics(
     context: PipelineContext,
-    startTime: number
+    startTime: number,
   ): PipelineMetrics {
     const totalDuration = Date.now() - startTime;
     const componentsProcessed = context.processedComponents;

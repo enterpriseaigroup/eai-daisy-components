@@ -145,7 +145,7 @@ export class BusinessLogicTransformer {
    */
   public async transformComponent(
     component: ComponentDefinition,
-    options: TransformationOptions = {}
+    options: TransformationOptions = {},
   ): Promise<TransformationResult> {
     this.logger.info(`Transforming component ${component.name}`);
 
@@ -184,7 +184,7 @@ export class BusinessLogicTransformer {
         component,
         context,
         transformations,
-        transformAPICalls
+        transformAPICalls,
       );
 
       // Transform React patterns
@@ -230,7 +230,7 @@ export class BusinessLogicTransformer {
     } catch (error) {
       this.logger.error(
         `Failed to transform component ${component.name}`,
-        error as Error
+        error as Error,
       );
 
       return {
@@ -285,7 +285,7 @@ export class BusinessLogicTransformer {
   private transformImports(
     component: ComponentDefinition,
     context: CodeGenContext,
-    transformations: AppliedTransformation[]
+    transformations: AppliedTransformation[],
   ): void {
     // Add React import
     context.imports.push("import React from 'react';");
@@ -306,7 +306,7 @@ export class BusinessLogicTransformer {
             type: 'api',
             from: dep.importPath,
             to: mappedImport,
-            description: `Mapped DAISY v1 import to Configurator equivalent`,
+            description: 'Mapped DAISY v1 import to Configurator equivalent',
           });
         }
 
@@ -324,7 +324,7 @@ export class BusinessLogicTransformer {
   private transformProps(
     component: ComponentDefinition,
     context: CodeGenContext,
-    transformations: AppliedTransformation[]
+    transformations: AppliedTransformation[],
   ): void {
     if (component.props.length === 0) {
       context.propsInterface = '';
@@ -349,7 +349,7 @@ export class BusinessLogicTransformer {
           type: 'prop',
           from: prop.type,
           to: transformedType,
-          description: `Transformed prop type for Configurator compatibility`,
+          description: 'Transformed prop type for Configurator compatibility',
         });
       }
     }
@@ -383,12 +383,12 @@ export class BusinessLogicTransformer {
     component: ComponentDefinition,
     context: CodeGenContext,
     transformations: AppliedTransformation[],
-    transformAPICalls: boolean
+    transformAPICalls: boolean,
   ): void {
     for (const logic of component.businessLogic) {
       const transformedLogic = this.transformLogicFunction(
         logic,
-        transformAPICalls
+        transformAPICalls,
       );
 
       context.helpers.push(transformedLogic);
@@ -409,7 +409,7 @@ export class BusinessLogicTransformer {
    */
   private transformLogicFunction(
     logic: BusinessLogicDefinition,
-    transformAPICalls: boolean
+    transformAPICalls: boolean,
   ): string {
     const params = logic.parameters
       .map(p => `${p.name}${p.optional ? '?' : ''}: ${p.type}`)
@@ -419,20 +419,20 @@ export class BusinessLogicTransformer {
     const functionBody = [
       signature,
       `  // ${logic.purpose}`,
-      `  // TODO: Implement business logic from DAISY v1`,
+      '  // TODO: Implement business logic from DAISY v1',
     ];
 
     if (transformAPICalls && logic.externalDependencies.length > 0) {
       functionBody.push(
-        `  // External dependencies: ${logic.externalDependencies.join(', ')}`
+        `  // External dependencies: ${logic.externalDependencies.join(', ')}`,
       );
       functionBody.push(
-        `  // Note: API calls stubbed for Configurator compatibility`
+        '  // Note: API calls stubbed for Configurator compatibility',
       );
     }
 
     functionBody.push(
-      `  throw new Error('Business logic not yet implemented');`
+      '  throw new Error(\'Business logic not yet implemented\');',
     );
     functionBody.push('};');
 
@@ -445,14 +445,14 @@ export class BusinessLogicTransformer {
   private transformReactPatterns(
     component: ComponentDefinition,
     context: CodeGenContext,
-    transformations: AppliedTransformation[]
+    transformations: AppliedTransformation[],
   ): void {
     const patterns = component.reactPatterns;
 
     // Add hooks based on detected patterns
     if (patterns.includes('useState')) {
       context.componentBody.push(
-        '  // State management preserved from DAISY v1'
+        '  // State management preserved from DAISY v1',
       );
       transformations.push({
         type: 'hook',
@@ -489,7 +489,7 @@ export class BusinessLogicTransformer {
   private addConfiguratorIntegration(
     _component: ComponentDefinition, // TODO: Use component metadata for integration
     context: CodeGenContext,
-    transformations: AppliedTransformation[]
+    transformations: AppliedTransformation[],
   ): void {
     context.configuratorIntegration = [
       '  // Configurator integration',
@@ -511,14 +511,14 @@ export class BusinessLogicTransformer {
   private applyCustomRules(
     rules: TransformationRule[],
     context: CodeGenContext,
-    transformations: AppliedTransformation[]
+    transformations: AppliedTransformation[],
   ): void {
     for (const rule of rules) {
       this.logger.debug(`Applying custom rule: ${rule.name}`);
 
       // Apply rule to component body
       context.componentBody = context.componentBody.map(line =>
-        line.replace(rule.pattern, rule.replacement)
+        line.replace(rule.pattern, rule.replacement),
       );
 
       transformations.push({
@@ -539,7 +539,7 @@ export class BusinessLogicTransformer {
    */
   private generateCode(
     component: ComponentDefinition,
-    context: CodeGenContext
+    context: CodeGenContext,
   ): string {
     const parts: string[] = [];
 
@@ -551,7 +551,7 @@ export class BusinessLogicTransformer {
     parts.push(' * Business logic preserved with functional equivalency');
     parts.push(' *');
     parts.push(
-      ` * @fileoverview ${component.metadata.documentation || component.name}`
+      ` * @fileoverview ${component.metadata.documentation || component.name}`,
     );
     parts.push(' * @version 2.0.0');
     parts.push(' */');
@@ -578,7 +578,7 @@ export class BusinessLogicTransformer {
     const propsParam =
       component.props.length > 0 ? `props: ${component.name}Props` : '';
     parts.push(
-      `const ${component.name}: FC<${component.props.length > 0 ? `${component.name}Props` : 'Record<string, never>'}> = (${propsParam}) => {`
+      `const ${component.name}: FC<${component.props.length > 0 ? `${component.name}Props` : 'Record<string, never>'}> = (${propsParam}) => {`,
     );
 
     if (context.configuratorIntegration) {
@@ -593,7 +593,7 @@ export class BusinessLogicTransformer {
 
     parts.push('  return (');
     parts.push(
-      '    <div className={`${component.name.toLowerCase()}-component`}>'
+      '    <div className={`${component.name.toLowerCase()}-component`}>',
     );
     parts.push(`      {/* TODO: Implement ${component.name} UI */}`);
     parts.push(`      <p>Component: ${component.name}</p>`);
@@ -625,7 +625,7 @@ export function createTransformer(): BusinessLogicTransformer {
  */
 export async function transformComponent(
   component: ComponentDefinition,
-  options?: TransformationOptions
+  options?: TransformationOptions,
 ): Promise<TransformationResult> {
   const transformer = createTransformer();
   return transformer.transformComponent(component, options);
@@ -636,7 +636,7 @@ export async function transformComponent(
  */
 export async function transformComponents(
   components: ComponentDefinition[],
-  options?: TransformationOptions
+  options?: TransformationOptions,
 ): Promise<TransformationResult[]> {
   const transformer = createTransformer();
   const results: TransformationResult[] = [];

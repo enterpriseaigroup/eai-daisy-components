@@ -2,12 +2,12 @@
  * V2 Component Generator Tests
  */
 
-import { describe, it, expect, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import {
   V2ComponentGenerator,
   createV2Generator,
 } from '@/pipeline/generators/v2-generator';
-import type { ExtractionConfig, ComponentDefinition } from '@/types';
+import type { ComponentDefinition, ExtractionConfig } from '@/types';
 import type { TransformationResult } from '@/pipeline/transformers/configurator-transformer';
 
 jest.mock('@/utils/filesystem');
@@ -124,7 +124,7 @@ describe('V2ComponentGenerator', () => {
     it('should generate component files', async () => {
       const result = await generator.generate(
         mockTransformation,
-        'source code'
+        'source code',
       );
 
       expect(result.success).toBe(true);

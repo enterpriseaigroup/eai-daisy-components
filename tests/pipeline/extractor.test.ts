@@ -8,12 +8,12 @@
  */
 
 import {
-  describe,
-  it,
-  expect,
-  jest,
-  beforeEach,
   afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
 } from '@jest/globals';
 import {
   ComponentExtractor,
@@ -21,7 +21,7 @@ import {
   extractComponent,
 } from '@/pipeline/extractor';
 import type { ExtractionResult, ExtractorOptions } from '@/pipeline/extractor';
-import { writeFile, mkdir, rm } from 'fs/promises';
+import { mkdir, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
@@ -281,7 +281,7 @@ module.exports = {};
       await writeFile(
         join(testDir, 'Component.test.tsx'),
         testFileCode,
-        'utf-8'
+        'utf-8',
       );
       await writeFile(join(testDir, 'config.js'), configFile, 'utf-8');
 
@@ -357,7 +357,7 @@ export const Component = () => <div>Component</div>;
       expect(result.component.metadata.createdAt.constructor.name).toBe('Date');
       expect(result.component.metadata.lastModified).toBeTruthy();
       expect(result.component.metadata.lastModified.constructor.name).toBe(
-        'Date'
+        'Date',
       );
     });
 
