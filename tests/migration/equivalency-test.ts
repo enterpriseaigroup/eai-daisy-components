@@ -55,8 +55,10 @@ export async function runEquivalencyTests(
       expect(result.score).toBeGreaterThanOrEqual(80);
     });
 
-    test.testCases.forEach(testCase => {
-      it(testCase.description, async () => {
+    for (const testCase of test.testCases) {
+      const description = String(testCase.description);
+      // eslint-disable-next-line jest/valid-title
+      it(description, async () => {
         const result = await testComponentEquivalency(
           test.v1Component,
           test.v2Component,
@@ -65,7 +67,7 @@ export async function runEquivalencyTests(
 
         expect(result.equivalent).toBe(true);
       });
-    });
+    }
   });
 }
 

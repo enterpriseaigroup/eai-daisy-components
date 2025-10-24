@@ -384,7 +384,10 @@ export class EquivalencyValidator {
         }
       } else {
         // Validate prop type compatibility
-        const migratedProp = migratedProps.get(name)!;
+        const migratedProp = migratedProps.get(name);
+        if (!migratedProp) {
+          continue;
+        }
         if (strict && baseProp.type !== migratedProp.type) {
           warnings.push({
             code: 'PROP_TYPE_CHANGED',
@@ -438,7 +441,10 @@ export class EquivalencyValidator {
         });
       } else if (strict) {
         // Validate function signature
-        const migratedFunc = migratedLogic.get(name)!;
+        const migratedFunc = migratedLogic.get(name);
+        if (!migratedFunc) {
+          continue;
+        }
         if (baseLogic.signature !== migratedFunc.signature) {
           warnings.push({
             code: 'SIGNATURE_CHANGED',

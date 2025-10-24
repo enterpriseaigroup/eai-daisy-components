@@ -434,10 +434,8 @@ return;
             migrated: migratedFunc,
             impact: 'high',
           });
-        }
-
-        // Check for implementation changes
-        else if (originalFunc.hash !== migratedFunc.hash) {
+        } else if (originalFunc.hash !== migratedFunc.hash) {
+          // Check for implementation changes
           // Deeper analysis needed to determine if change is semantic
           const semanticallyEquivalent = this.checkSemanticEquivalence(
             originalFunc,

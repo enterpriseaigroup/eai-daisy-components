@@ -704,9 +704,7 @@ export class FileSystemError extends Error {
     this.name = 'FileSystemError';
     this.originalError = originalError;
 
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, FileSystemError);
-    }
+    Error.captureStackTrace(this, FileSystemError);
   }
 
   /**

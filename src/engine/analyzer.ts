@@ -601,8 +601,8 @@ export class DependencyAnalyzer {
     // Add usage context for import
     const context: DependencyUsageContext = {
       location: {
-        line: node.loc ? node.loc.start.line : 0,
-        column: node.loc ? node.loc.start.column : 0,
+        line: node.loc.start.line,
+        column: node.loc.start.column,
       },
       usage: 'import',
       context: `import ${imports.join(', ')} from '${importPath}'`,

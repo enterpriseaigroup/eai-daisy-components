@@ -93,7 +93,7 @@ export class V2ComponentGenerator {
     };
   }
 
-  private async generateComponentFile(
+  private generateComponentFile(
     result: TransformationResult,
     _sourceCode: string,
     options: GenerationOptions,
@@ -101,13 +101,13 @@ export class V2ComponentGenerator {
     const { transformed } = result;
     const content = this.generateConfiguratorComponent(result, options);
 
-    return {
+    return Promise.resolve({
       path: `${transformed.name}.tsx`,
       content,
       size: Buffer.from(content).length,
       type: 'component',
       generatedAt: new Date(),
-    };
+    });
   }
 
   private generateConfiguratorComponent(
@@ -161,11 +161,11 @@ export default ${transformed.name};
 `;
   }
 
-  private async generateTypeFiles(
+  private generateTypeFiles(
     result: TransformationResult,
   ): Promise<GeneratedFile[]> {
     const content = `export * from './${result.transformed.name}';`;
-    return [
+    return Promise.resolve([
       {
         path: 'index.ts',
         content,
@@ -173,10 +173,10 @@ export default ${transformed.name};
         type: 'types',
         generatedAt: new Date(),
       },
-    ];
+    ]);
   }
 
-  private async generateTestFiles(
+  private generateTestFiles(
     result: TransformationResult,
   ): Promise<GeneratedFile[]> {
     const content = `import { render } from '@testing-library/react';
@@ -190,7 +190,7 @@ describe('${result.transformed.name}', () => {
 });
 `;
 
-    return [
+    return Promise.resolve([
       {
         path: `${result.transformed.name}.test.tsx`,
         content,
@@ -198,10 +198,10 @@ describe('${result.transformed.name}', () => {
         type: 'test',
         generatedAt: new Date(),
       },
-    ];
+    ]);
   }
 
-  private async generateDocumentation(
+  private generateDocumentation(
     result: TransformationResult,
   ): Promise<GeneratedFile[]> {
     const content = `# ${result.transformed.name}
@@ -214,7 +214,7 @@ ${result.transformed.props.map(p => `- **${p.name}** (${p.type}): ${p.descriptio
 - Business Logic Preserved: ${result.businessLogicPreserved}
 `;
 
-    return [
+    return Promise.resolve([
       {
         path: 'README.md',
         content,
@@ -222,10 +222,10 @@ ${result.transformed.props.map(p => `- **${p.name}** (${p.type}): ${p.descriptio
         type: 'documentation',
         generatedAt: new Date(),
       },
-    ];
+    ]);
   }
 
-  private async generateExamples(
+  private generateExamples(
     result: TransformationResult,
   ): Promise<GeneratedFile[]> {
     const content = `import { ${result.transformed.name} } from './${result.transformed.name}';
@@ -233,7 +233,7 @@ ${result.transformed.props.map(p => `- **${p.name}** (${p.type}): ${p.descriptio
 export const Example = () => <${result.transformed.name} />;
 `;
 
-    return [
+    return Promise.resolve([
       {
         path: `${result.transformed.name}.examples.tsx`,
         content,
@@ -241,7 +241,7 @@ export const Example = () => <${result.transformed.name} />;
         type: 'example',
         generatedAt: new Date(),
       },
-    ];
+    ]);
   }
 
   private async writeArtifacts(

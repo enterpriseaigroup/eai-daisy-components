@@ -10,8 +10,8 @@
  */
 
 import type {
-  ComponentDefinition,
   BusinessLogicDefinition,
+  ComponentDefinition,
   // PropDefinition, // TODO: Use for component prop transformation
   // ComponentDependency, // TODO: Use for dependency analysis
   // ReactPattern, // TODO: Use for pattern transformation
@@ -143,7 +143,7 @@ export class BusinessLogicTransformer {
    * @param options - Transformation options
    * @returns Transformation result with generated code
    */
-  public async transformComponent(
+  public transformComponent(
     component: ComponentDefinition,
     options: TransformationOptions = {},
   ): Promise<TransformationResult> {
@@ -219,21 +219,21 @@ export class BusinessLogicTransformer {
         strategy,
       });
 
-      return {
+      return Promise.resolve({
         component: transformedComponent,
         code,
         strategy,
         transformations,
         warnings,
         success: true,
-      };
+      });
     } catch (error) {
       this.logger.error(
         `Failed to transform component ${component.name}`,
         error as Error,
       );
 
-      return {
+      return Promise.resolve({
         component,
         code: '',
         strategy: 'manual-review-required',
@@ -243,7 +243,7 @@ export class BusinessLogicTransformer {
           error instanceof Error ? error.message : 'Unknown error',
         ],
         success: false,
-      };
+      });
     }
   }
 

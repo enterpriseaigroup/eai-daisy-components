@@ -640,7 +640,7 @@ export class CLIApplication {
     options: Partial<CLIOptions>,
   ): PipelineOptions {
     return {
-      mode: (options.mode as ExecutionMode | undefined) || 'full-pipeline',
+      mode: (options.mode) || 'full-pipeline',
       parallel: options.parallel ?? true,
       maxWorkers: options.maxWorkers || 4,
       skipErrors: options.skipErrors || false,

@@ -674,42 +674,45 @@ export class OutputGenerator {
     this.formatters.set('.ts', {
       extension: '.ts',
       contentType: 'text/typescript',
-      formatter: async (content: string) => {
+      formatter: (content: string) => {
         // Basic formatting - in production, use prettier or similar
-        return content
+        return Promise.resolve(content
           .replace(/;\s*}/g, ';\n}')
           .replace(/{\s*/g, '{\n  ')
-          .replace(/\s*}/g, '\n}');
+          .replace(/\s*}/g, '\n}'));
       },
-      validator: async (_content: string) => {
-        return { valid: true, errors: [], warnings: [], suggestions: [] };
+      validator: (_content: string) => {
+        return Promise.resolve({ valid: true, errors: [], warnings: [], suggestions: [] });
       },
     });
 
-    this.formatters.set('.tsx', this.formatters.get('.ts')!);
+    const tsFormatter = this.formatters.get('.ts');
+    if (tsFormatter) {
+      this.formatters.set('.tsx', tsFormatter);
+    }
 
     // JSON formatter
     this.formatters.set('.json', {
       extension: '.json',
       contentType: 'application/json',
-      formatter: async (content: string) => {
+      formatter: (content: string) => {
         try {
-          return JSON.stringify(JSON.parse(content), null, 2);
+          return Promise.resolve(JSON.stringify(JSON.parse(content), null, 2));
         } catch {
-          return content;
+          return Promise.resolve(content);
         }
       },
-      validator: async (content: string) => {
+      validator: (content: string) => {
         try {
           JSON.parse(content);
-          return { valid: true, errors: [], warnings: [], suggestions: [] };
+          return Promise.resolve({ valid: true, errors: [], warnings: [], suggestions: [] });
         } catch (error) {
-          return {
+          return Promise.resolve({
             valid: false,
             errors: [error instanceof Error ? error.message : 'Invalid JSON'],
             warnings: [],
             suggestions: [],
-          };
+          });
         }
       },
     });
@@ -719,7 +722,7 @@ export class OutputGenerator {
    * Initialize content validators
    */
   private initializeValidators(): void {
-    this.validators.set('.ts', async (content: string) => {
+    this.validators.set('.ts', (content: string) => {
       // Basic syntax validation
       const syntaxErrors: string[] = [];
 
@@ -734,7 +737,7 @@ export class OutputGenerator {
         );
       }
 
-      return {
+      return Promise.resolve({
         valid: syntaxErrors.length === 0,
         errors: syntaxErrors,
         warnings: [],
@@ -742,7 +745,7 @@ export class OutputGenerator {
           syntaxErrors.length > 0
             ? ['Consider using TypeScript strict mode']
             : [],
-      };
+      });
     });
   }
 
@@ -753,24 +756,24 @@ export class OutputGenerator {
     // Implementation placeholder
   }
 
-  private async generateIndexFiles(
+  private generateIndexFiles(
     _files: GeneratedFileInfo[],
     _config: OutputGenerationConfig,
   ): Promise<GeneratedFileInfo[]> {
-    return [];
+    return Promise.resolve([]);
   }
 
   private async createBackup(_filePath: string): Promise<void> {
     // Implementation placeholder
   }
 
-  private async generateSourceMap(
+  private generateSourceMap(
     _original: string,
     _transformed: string,
     _outputPath: string,
   ): Promise<string> {
     // Implementation placeholder
-    return '';
+    return Promise.resolve('');
   }
 
   private calculateContentHash(content: string): string {
@@ -784,17 +787,17 @@ export class OutputGenerator {
     return hash.toString(16);
   }
 
-  private async compressFile(
+  private compressFile(
     _filePath: string,
     _compressionConfig: OutputGenerationConfig['compression'],
   ): Promise<GeneratedFileInfo['compression']> {
     // Implementation placeholder
-    return {
+    return Promise.resolve({
       algorithm: 'gzip',
       originalSize: 1000,
       compressedSize: 600,
       ratio: 0.6,
-    };
+    });
   }
 
   private calculateMetrics(
@@ -915,56 +918,56 @@ export class OutputGenerator {
     };
   }
 
-  private async validateFile(
+  private validateFile(
     _file: GeneratedFileInfo,
     _level: OutputGenerationConfig['validationLevel'],
   ): Promise<FileValidationResult> {
     // Implementation placeholder
-    return {
+    return Promise.resolve({
       filePath: _file.outputPath,
       passed: true,
       syntax: { valid: true, errors: [] },
       typeChecking: { valid: true, errors: [] },
       quality: { score: 90, issues: [] },
       security: { passed: true, vulnerabilities: [] },
-    };
+    });
   }
 
-  private async performCrossFileValidation(
+  private performCrossFileValidation(
     _files: GeneratedFileInfo[],
   ): Promise<CrossFileValidationResult> {
     // Implementation placeholder
-    return {
+    return Promise.resolve({
       importExportConsistency: true,
       dependencyResolution: true,
       circularDependencies: [],
       unusedExports: [],
       missingDependencies: [],
-    };
+    });
   }
 
-  private async validateDependencies(
+  private validateDependencies(
     _files: GeneratedFileInfo[],
   ): Promise<DependencyValidationResult> {
     // Implementation placeholder
-    return {
+    return Promise.resolve({
       allResolved: true,
       external: [],
       internal: [],
       conflicts: [],
-    };
+    });
   }
 
-  private async validateTypeSafety(
+  private validateTypeSafety(
     _files: GeneratedFileInfo[],
   ): Promise<TypeSafetyValidationResult> {
     // Implementation placeholder
-    return {
+    return Promise.resolve({
       score: 95,
       coverage: 98,
       errors: [],
       warnings: [],
       strictModeCompliance: true,
-    };
+    });
   }
 }

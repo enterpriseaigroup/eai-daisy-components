@@ -98,69 +98,71 @@ export class PseudoCodeGenerator {
   /**
    * Generate pseudo-code documentation for component
    */
-  public async generate(
+  public generate(
     componentCode: string,
     componentName: string,
     isV2Component: boolean = false,
   ): Promise<PseudoCodeResult> {
-    this.logger.info(`Generating pseudo-code documentation for: ${componentName}`);
+    return Promise.resolve().then(() => {
+      this.logger.info(`Generating pseudo-code documentation for: ${componentName}`);
 
-    const result: PseudoCodeResult = {
-      success: false,
-      originalCode: componentCode,
-      documentedCode: componentCode,
-      blocksDocumented: [],
-      warnings: [],
-    };
+      const result: PseudoCodeResult = {
+        success: false,
+        originalCode: componentCode,
+        documentedCode: componentCode,
+        blocksDocumented: [],
+        warnings: [],
+      };
 
-    try {
-      // Parse AST
-      const ast = parse(componentCode, {
-        loc: true,
-        range: true,
-        tokens: true,
-        comment: true,
-        jsx: true,
-      });
-
-      // Find business logic blocks
-      const blocks = this.findBusinessLogicBlocks(ast, componentCode);
-      this.logger.debug(`Found ${blocks.length} business logic blocks`);
-
-      // Generate documentation for each block
-      let documentedCode = componentCode;
-      const blocksDocumented: BusinessLogicBlock[] = [];
-
-      // Process blocks in reverse order to maintain line numbers
-      for (const block of blocks.reverse()) {
-        const documentation = this.generateDocumentation(block, isV2Component);
-        documentedCode = this.insertDocumentation(
-          documentedCode,
-          block.startLine,
-          documentation,
-        );
-
-        blocksDocumented.push({
-          type: block.type,
-          name: block.name,
-          documentation,
-          lineNumber: block.startLine,
-          confidence: block.confidence,
+      try {
+        // Parse AST
+        const ast = parse(componentCode, {
+          loc: true,
+          range: true,
+          tokens: true,
+          comment: true,
+          jsx: true,
         });
+
+        // Find business logic blocks
+        const blocks = this.findBusinessLogicBlocks(ast, componentCode);
+        this.logger.debug(`Found ${blocks.length} business logic blocks`);
+
+        // Generate documentation for each block
+        let documentedCode = componentCode;
+        const blocksDocumented: BusinessLogicBlock[] = [];
+
+        // Process blocks in reverse order to maintain line numbers
+        for (const block of blocks.reverse()) {
+          const documentation = this.generateDocumentation(block, isV2Component);
+          documentedCode = this.insertDocumentation(
+            documentedCode,
+            block.startLine,
+            documentation,
+          );
+
+          blocksDocumented.push({
+            type: block.type,
+            name: block.name,
+            documentation,
+            lineNumber: block.startLine,
+            confidence: block.confidence,
+          });
+        }
+
+        result.documentedCode = documentedCode;
+        result.blocksDocumented = blocksDocumented.reverse();
+        result.success = true;
+
+        this.logger.info(`Generated documentation for ${blocks.length} business logic blocks`);
+      } catch (error) {
+        const errorObj = error instanceof Error ? error : undefined;
+        this.logger.error('Pseudo-code generation failed', errorObj);
+        result.warnings.push(`Generation failed: ${error instanceof Error ? error.message : String(error)}`);
       }
 
-      result.documentedCode = documentedCode;
-      result.blocksDocumented = blocksDocumented.reverse();
-      result.success = true;
-
-      this.logger.info(`Generated documentation for ${blocks.length} business logic blocks`);
-    } catch (error) {
-      const errorObj = error instanceof Error ? error : undefined;
-      this.logger.error('Pseudo-code generation failed', errorObj);
-      result.warnings.push(`Generation failed: ${error instanceof Error ? error.message : String(error)}`);
-    }
-
-    return result;
+      return result;
+    });
   }
 
   /**
@@ -206,11 +208,11 @@ export class PseudoCodeGenerator {
       }
 
       // Arrow function expressions (exported helpers)
-      if (
-        node.type === AST_NODE_TYPES.VariableDeclaration &&
-        node.declarations[0]?.init?.type === AST_NODE_TYPES.ArrowFunctionExpression
-      ) {
-        blocks.push(this.analyzeExportedFunction(node, sourceCode));
+      if (node.type === AST_NODE_TYPES.VariableDeclaration && node.declarations.length > 0) {
+        const firstDecl = node.declarations[0];
+        if (firstDecl.init?.type === AST_NODE_TYPES.ArrowFunctionExpression) {
+          blocks.push(this.analyzeExportedFunction(node, sourceCode));
+        }
       }
 
       // Recurse

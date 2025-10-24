@@ -160,9 +160,7 @@ export class PipelineError extends Error {
     this.timestamp = new Date();
     this.userInfo = this.generateUserInfo(userInfo);
 
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, PipelineError);
-    }
+    Error.captureStackTrace(this, PipelineError);
   }
 
   /**
@@ -588,18 +586,18 @@ export class FallbackStrategy implements ErrorRecoveryStrategy {
     'business-logic',
   ];
 
-  public async recover(
+  public recover(
     error: PipelineError,
     _context: ErrorContext,
   ): Promise<RecoveryResult> {
-    return {
+    return Promise.resolve({
       success: true,
       message: 'Using fallback implementation - manual review may be required',
       data: {
         requiresManualReview: true,
         fallbackReason: error.message,
       },
-    };
+    });
   }
 }
 
@@ -615,19 +613,19 @@ export class SkipStrategy implements ErrorRecoveryStrategy {
     'generation',
   ];
 
-  public async recover(
+  public recover(
     error: PipelineError,
     _context: ErrorContext,
   ): Promise<RecoveryResult> {
     if (error.severity === 'critical') {
-      return {
+      return Promise.resolve({
         success: false,
         message: 'Cannot skip critical error',
         alternativeStrategies: ['retry', 'manual'],
-      };
+      });
     }
 
-    return {
+    return Promise.resolve({
       success: true,
       message:
         'Skipping failed operation and continuing with remaining components',
@@ -635,7 +633,7 @@ export class SkipStrategy implements ErrorRecoveryStrategy {
         skipped: true,
         reason: error.message,
       },
-    };
+    });
   }
 }
 
@@ -931,7 +929,10 @@ export function getGlobalErrorHandler(): ErrorHandler {
   if (!globalErrorHandler) {
     initializeErrorHandling();
   }
-  return globalErrorHandler!;
+  if (!globalErrorHandler) {
+    throw new Error('Failed to initialize global error handler');
+  }
+  return globalErrorHandler;
 }
 
 // ============================================================================

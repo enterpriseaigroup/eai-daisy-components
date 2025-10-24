@@ -286,8 +286,7 @@ export class ComponentInventoryGenerator {
     parsing: Map<string, ParseResult>,
     dependencies: DependencyAnalysisResult,
     extractionConfig: ExtractionConfig,
-  ): Promise<ComponentInventory> {
-    return Promise.resolve().then(() => {
+  ): ComponentInventory {
     try {
       this.logger.info('Generating component inventory...');
 
@@ -345,7 +344,6 @@ export class ComponentInventoryGenerator {
       );
       throw error;
     }
-    });
   }
 
   /**
@@ -792,7 +790,7 @@ export class ComponentInventoryGenerator {
     return array.reduce(
       (groups, item) => {
         const key = keyFn(item);
-        if (!groups[key]) {
+        if (!(key in groups)) {
           groups[key] = [];
         }
         groups[key].push(item);

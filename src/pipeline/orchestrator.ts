@@ -376,13 +376,6 @@ export class PipelineOrchestrator {
   }
 
   /**
-   * Get current execution progress
-   */
-  getProgress(): PipelineProgress | null {
-    return this.progress || null;
-  }
-
-  /**
    * Check if pipeline is currently running
    */
   isExecuting(): boolean {
@@ -514,7 +507,7 @@ export class PipelineOrchestrator {
         parsing &&
         dependencies
       ) {
-        inventory = await this.executeInventoryGenerationPhase(
+        inventory = this.executeInventoryGenerationPhase(
           context,
           discovery,
           parsing,
@@ -739,12 +732,12 @@ break;
   /**
    * Execute inventory generation phase
    */
-  private async executeInventoryGenerationPhase(
+  private executeInventoryGenerationPhase(
     context: PipelineContext,
     discovery: DiscoveryResult,
     parsing: Map<string, ParseResult>,
     dependencies: DependencyAnalysisResult,
-  ): Promise<ComponentInventory> {
+  ): ComponentInventory {
     this.updatePhase(
       'inventory-generation',
       'Generating component inventory...',
@@ -766,7 +759,7 @@ break;
       currentOperation: 'Assessing component readiness...',
     });
 
-    const inventory = await this.inventoryGenerator.generateInventory(
+    const inventory = this.inventoryGenerator.generateInventory(
       discovery,
       parsing,
       dependencies,

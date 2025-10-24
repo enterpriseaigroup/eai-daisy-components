@@ -286,7 +286,7 @@ export class ConsoleOutputTarget implements LogOutputTarget {
     this.useColors = useColors;
   }
 
-  public async write(formattedEntry: string): Promise<void> {
+  public write(formattedEntry: string): Promise<void> {
     if (this.useColors) {
       // Simple color coding based on log level
       if (formattedEntry.includes('ERROR')) {
@@ -303,6 +303,7 @@ export class ConsoleOutputTarget implements LogOutputTarget {
     } else {
       console.log(formattedEntry);
     }
+    return Promise.resolve();
   }
 }
 
@@ -327,8 +328,9 @@ export class FileOutputTarget implements LogOutputTarget {
         this.writeStream = createWriteStream(this.filePath, { flags: 'a' });
       }
 
+      const stream = this.writeStream;
       return new Promise((resolve, reject) => {
-        this.writeStream!.write(formattedEntry + '\n', error => {
+        stream.write(formattedEntry + '\n', error => {
           if (error) {
 reject(error);
 } else {
@@ -344,8 +346,9 @@ resolve();
 
   public async close(): Promise<void> {
     if (this.writeStream) {
+      const stream = this.writeStream;
       return new Promise(resolve => {
-        this.writeStream!.end(() => {
+        stream.end(() => {
           this.writeStream = null;
           resolve();
         });
@@ -355,11 +358,12 @@ resolve();
 
   public async flush(): Promise<void> {
     if (this.writeStream) {
+      const stream = this.writeStream;
       return new Promise<void>((resolve, reject) => {
         // WriteStream doesn't have flush, but we can use the 'drain' event
-        if (this.writeStream!.writableNeedDrain) {
-          this.writeStream!.once('drain', () => resolve());
-          this.writeStream!.once('error', (error: Error) => reject(error));
+        if (stream.writableNeedDrain) {
+          stream.once('drain', () => resolve());
+          stream.once('error', (error: Error) => reject(error));
         } else {
           resolve();
         }
@@ -390,7 +394,7 @@ export class JsonFileOutputTarget implements LogOutputTarget {
       await this.flush();
     } else if (!this.flushTimer) {
       // Auto-flush after 5 seconds
-      this.flushTimer = setTimeout(() => this.flush(), 5000);
+      this.flushTimer = setTimeout(() => void this.flush(), 5000);
     }
   }
 
@@ -561,7 +565,7 @@ export class Logger {
     const formattedEntry = this.config.formatter.format(entry);
 
     // Write to all output targets
-    this.config.outputs.forEach(async output => {
+    void Promise.all(this.config.outputs.map(async output => {
       try {
         await output.write(formattedEntry);
       } catch (error) {
@@ -569,7 +573,7 @@ export class Logger {
         console.error('Failed to write log entry:', error);
         console.error('Original log entry:', formattedEntry);
       }
-    });
+    }));
   }
 }
 
@@ -592,8 +596,9 @@ export class LoggingManager {
    * Get or create logger for component
    */
   public getLogger(name: string, overrides?: Partial<LoggerConfig>): Logger {
-    if (this.loggers.has(name)) {
-      return this.loggers.get(name)!;
+    const existingLogger = this.loggers.get(name);
+    if (existingLogger) {
+      return existingLogger;
     }
 
     const logger = this.createLogger(name, overrides);
@@ -787,7 +792,10 @@ export function getGlobalLogger(name: string): Logger {
   if (!globalLoggingManager) {
     initializeLogging();
   }
-  return globalLoggingManager!.getLogger(name);
+  if (!globalLoggingManager) {
+    throw new Error('Failed to initialize global logging manager');
+  }
+  return globalLoggingManager.getLogger(name);
 }
 
 /**

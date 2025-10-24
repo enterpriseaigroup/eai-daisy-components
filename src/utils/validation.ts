@@ -160,7 +160,7 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     severity: 'error',
     enabled: true,
     categories: ['structure', 'naming'],
-    async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
+    validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
       const namePattern = /^[A-Z][a-zA-Z0-9]*$/;
 
@@ -177,7 +177,7 @@ export const STRUCTURE_RULES: ValidationRule[] = [
         });
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 
@@ -188,7 +188,7 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     severity: 'error',
     enabled: true,
     categories: ['structure', 'filesystem'],
-    async validate(
+    validate(
       component: ComponentDefinition,
       context: ValidationContext,
     ): Promise<ValidationIssue[]> {
@@ -208,7 +208,7 @@ export const STRUCTURE_RULES: ValidationRule[] = [
         });
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 
@@ -219,10 +219,10 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     severity: 'warning',
     enabled: true,
     categories: ['structure', 'business-logic'],
-    async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
+    validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
 
-      if (!component.businessLogic || component.businessLogic.length === 0) {
+      if (component.businessLogic.length === 0) {
         issues.push({
           id: `${component.id}-no-business-logic`,
           severity: 'warning',
@@ -235,7 +235,7 @@ export const STRUCTURE_RULES: ValidationRule[] = [
         });
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 
@@ -246,7 +246,7 @@ export const STRUCTURE_RULES: ValidationRule[] = [
     severity: 'warning',
     enabled: true,
     categories: ['structure', 'type'],
-    async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
+    validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
       const validTypes: ComponentType[] = [
         'functional',
@@ -268,7 +268,7 @@ export const STRUCTURE_RULES: ValidationRule[] = [
         });
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 ];
@@ -284,7 +284,7 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
     severity: 'error',
     enabled: true,
     categories: ['dependencies', 'imports'],
-    async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
+    validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
 
       for (const dep of component.dependencies) {
@@ -312,7 +312,7 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
         }
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 
@@ -323,7 +323,7 @@ export const DEPENDENCY_RULES: ValidationRule[] = [
     severity: 'error',
     enabled: true,
     categories: ['dependencies', 'circular'],
-    async validate(
+    validate(
       component: ComponentDefinition,
       context: ValidationContext,
     ): Promise<ValidationIssue[]> {
@@ -395,7 +395,7 @@ return cycle;
         });
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 ];
@@ -411,10 +411,10 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
     severity: 'warning',
     enabled: true,
     categories: ['business-logic', 'documentation'],
-    async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
+    validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
 
-      if (!component.businessLogic || component.businessLogic.length === 0) {
+      if (component.businessLogic.length === 0) {
         issues.push({
           id: `${component.id}-no-business-logic`,
           severity: 'warning',
@@ -427,7 +427,7 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
         });
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 
@@ -438,10 +438,10 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
     severity: 'info',
     enabled: true,
     categories: ['business-logic', 'react'],
-    async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
+    validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
 
-      if (component.reactPatterns && component.reactPatterns.length > 0) {
+      if (component.reactPatterns.length > 0) {
         const complexPatterns = component.reactPatterns.filter(pattern =>
           [
             'useReducer',
@@ -465,7 +465,7 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
         }
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 
@@ -476,7 +476,7 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
     severity: 'warning',
     enabled: true,
     categories: ['business-logic', 'complexity'],
-    async validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
+    validate(component: ComponentDefinition): Promise<ValidationIssue[]> {
       const issues: ValidationIssue[] = [];
 
       if (
@@ -495,7 +495,7 @@ export const BUSINESS_LOGIC_RULES: ValidationRule[] = [
         });
       }
 
-      return issues;
+      return Promise.resolve(issues);
     },
   },
 ];

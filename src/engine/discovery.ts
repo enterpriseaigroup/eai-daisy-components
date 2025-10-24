@@ -458,7 +458,7 @@ export class ComponentDiscoveryEngine {
     );
     for (const match of functionMatches) {
       const name = match[1];
-      if (match.index !== undefined && name) {
+      if (name) {
         declarations.push({
           name,
           type: 'functional',
@@ -474,7 +474,7 @@ export class ComponentDiscoveryEngine {
     );
     for (const match of arrowMatches) {
       const name = match[1];
-      if (match.index !== undefined && name) {
+      if (name) {
         declarations.push({
           name,
           type: 'functional',
@@ -490,7 +490,7 @@ export class ComponentDiscoveryEngine {
     );
     for (const match of forwardRefMatches) {
       const name = match[1];
-      if (match.index !== undefined && name) {
+      if (name) {
         declarations.push({
           name,
           type: 'functional',
@@ -506,7 +506,7 @@ export class ComponentDiscoveryEngine {
     );
     for (const match of classMatches) {
       const name = match[1];
-      if (match.index !== undefined && name) {
+      if (name) {
         declarations.push({
           name,
           type: 'class',
@@ -522,7 +522,7 @@ export class ComponentDiscoveryEngine {
     );
     for (const match of hookMatches) {
       const name = match[1];
-      if (match.index !== undefined && name) {
+      if (name) {
         declarations.push({
           name,
           type: 'hook',

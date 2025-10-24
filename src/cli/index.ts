@@ -275,7 +275,7 @@ const scanCommand: CLICommand = {
 
     const sourceDir = options.source || config.sourcePath;
 
-    return Promise.resolve().then(async () => {
+    return Promise.resolve().then(() => {
 
     if (!sourceDir) {
       throw new PipelineError(
@@ -499,7 +499,7 @@ export class CLIBuilder {
       ? await configManager.loadFromFile(options.config)
       : configManager.createMinimal(process.cwd(), './output');
 
-    const logLevel = (options.logLevel as LogLevel | undefined) || config.logging.level;
+    const logLevel = (options.logLevel) || config.logging.level;
     const logger = createSimpleLogger('cli', logLevel);
 
     const fileManager = new FileSystemManager();

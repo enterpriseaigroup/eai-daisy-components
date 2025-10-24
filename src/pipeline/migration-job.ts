@@ -157,16 +157,14 @@ export class MigrationJob {
 
       // Apply documentation to generated v2 component
       const v2Component = generation.artifacts.component;
-      if (v2Component) {
-        const v2Documentation = await v2PseudoCodeGen.generate(
-          v2Component.content,
-          component.name,
-          true, // isV2Component = true
-        );
-        if (v2Documentation.success) {
-          // Note: GeneratedFile.content is readonly, update would need to recreate the object
-          // For now, documentation is generated but not re-integrated
-        }
+      const v2Documentation = await v2PseudoCodeGen.generate(
+        v2Component.content,
+        component.name,
+        true, // isV2Component = true
+      );
+      if (v2Documentation.success) {
+        // Note: GeneratedFile.content is readonly, update would need to recreate the object
+        // For now, documentation is generated but not re-integrated
       }
 
       const validator = new MigrationValidator(this.config);

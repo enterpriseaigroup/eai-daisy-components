@@ -385,7 +385,7 @@ export class BatchMigrationOrchestrator {
       // Record completion
       this.tracker.updateStatus(component.id, result.success ? 'completed' : 'failed');
 
-      if (!result.success && result.errors && result.errors.length > 0) {
+      if (!result.success && result.errors.length > 0) {
         const firstError = result.errors[0];
         if (firstError) {
           const error = new Error(firstError.message);

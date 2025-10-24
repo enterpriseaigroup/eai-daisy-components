@@ -214,7 +214,7 @@ export class ConfiguratorTransformer {
   /**
    * Apply component transformations
    */
-  private async applyTransformations(
+  private applyTransformations(
     component: ComponentDefinition,
     _sourceCode: string,
     analysis: BusinessLogicAnalysis,
@@ -239,7 +239,7 @@ export class ConfiguratorTransformer {
     // Transform validations
     transformations.push(...this.transformValidations(analysis.validations));
 
-    return transformations;
+    return Promise.resolve(transformations);
   }
 
   /**

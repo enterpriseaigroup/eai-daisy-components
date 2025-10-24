@@ -651,7 +651,7 @@ export class ComponentParser {
       | TSESTree.FunctionExpression,
     structure: ComponentStructure,
   ): void {
-    if (!node.body || node.body.type !== 'BlockStatement') {
+    if (node.body.type !== 'BlockStatement') {
       return;
     }
 

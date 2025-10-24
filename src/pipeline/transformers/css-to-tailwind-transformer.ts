@@ -144,13 +144,13 @@ export class CSSToTailwindTransformer {
    */
   private findCSSImports(code: string): CSSImport[] {
     const imports: CSSImport[] = [];
-    
+
     // Remove all comments to avoid matching commented imports
     let activeCode = code;
-    
+
     // Remove single-line comments
     activeCode = activeCode.replace(/\/\/.*$/gm, '');
-    
+
     // Remove multi-line comments
     activeCode = activeCode.replace(/\/\*[\s\S]*?\*\//g, '');    const patterns = [
       // Direct CSS imports: import './Button.css'
@@ -510,7 +510,7 @@ export class CSSToTailwindTransformer {
     for (const [className, tailwindClasses] of Object.entries(mappings)) {
       const escapedClass = this.escapeRegex(className);
       const escapedCamelCase = this.escapeRegex(className.replace(/-/g, '_'));
-      
+
       // Replace className="class-name" with Tailwind classes
       const patterns = [
         // className="class-name"

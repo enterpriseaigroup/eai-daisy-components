@@ -553,7 +553,7 @@ export class ConfigurationManager {
       logging: LoggingConfigSchema,
     };
 
-    const schema = sectionSchemas[section as keyof typeof sectionSchemas];
+    const schema = sectionSchemas[section as keyof typeof sectionSchemas] as z.ZodSchema | undefined;
     if (!schema) {
       throw new ConfigurationError(
         `Unknown configuration section: ${String(section)}`,
@@ -591,9 +591,7 @@ export class ConfigurationError extends Error {
     this.errors = errors;
 
     // Maintain proper stack trace
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, ConfigurationError);
-    }
+    Error.captureStackTrace(this, ConfigurationError);
   }
 
   /**

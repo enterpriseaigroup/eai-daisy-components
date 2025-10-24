@@ -30,11 +30,12 @@ export class MigrationValidator {
     // Config reserved for future validation enhancements
   }
 
-  public async validate(
+  public validate(
     component: ComponentDefinition,
     transformation: TransformationResult,
     generation: GenerationResult,
   ): Promise<MigrationValidationResult> {
+    return Promise.resolve().then(() => {
     this.logger.debug(`Validating migration: ${component.name}`);
 
     const errors = [];
@@ -75,6 +76,7 @@ export class MigrationValidator {
       typesSafe: true,
       testsPass: true,
     };
+    });
   }
 
   private calculateScore(

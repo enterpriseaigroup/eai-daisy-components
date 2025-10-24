@@ -259,7 +259,7 @@ export class ComponentDiscoveryService {
     }
 
     const filteredComponents = result.components.filter(component =>
-      this.matchesCriteria(component, this.config.filters!),
+      this.matchesCriteria(component, this.config.filters || {}),
     );
 
     return {
