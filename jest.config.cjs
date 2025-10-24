@@ -4,6 +4,8 @@ module.exports = {
 
   // Module resolution
   moduleNameMapper: {
+    '^@/tools/(.*)$': '<rootDir>/tools/$1',
+    '^@/docs/(.*)$': '<rootDir>/docs/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
     '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
