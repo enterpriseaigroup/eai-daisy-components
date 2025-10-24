@@ -10,27 +10,30 @@ The flow demonstrates a multi-layered security approach that combines user authe
 
 **All components follow this standard flow:**
 1. **Phase 1**: User authenticates and receives tokens (one-time per session)
-2. **Phase 2**: Component validates its tenant API key (once per component initialization)
-3. **Phase 3**: Component retrieves third-party API configuration via `GetAPI` (as needed)
-4. **Phase 4**: Component makes API calls via `CallAPI` through APIM (per user interaction)
+2. **Phase 2**: Component validates its tenant API key via `POST /api-keys/validate` (once per component initialization)
+3. **Phase 3**: Component retrieves third-party API configuration via `GET /api-configs/{apiName}` (as needed)
+4. **Phase 4**: Component makes API calls via `POST /api-proxies` through APIM (per user interaction)
 
 This pattern ensures consistent security, monitoring, and usage tracking across all component types.
 
-**Key Architectural Principle**: Public API is a lightweight RESTful gateway with three main endpoints:
-1. **Authentication endpoints** - Handle OAuth flow and token management
-2. **GetAPI** - Retrieve API configurations and credentials from PayloadCMS
-3. **CallAPI** - Proxy calls to third-party APIs through Azure APIM (Mid2025)
+**Key Architectural Principle**: Public API follows RESTful resource-oriented design:
+1. **Authentication endpoints** (`/auth/*`) - Handle OAuth flow and token management
+2. **API Keys resource** (`/api-keys`) - Validate tenant API keys
+3. **API Configurations resource** (`/api-configs/{apiName}`) - Retrieve third-party API configurations
+4. **API Proxies resource** (`/api-proxies`) - Proxy calls to third-party APIs through Azure APIM (Mid2025)
+
+**RESTful Design**: Resources are nouns (not verbs), HTTP methods (GET, POST) define actions, and hierarchical paths reflect resource relationships.
 
 ## System Components
 
 - **Browser**: The user's web browser displaying the application UI
 - **App Service**: The application server that delivers web pages and components (e.g., Next.js, React SSR)
 - **Entra**: Microsoft's identity and access management service (formerly Azure AD)
-- **Public API**: Lightweight RESTful API gateway with three main endpoints:
+- **Public API**: Lightweight RESTful API gateway with resource-oriented endpoints:
   - `/auth/*` - OAuth flow and token management
-  - `/validate-api-key` - Validates tenant API key for usage tracking, rate limiting, and authorization
-  - `/GetAPI` - Retrieves API configurations and credentials from PayloadCMS
-  - `/CallAPI` - Proxies calls to third-party APIs through Azure APIM
+  - `POST /api-keys/validate` - Validates tenant API key for usage tracking, rate limiting, and authorization
+  - `GET /api-configs/{apiName}` - Retrieves third-party API configurations and credentials from PayloadCMS
+  - `POST /api-proxies` - Proxies calls to third-party APIs through Azure APIM
 - **PayloadCMS**: Content management system that:
   - Stores tenant configurations (including Tenant API Keys)
   - Manages user access per tenant
@@ -88,8 +91,9 @@ This phase establishes the user's identity and provides tokens for subsequent AP
 
 #### Validation Flow
 
-1. **API Key Validation Request**: Component sends POST to `/validate-api-key`:
+1. **API Key Validation Request**: Component sends `POST /api-keys/validate`:
    - Headers: `Authorization: Bearer <userToken>`, `X-API-Key: <tenantApiKey>`
+   - Body: `{}` (empty, validation uses headers)
 
 2. **Validation Process**:
    - Public API validates user token with Entra
@@ -103,9 +107,9 @@ This phase establishes the user's identity and provides tokens for subsequent AP
 
 3. **Result**: If valid, component can proceed with API calls. All subsequent calls include both tokens.
 
-**Template Note**: Every component must perform this validation before making GetAPI or CallAPI requests. The tenant API key is hardcoded in the component and identifies which tenant's configuration and billing to use.
+**Template Note**: Every component must perform this validation before accessing `/api-configs` or `/api-proxies`. The tenant API key is hardcoded in the component and identifies which tenant's configuration and billing to use.
 
-### Phase 3: Get API Configuration (GetAPI)
+### Phase 3: Get API Configuration
 
 **Applies to**: All components that need third-party API credentials
 **Frequency**: As needed (typically once, can be cached)
@@ -113,12 +117,12 @@ This phase establishes the user's identity and provides tokens for subsequent AP
 
 When the user interacts with a component (e.g., enters an address in GetAddress):
 
-#### GetAPI Flow
+#### API Configuration Retrieval Flow
 
-1. **GetAPI Request**: Component sends GET to `/GetAPI` with:
+1. **API Config Request**: Component sends `GET /api-configs/{apiName}`:
    - Headers: `Authorization: Bearer <userToken>`, `X-API-Key: <tenantApiKey>`
-   - Query params: `?apiName={API_NAME}`
-   - **Example**: `?apiName=DPHI` for GetAddress, `?apiName=Stripe` for PaymentProcessor
+   - Path parameter: `{apiName}` identifies the third-party API
+   - **Example**: `GET /api-configs/DPHI` for GetAddress, `GET /api-configs/Stripe` for PaymentProcessor
 
 2. **Retrieve Configuration**: Public API calls PayloadCMS to:
    - Look up tenant from API key
@@ -132,7 +136,7 @@ When the user interacts with a component (e.g., enters an address in GetAddress)
 
 **Template Note**: The tenant admin must pre-configure each third-party API in PayloadCMS Tenant Settings. This includes the API name (e.g., "DPHI", "Stripe"), endpoint URL, and encrypted credentials. Components request configuration by API name.
 
-### Phase 4: Call Third-Party API (CallAPI via APIM)
+### Phase 4: Call Third-Party API via APIM
 
 **Applies to**: All components making third-party API calls
 **Frequency**: Per user interaction (e.g., every address lookup, payment, document validation)
@@ -140,13 +144,27 @@ When the user interacts with a component (e.g., enters an address in GetAddress)
 
 **Mid2025 Implementation**: All calls route through Azure APIM for security, monitoring, and centralized management
 
-#### CallAPI Flow
+#### API Proxy Flow
 
-1. **CallAPI Request**: Component sends POST to `/CallAPI` with:
+1. **API Proxy Request**: Component sends `POST /api-proxies`:
    - Headers: `Authorization: Bearer <userToken>`, `X-API-Key: <tenantApiKey>`
    - Body: `{ apiUrl: <API_URL>, credentials: <API_creds>, parameters: {...} }`
-   - **Example for GetAddress**: `{ apiUrl: <DPHI_URL>, credentials: <DPHI_creds>, parameters: { address: "123 Main St" } }`
-   - **Example for PaymentProcessor**: `{ apiUrl: <Stripe_URL>, credentials: <Stripe_creds>, parameters: { amount: 100, currency: "USD" } }`
+   - **Example for GetAddress**:
+     ```json
+     {
+       "apiUrl": "https://dphi.example.com/v1/getaddress",
+       "credentials": { "apiKey": "..." },
+       "parameters": { "address": "123 Main St" }
+     }
+     ```
+   - **Example for PaymentProcessor**:
+     ```json
+     {
+       "apiUrl": "https://api.stripe.com/v1/charges",
+       "credentials": { "apiKey": "..." },
+       "parameters": { "amount": 100, "currency": "USD" }
+     }
+     ```
 
 2. **Proxy Through APIM**: Public API forwards the request to Azure APIM:
    - APIM receives the third-party API URL, credentials, and parameters
@@ -158,6 +176,35 @@ When the user interacts with a component (e.g., enters an address in GetAddress)
    - Component displays the results to the user
 
 **Template Note**: This is where component-specific business logic executes. The parameters vary by component type and third-party API, but the flow pattern remains identical. APIM provides centralized logging, rate limiting, and security for all third-party API calls.
+
+## RESTful API Design Decisions
+
+Following RESTful best practices ensures the Public API is intuitive, maintainable, and standards-compliant:
+
+### Resource-Oriented URLs (Nouns, Not Verbs)
+
+| ❌ Old (RPC-style) | ✅ New (RESTful) | Rationale |
+|-------------------|------------------|-----------|
+| `POST /validate-api-key` | `POST /api-keys/validate` | `api-keys` is the resource, `validate` is a sub-resource action |
+| `GET /GetAPI?apiName=DPHI` | `GET /api-configs/DPHI` | Uses path parameter for resource ID, not query string |
+| `POST /CallAPI` | `POST /api-proxies` | `api-proxies` represents the proxy resource collection |
+
+### RESTful Principles Applied
+
+1. **Resources are nouns**: `/api-keys`, `/api-configs`, `/api-proxies`
+2. **HTTP methods define actions**: GET retrieves, POST creates/validates
+3. **Hierarchical structure**: `/api-configs/{apiName}` shows resource hierarchy
+4. **Consistent naming**: All lowercase, hyphens for readability, plural nouns for collections
+5. **Path parameters over query strings**: `/api-configs/DPHI` instead of `/api-configs?name=DPHI`
+
+### Endpoint Summary
+
+| Endpoint | Method | Purpose | Resource Type |
+|----------|--------|---------|---------------|
+| `/auth/callback` | GET | OAuth callback | Authentication flow |
+| `/api-keys/validate` | POST | Validate tenant API key | Action on api-keys resource |
+| `/api-configs/{apiName}` | GET | Retrieve API configuration | Document (singular resource) |
+| `/api-proxies` | POST | Create API proxy call | Collection (creates new proxy) |
 
 ## Security Features
 
@@ -192,11 +239,12 @@ When creating a new component that integrates with a third-party API, follow thi
   - Rate limits and usage quotas
 
 #### 3. Component Logic
-- [ ] Call `GET /GetAPI?apiName={YOUR_API}` to retrieve configuration (Phase 3)
-- [ ] Store API URL and credentials (consider caching)
-- [ ] On user interaction, call `POST /CallAPI` with:
-  - `apiUrl`: from GetAPI response
-  - `credentials`: from GetAPI response
+- [ ] Call `GET /api-configs/{YOUR_API}` to retrieve configuration (Phase 3)
+  - Example: `GET /api-configs/DPHI` or `GET /api-configs/Stripe`
+- [ ] Store API URL and credentials (consider caching for performance)
+- [ ] On user interaction, call `POST /api-proxies` with:
+  - `apiUrl`: from api-configs response
+  - `credentials`: from api-configs response
   - `parameters`: component-specific data
 
 #### 4. Error Handling
@@ -231,13 +279,13 @@ const headers = {
 ```
 Component Mount
   ↓
-1. POST /validate-api-key (validate tenant API key)
+1. POST /api-keys/validate (validate tenant API key)
   ↓
 User Interaction
   ↓
-2. GET /GetAPI?apiName={API} (get third-party API config - cache if possible)
+2. GET /api-configs/{apiName} (get third-party API config - cache if possible)
   ↓
-3. POST /CallAPI (make actual API call through APIM)
+3. POST /api-proxies (make actual API call through APIM)
   ↓
 Display Results
 ```
@@ -283,7 +331,7 @@ sequenceDiagram
   AppService-->>Browser: 200 OK + Deliver GetAddress page (userToken + hardcoded tenantApiKey)
 
   Note over Browser,Payload: PHASE 2: API Key Validation (before any API calls)
-  Browser->>PublicAPI: POST /validate-api-key
+  Browser->>PublicAPI: POST /api-keys/validate
     note right of Browser: headers: Authorization: Bearer <userToken>,<br/>X-API-Key: <tenantApiKey>
 
   PublicAPI->>Entra: Validate user token / introspect
@@ -296,8 +344,8 @@ sequenceDiagram
   Payload-->>PublicAPI: 200 OK (validation passed)
   PublicAPI-->>Browser: 200 OK (API key validated)
 
-  Note over Browser,Payload: PHASE 3: Get API Configuration (GetAPI)
-  Browser->>PublicAPI: GET /GetAPI?apiName=DPHI
+  Note over Browser,Payload: PHASE 3: Get API Configuration
+  Browser->>PublicAPI: GET /api-configs/DPHI
     note right of Browser: User enters address in component<br/>headers: Authorization: Bearer <userToken>,<br/>X-API-Key: <tenantApiKey>
 
   PublicAPI->>Entra: Validate user token
@@ -309,8 +357,8 @@ sequenceDiagram
 
   PublicAPI-->>Browser: 200 OK { apiUrl, credentials }
 
-  Note over Browser,DPHI: PHASE 4: Call Third-Party API (CallAPI via APIM - Mid2025)
-  Browser->>PublicAPI: POST /CallAPI
+  Note over Browser,DPHI: PHASE 4: Call Third-Party API via APIM (Mid2025)
+  Browser->>PublicAPI: POST /api-proxies
     note right of Browser: headers: Authorization: Bearer <userToken>,<br/>X-API-Key: <tenantApiKey><br/>body: {<br/>  apiUrl: <DPHI_URL>,<br/>  credentials: <DPHI_creds>,<br/>  parameters: { address: "123 Main St" }<br/>}
 
   PublicAPI->>Entra: Validate user token
