@@ -2,28 +2,32 @@
  * Protected - Configurator V2 Component
  *
  * Component Protected from page.tsx
+ *
+ * @migrated from DAISY v1
  */
 
-import React from 'react';
-import { useConfigurator } from '@configurator/sdk';
+import React from 'react'
 
-
-export interface ProtectedProps {
-
-}
-
-export const Protected: React.FC<ProtectedProps> = (props) => {
-  const config = useConfigurator();
-
-
-
+  /**
+   * BUSINESS LOGIC: Protected
+   *
+   * WHY THIS EXISTS:
+   * - Implements business logic requirement
+   *
+   * WHAT IT DOES:
+   * 1. Implements Protected logic
+   * 2. Returns computed result
+   *
+   * DATA FLOW:
+   * Input: Component state and props
+   * Processing: Processes data and applies business logic
+   * Output: Computed value or side effect
+   *
+   */
+function Protected() {
   return (
-    <div className="protected">
-      {/* Component implementation */}
-    </div>
+    <h1>Protected Page</h1>
   );
-};
-
-Protected.displayName = 'Protected';
+}
 
 export default Protected;

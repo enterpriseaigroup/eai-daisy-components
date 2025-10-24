@@ -95,11 +95,15 @@ export class V2ComponentGenerator {
 
   private generateComponentFile(
     result: TransformationResult,
-    _sourceCode: string,
+    sourceCode: string,
     options: GenerationOptions,
   ): Promise<GeneratedFile> {
     const { transformed } = result;
-    const content = this.generateConfiguratorComponent(result, options);
+    const content = this.generateConfiguratorComponent(
+      result,
+      sourceCode,
+      options,
+    );
 
     return Promise.resolve({
       path: `${transformed.name}.tsx`,
@@ -112,12 +116,28 @@ export class V2ComponentGenerator {
 
   private generateConfiguratorComponent(
     result: TransformationResult,
+    sourceCode: string,
     options: GenerationOptions,
   ): string {
     const { transformed, transformations } = result;
     const doc =
       transformed.metadata.documentation || `${transformed.name} component`;
 
+    // Use transformed source code if available, otherwise fall back to template
+    if (sourceCode && sourceCode.trim().length > 0) {
+      // Return the transformed source code directly with header comment
+      return `/**
+ * ${transformed.name} - Configurator V2 Component
+ *
+ * ${doc}
+ *
+ * @migrated from DAISY v1
+ */
+
+${sourceCode}`;
+    }
+
+    // Fallback: Generate template-based component
     const propsInterface = `export interface ${transformed.name}Props {
 ${transformed.props.map(p => `  ${p.name}${p.required ? '' : '?'}: ${p.type};`).join('\n')}
 }`;

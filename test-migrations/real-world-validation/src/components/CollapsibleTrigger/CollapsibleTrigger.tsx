@@ -2,28 +2,88 @@
  * CollapsibleTrigger - Configurator V2 Component
  *
  * Component CollapsibleTrigger from collapsible.tsx
+ *
+ * @migrated from DAISY v1
  */
 
-import React from 'react';
-import { useConfigurator } from '@configurator/sdk';
+"use client"
 
+import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
 
-export interface CollapsibleTriggerProps {
-
+  /**
+   * BUSINESS LOGIC: Collapsible
+   *
+   * WHY THIS EXISTS:
+   * - Implements business logic requirement
+   *
+   * WHAT IT DOES:
+   * 1. Implements Collapsible logic
+   * 2. Returns computed result
+   *
+   * DATA FLOW:
+   * Input: Component state and props
+   * Processing: Processes data and applies business logic
+   * Output: Computed value or side effect
+   *
+   */
+function Collapsible({
+  ...props
+}: React.ComponentProps<typeof CollapsiblePrimitive.Root>) {
+  return <CollapsiblePrimitive.Root data-slot="collapsible" {...props} />
 }
 
-export const CollapsibleTrigger: React.FC<CollapsibleTriggerProps> = (props) => {
-  const config = useConfigurator();
-
-
-
+  /**
+   * BUSINESS LOGIC: CollapsibleTrigger
+   *
+   * WHY THIS EXISTS:
+   * - Implements business logic requirement
+   *
+   * WHAT IT DOES:
+   * 1. Implements CollapsibleTrigger logic
+   * 2. Returns computed result
+   *
+   * DATA FLOW:
+   * Input: Component state and props
+   * Processing: Processes data and applies business logic
+   * Output: Computed value or side effect
+   *
+   */
+function CollapsibleTrigger({
+  ...props
+}: React.ComponentProps<typeof CollapsiblePrimitive.CollapsibleTrigger>) {
   return (
-    <div className="collapsibletrigger">
-      {/* Component implementation */}
-    </div>
-  );
-};
+    <CollapsiblePrimitive.CollapsibleTrigger
+      data-slot="collapsible-trigger"
+      {...props}
+    />
+  )
+}
 
-CollapsibleTrigger.displayName = 'CollapsibleTrigger';
+  /**
+   * BUSINESS LOGIC: CollapsibleContent
+   *
+   * WHY THIS EXISTS:
+   * - Implements business logic requirement
+   *
+   * WHAT IT DOES:
+   * 1. Implements CollapsibleContent logic
+   * 2. Returns computed result
+   *
+   * DATA FLOW:
+   * Input: Component state and props
+   * Processing: Processes data and applies business logic
+   * Output: Computed value or side effect
+   *
+   */
+function CollapsibleContent({
+  ...props
+}: React.ComponentProps<typeof CollapsiblePrimitive.CollapsibleContent>) {
+  return (
+    <CollapsiblePrimitive.CollapsibleContent
+      data-slot="collapsible-content"
+      {...props}
+    />
+  )
+}
 
-export default CollapsibleTrigger;
+export { Collapsible, CollapsibleTrigger, CollapsibleContent }

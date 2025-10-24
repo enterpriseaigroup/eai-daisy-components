@@ -2,28 +2,31 @@
  * useGetByQuery - Configurator V2 Component
  *
  * Component useGetByQuery from useGetByQuery.ts
+ *
+ * @migrated from DAISY v1
  */
 
-import React from 'react';
-import { useConfigurator } from '@configurator/sdk';
+// import type { IGetByQueryUseCase } from '@application/interfaces/IGetByQueryUseCase';
+// import { useQuery } from '@tanstack/react-query';
 
+// import container from '@presentation/di';
+// import { UserConfig } from '@domain/entities/ProfileData';
 
-export interface useGetByQueryProps {
+// export const useGetByQuery = (token: string) => {
+//     const getByQueryUseCase = container.resolve<IGetByQueryUseCase>("IGetByQueryUseCase");
 
-}
+//     const fetchData = async () => {
+//         const payload: string = "";
+//         return await getByQueryUseCase.execute(payload, token);
+//     };
 
-export const useGetByQuery: React.FC<useGetByQueryProps> = (props) => {
-  const config = useConfigurator();
+//     const { data, isLoading, isError, error } = useQuery<UserConfig, Error>({
+//         queryKey: ["fetch-getByQuery", token], // Token in queryKey for auto-refetching
+//         queryFn: fetchData,
+//         staleTime: 1000 * 60 * 5,
+//         retry: 3,
+//         enabled: !!token, // Ensures query only runs when token is available
+//     });
 
-
-
-  return (
-    <div className="usegetbyquery">
-      {/* Component implementation */}
-    </div>
-  );
-};
-
-useGetByQuery.displayName = 'useGetByQuery';
-
-export default useGetByQuery;
+//     return { data, isLoading, isError, error };
+// };

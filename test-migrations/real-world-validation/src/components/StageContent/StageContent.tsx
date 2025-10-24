@@ -2,33 +2,506 @@
  * StageContent - Configurator V2 Component
  *
  * Component StageContent from StageContent.tsx
+ *
+ * @migrated from DAISY v1
  */
 
-import React from 'react';
-import { useConfigurator } from '@configurator/sdk';
+'use client';
 
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { StageType } from '@domain/entities/ApplicationStage';
+import type { IStageService } from '@application/interfaces/IStageService';
+import PropertyStage from '../stages/PropertyStage';
+import PlanningStage from '../stages/PlanningStage';
+import DocumentStage from '../stages/DocumentStage';
+import SubmissionStage from '../stages/SubmissionStage';
+import Daisy from '../chatbot/Daisy';
+import { useStageContent } from './useStageContent';
+import { useProfileStore } from '../../store/useProfileStore';
+import PropertyReportModal from './PropertyReportModal';
+import { StageProgress } from './StageProgress';
+import DevelopmentSummaryCard from '../LeftColumn/DevelopmentSummaryCard';
+import PropertyInfoCard from '../LeftColumn/PropertyInfoCard';
+import type { Project } from '@/app/domain/entities/ProfileData';
+import { MessageSquareText, X, Home, HomeIcon } from 'lucide-react';
+import { useIsMobile } from './useIsMobile';
 
-export interface StageContentProps {
+interface StageContentProps {
   stage: StageType;
   stageService: IStageService;
   onStageChange: (stage: StageType) => void;
 }
 
-export const StageContent: React.FC<StageContentProps> = (props) => {
-  const config = useConfigurator();
+  /**
+   * BUSINESS LOGIC: StageContent
+   *
+   * WHY THIS EXISTS:
+   * - Implements business logic requirement
+   *
+   * WHAT IT DOES:
+   * 1. Implements StageContent logic
+   * 2. Calls helper functions: useStageContent, useProfileStore, useProfileStore, raw.trim, useState, useState, useIsMobile, useState, useState, useCallback, setShowBotNotification, useCallback, setShowMobileBot, setShowBotNotification, setChatMessageCount, useEffect, setChatMessageCount, setShowBotNotification, window.addEventListener, window.removeEventListener, useMemo, instance.loginRedirect, stageService.isAuthenticationRequired, setShowReportModal, setShowReportModal, .map, .toUpperCase, view.charAt, view.slice, setMobileView
+   * 3. Returns computed result
+   *
+   * WHAT IT CALLS:
+   * - useStageContent() - Function call
+   * - useProfileStore() - Function call
+   * - useProfileStore() - Function call
+   * - raw.trim() - Function call
+   * - useState() - Function call
+   * - useState() - Function call
+   * - useIsMobile() - Function call
+   * - useState() - Function call
+   * - useState() - Function call
+   * - useCallback() - Function call
+   * - setShowBotNotification() - Function call
+   * - useCallback() - Function call
+   * - setShowMobileBot() - Function call
+   * - setShowBotNotification() - Function call
+   * - setChatMessageCount() - Function call
+   * - useEffect() - Function call
+   * - setChatMessageCount() - Function call
+   * - setShowBotNotification() - Function call
+   * - window.addEventListener() - Function call
+   * - window.removeEventListener() - Function call
+   * - useMemo() - Function call
+   * - instance.loginRedirect() - Function call
+   * - stageService.isAuthenticationRequired() - Function call
+   * - setShowReportModal() - Function call
+   * - setShowReportModal() - Function call
+   * - .map() - Function call
+   * - .toUpperCase() - Function call
+   * - view.charAt() - Function call
+   * - view.slice() - Function call
+   * - setMobileView() - Function call
+   *
+   * WHY IT CALLS THEM:
+   * - useStageContent: Required functionality
+   * - useProfileStore: Required functionality
+   * - useProfileStore: Required functionality
+   * - raw.trim: Required functionality
+   * - useState: Required functionality
+   * - useState: Required functionality
+   * - useIsMobile: Required functionality
+   * - useState: Required functionality
+   * - useState: Required functionality
+   * - useCallback: Required functionality
+   * - setShowBotNotification: State update
+   * - useCallback: Required functionality
+   * - setShowMobileBot: State update
+   * - setShowBotNotification: State update
+   * - setChatMessageCount: State update
+   * - useEffect: Required functionality
+   * - setChatMessageCount: State update
+   * - setShowBotNotification: State update
+   * - window.addEventListener: Required functionality
+   * - window.removeEventListener: Required functionality
+   * - useMemo: Required functionality
+   * - instance.loginRedirect: Required functionality
+   * - stageService.isAuthenticationRequired: Required functionality
+   * - setShowReportModal: State update
+   * - setShowReportModal: State update
+   * - .map: Required functionality
+   * - .toUpperCase: Required functionality
+   * - view.charAt: Required functionality
+   * - view.slice: Required functionality
+   * - setMobileView: State update
+   *
+   * DATA FLOW:
+   * Input: Component state and props
+   * Processing: Calls useStageContent, useProfileStore, useProfileStore to process data
+   * Output: Computed value or side effect
+   *
+   */
+export function StageContent({ stage, stageService, onStageChange }: StageContentProps) {
+  const {
+    instance,
+    isAuthenticated,
+    hasValue,
+    propertyReportLink,
+    address,
+    propId,
+    projectData,
+    showBotNotification,
+    setShowBotNotification,
+  } = useStageContent(stageService, onStageChange);
 
-  const showReportModal = useConfiguratorState(false);
-  const mobileView = useConfiguratorState('home');
-  const showMobileBot = useConfiguratorState(false);
-  const chatMessageCount = useConfiguratorState(0);
+  const profileData = useProfileStore(s => s.profileData);
+  const applicationName = useProfileStore(s => {
+    const raw = s.profileData?.user_config?.project?.application_name;
+    return s.isAnonymous ? 'My project' : raw?.trim() || 'My project';
+  });
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [mobileView, setMobileView] = useState<'home' | 'property'>('home');
+  const isMobile = useIsMobile();
+  // Toggle for mobile chatbot visibility
+  const [showMobileBot, setShowMobileBot] = useState(false);
+  const [chatMessageCount, setChatMessageCount] = useState(0);
+
+    /**
+     * BUSINESS LOGIC: handleNotificationClose
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setShowBotNotification functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setShowBotNotification() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setShowBotNotification: State update
+     *
+     * DATA FLOW:
+     * Input: setShowBotNotification state/props
+     * Processing: Calls setShowBotNotification to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - setShowBotNotification: Triggers when setShowBotNotification changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+  const handleNotificationClose = useCallback(() => {
+    setShowBotNotification(false);
+  }, [setShowBotNotification]);
+
+    /**
+     * BUSINESS LOGIC: handleMobileChatToggle
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setShowMobileBot, setShowBotNotification, setChatMessageCount functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setShowMobileBot() - Function call
+     * - setShowBotNotification() - Function call
+     * - setChatMessageCount() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setShowMobileBot: State update
+     * - setShowBotNotification: State update
+     * - setChatMessageCount: State update
+     *
+     * DATA FLOW:
+     * Input: showMobileBot, showBotNotification, setShowBotNotification state/props
+     * Processing: Calls setShowMobileBot, setShowBotNotification, setChatMessageCount to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - showMobileBot: Triggers when showMobileBot changes
+     * - showBotNotification: Triggers when showBotNotification changes
+     * - setShowBotNotification: Triggers when setShowBotNotification changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+  const handleMobileChatToggle = useCallback(() => {
+    setShowMobileBot(prev => !prev);
+    // Clear notification when opening mobile chat
+    if (!showMobileBot && showBotNotification) {
+      setShowBotNotification(false);
+      setChatMessageCount(0); // Reset counter when chat opens
+    }
+  }, [showMobileBot, showBotNotification, setShowBotNotification]);
+
+    /**
+     * BUSINESS LOGIC: Side Effect
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Monitors isMobile, showMobileBot, setShowBotNotification for changes
+     * 2. Executes setChatMessageCount, setShowBotNotification, window.addEventListener, window.removeEventListener functions
+     * 3. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - setChatMessageCount() - Function call
+     * - setShowBotNotification() - Function call
+     * - window.addEventListener() - Function call
+     * - window.removeEventListener() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setChatMessageCount: State update
+     * - setShowBotNotification: State update
+     * - window.addEventListener: Required functionality
+     * - window.removeEventListener: Required functionality
+     *
+     * DATA FLOW:
+     * Input: isMobile, showMobileBot, setShowBotNotification state/props
+     * Processing: Calls setChatMessageCount, setShowBotNotification, window.addEventListener to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * DEPENDENCIES:
+     * - isMobile: Triggers when isMobile changes
+     * - showMobileBot: Triggers when showMobileBot changes
+     * - setShowBotNotification: Triggers when setShowBotNotification changes
+     *
+     */
+  useEffect(() => {
+      /**
+       * BUSINESS LOGIC: handleNewMessage
+       *
+       * WHY THIS EXISTS:
+       * - Implements business logic requirement
+       *
+       * WHAT IT DOES:
+       * 1. Implements handleNewMessage logic
+       * 2. Calls helper functions: setChatMessageCount, setShowBotNotification
+       * 3. Returns computed result
+       *
+       * WHAT IT CALLS:
+       * - setChatMessageCount() - Function call
+       * - setShowBotNotification() - Function call
+       *
+       * WHY IT CALLS THEM:
+       * - setChatMessageCount: State update
+       * - setShowBotNotification: State update
+       *
+       * DATA FLOW:
+       * Input: Component state and props
+       * Processing: Calls setChatMessageCount, setShowBotNotification to process data
+       * Output: Computed value or side effect
+       *
+       */
+    const handleNewMessage = (event: MessageEvent) => {
+      if (event.data === "newMessageFromChatbot") {
+        // Only show notification if on mobile and chat bubble is closed
+        if (isMobile && !showMobileBot) {
+          setChatMessageCount(prev => prev + 1);
+          setShowBotNotification(true);
+        }
+      }
+    };
+    window.addEventListener("message", handleNewMessage);
+    return () => window.removeEventListener("message", handleNewMessage);
+  }, [isMobile, showMobileBot, setShowBotNotification]);
+
+    /**
+     * BUSINESS LOGIC: renderStageComponent
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Implements business logic
+     *
+     * DATA FLOW:
+     * Input: stage, onStageChange, isMobile state/props
+     * Processing: Processes data and applies business logic
+     * Output: Computed value or side effect
+     *
+     * DEPENDENCIES:
+     * - stage: Triggers when stage changes
+     * - onStageChange: Triggers when onStageChange changes
+     * - isMobile: Triggers when isMobile changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+  const renderStageComponent = useMemo(() => {
+    switch (stage) {
+      case 'property': return <PropertyStage onStageChange={onStageChange} />;
+      case 'project': return <PlanningStage onStageChange={onStageChange} />;
+      case 'documents': return <DocumentStage onStageChange={onStageChange} />;
+      case 'application': return <SubmissionStage onStageChange={onStageChange} />;
+      default: return <div>Unknown stage</div>;
+    }
+  }, [stage, onStageChange, isMobile]);
+
+  if (stageService.isAuthenticationRequired(stage) && !isAuthenticated) {
+    instance.loginRedirect({
+      scopes: ["openid", "profile", "email"],
+      prompt: 'create'
+    });
+    return <div>Redirecting to login...</div>;
+  }
 
   return (
-    <div className="stagecontent">
-      {/* Component implementation */}
-    </div>
+    <>
+      {/* DESKTOP VIEW */}
+      <div className="hidden xl:flex flex-col w-full h-screen overflow-hidden xl:flex-row 2xl:max-w-[1536px] xl:max-w-[1280px] xl:mx-auto xl:gap-2 mt-4 mb-4 scrollbar-hidden">
+        {/* Left Panel */}
+        <div className="xl:w-80 2xl:w-[340px] overflow-y-auto scrollbar-hidden">
+          <PropertyInfoCard
+            address={address}
+            propId={propId}
+            projectData={projectData as Project}
+            hasValue={hasValue as (val: unknown) => boolean}
+            propertyReportLink={propertyReportLink}
+            setShowReportModal={setShowReportModal}
+          />
+          {(stage === 'project' || stage === 'documents' || stage === 'application') && (
+            <DevelopmentSummaryCard {...{ applicationName, project: profileData?.user_config?.project as Project }} />
+          )}
+        </div>
+
+        {/* Center Panel */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-6 max-w-[767px] 2xl:max-w-[850px] bg-white rounded scrollbar-hidden">
+          <div className="sticky top-0 z-10 pt-4 pb-2 bg-white">
+            <StageProgress {...{ currentStage: stage, onStageSelect: onStageChange, stageService }} />
+          </div>
+          {/* Desktop notification banner - only show on desktop */}
+          {showBotNotification && (
+            <div className="mt-4 px-4 py-3 flex items-center justify-between gap-3 text-black rounded-md outline outline-1 outline-[#E4E4E7] animate-fade-in">
+              <div className="flex items-center gap-2">
+                <MessageSquareText className="w-5 h-5" strokeWidth={1.75} />
+                <p className="text-sm font-medium">You have a new message from DAISY</p>
+              </div>
+              <button onClick={handleNotificationClose} className="p-1 text-gray-500 hover:text-gray-700">
+                <X className="w-4 h-4" strokeWidth={2} />
+              </button>
+            </div>
+          )}
+          <div className="relative">
+            {showReportModal ? (
+              <PropertyReportModal show={showReportModal} onClose={() => setShowReportModal(false)} reportUrl={propertyReportLink} />
+            ) : (
+              renderStageComponent
+            )}
+          </div>
+        </div>
+
+        {/* Chat Panel */}
+        <div className="xl:w-80 2xl:w-[340px] xl:h-full xl:overflow-y-auto">
+          <Daisy isOpen={true} setIsOpen={() => {}} onStageChange={onStageChange} />
+        </div>
+      </div>
+
+      {/* MOBILE VIEW */}
+      <div className="w-full h-screen overflow-hidden bg-white xl:hidden">
+        {mobileView === 'home' && (
+          <div className="flex flex-col w-full h-full pb-20">
+            <div className="sticky top-0 z-10 px-2 pt-4 pb-2 bg-white">
+              <StageProgress {...{ currentStage: stage, onStageSelect: onStageChange, stageService }} />
+            </div>
+            {/* Remove mobile notification banner - notification will show as badge on chat icon instead */}
+            <div className="flex-1 px-2 overflow-y-auto">
+              {showReportModal ? (
+                <PropertyReportModal show={showReportModal} onClose={() => setShowReportModal(false)} reportUrl={propertyReportLink} />
+              ) : (
+                renderStageComponent
+              )}
+            </div>
+          </div>
+        )}
+
+        {mobileView === 'property' && (
+          <div className="w-full h-full px-4 pt-4 pb-20 overflow-y-auto">
+            <PropertyInfoCard
+              address={address}
+              propId={propId}
+              projectData={projectData as Project}
+              hasValue={hasValue as (val: unknown) => boolean}
+              propertyReportLink={propertyReportLink}
+              setShowReportModal={setShowReportModal}
+            />
+            {(stage === 'project' || stage === 'documents' || stage === 'application') && (
+              <DevelopmentSummaryCard {...{ applicationName, project: profileData?.user_config?.project as Project }} />
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Mobile full-screen chatbot overlay - hard override to ensure sliding */}
+      <div
+        style={{
+          zIndex: 999999, // ensure above Formbricks
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: '80%',
+          maxWidth: '24rem', // matches max-w-sm
+          transform: showMobileBot ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 300ms ease-in-out',
+          backgroundColor: 'white',
+          borderLeft: '1px solid #e5e7eb', // Tailwind border-gray-200
+          boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+          willChange: 'transform',
+          pointerEvents: 'auto',
+        }}
+      >
+        <div className="flex flex-col w-full h-full">
+          <div className="flex-1 overflow-hidden">
+            <Daisy isOpen={showMobileBot} setIsOpen={setShowMobileBot} onStageChange={onStageChange} />
+          </div>
+        </div>
+      </div>
+
+      {/* Floating chatbot toggle button on mobile with notification badge */}
+      {!showMobileBot && (
+        <div className="fixed z-50 xl:hidden bottom-28 right-2">
+          <button
+            className="relative p-3 text-white bg-black rounded-full shadow-lg"
+            onClick={handleMobileChatToggle}
+            aria-label="Toggle Daisy Chat"
+          >
+            <MessageSquareText className="w-5 h-5" />
+            {showBotNotification && chatMessageCount > 0 && (
+              <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-1 -right-1">
+                {chatMessageCount}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* MOBILE BOTTOM NAVIGATION */}
+      <nav className="fixed bottom-0 left-0 z-40 flex items-center justify-between w-full px-24 py-2 bg-white border-t xl:hidden">
+        {(['home', 'property'] as const).map(view => {
+          const isSelected = mobileView === view;
+          const label = view.charAt(0).toUpperCase() + view.slice(1);
+          return (
+            <button
+              key={view}
+              onClick={() => setMobileView(view)}
+              className="inline-flex flex-col items-center justify-center gap-1"
+            >
+              {view === 'home' ? (
+                // Home icon with filled/unfilled variants
+                isSelected ? (
+                  <HomeIcon className="w-6 h-6 text-black fill-black" />
+                ) : (
+                  <Home className="w-6 h-6 text-zinc-500" />
+                )
+              ) : (
+                // Property icon - custom implementation for filled effect
+                <div className="relative flex items-center justify-center w-6 h-6">
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    isSelected 
+                      ? 'bg-black border-black' 
+                      : 'bg-transparent border-zinc-500'
+                  }`}>
+                    <span className={`text-sm font-bold ${
+                      isSelected ? 'text-white' : 'text-zinc-500'
+                    }`}>
+                      i
+                    </span>
+                  </div>
+                </div>
+              )}
+              <span className={`text-sm font-['Geist'] leading-normal ${
+                isSelected ? 'font-semibold text-black' : 'font-normal text-zinc-500'
+              }`}>
+                {label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+    </>
   );
-};
-
-StageContent.displayName = 'StageContent';
-
-export default StageContent;
+}

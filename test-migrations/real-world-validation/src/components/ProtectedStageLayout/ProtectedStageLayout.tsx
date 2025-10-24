@@ -2,29 +2,43 @@
  * ProtectedStageLayout - Configurator V2 Component
  *
  * Component ProtectedStageLayout from ProtectedStageLayout.tsx
+ *
+ * @migrated from DAISY v1
  */
 
-import React from 'react';
-import { useConfigurator } from '@configurator/sdk';
+'use client';
 
+import { MSALProvider } from "@presentation/components/auth/MSALAuthProvider";
+import { AuthProvider } from "../auth/AuthProvider";
+import { ReactNode } from "react";
 
-export interface ProtectedStageLayoutProps {
+interface ProtectedStageLayoutProps {
   children: ReactNode;
   onAuthFailure?: () => void;
 }
 
-export const ProtectedStageLayout: React.FC<ProtectedStageLayoutProps> = (props) => {
-  const config = useConfigurator();
-
-
-
+  /**
+   * BUSINESS LOGIC: ProtectedStageLayout
+   *
+   * WHY THIS EXISTS:
+   * - Implements business logic requirement
+   *
+   * WHAT IT DOES:
+   * 1. Implements ProtectedStageLayout logic
+   * 2. Returns computed result
+   *
+   * DATA FLOW:
+   * Input: Component state and props
+   * Processing: Processes data and applies business logic
+   * Output: Computed value or side effect
+   *
+   */
+export function ProtectedStageLayout({ children, onAuthFailure }: ProtectedStageLayoutProps) {
   return (
-    <div className="protectedstagelayout">
-      {/* Component implementation */}
-    </div>
+    <MSALProvider>
+      <AuthProvider onAuthFailure={onAuthFailure}>
+        {children}
+      </AuthProvider>
+    </MSALProvider>
   );
-};
-
-ProtectedStageLayout.displayName = 'ProtectedStageLayout';
-
-export default ProtectedStageLayout;
+}

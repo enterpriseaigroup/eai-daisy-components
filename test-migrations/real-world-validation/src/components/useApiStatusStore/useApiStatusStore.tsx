@@ -2,28 +2,59 @@
  * useApiStatusStore - Configurator V2 Component
  *
  * Component useApiStatusStore from useApiStatusStore.ts
+ *
+ * @migrated from DAISY v1
  */
 
-import React from 'react';
-import { useConfigurator } from '@configurator/sdk';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import logger from "zustand-logger-middleware";
 
-
-export interface useApiStatusStoreProps {
-
+export interface ApiStatus {
+  status: "idle" | "loading" | "success" | "error";
+  errorMessage?: string;
 }
 
-export const useApiStatusStore: React.FC<useApiStatusStoreProps> = (props) => {
-  const config = useConfigurator();
+export interface ApiStatusStore {
+  apiStatuses: Record<string, ApiStatus>;
+  setApiStatus: (apiName: string, status: ApiStatus) => void;
+  resetApiStatus: (apiName: string) => void;
+  resetAllApiStatuses: () => void;
+}
 
+export const useApiStatusStore = create<ApiStatusStore>()(
+  logger(
+    persist(
+      (set) => ({
+        apiStatuses: {},
 
+        setApiStatus: (apiName, status) =>
+          set((state) => {
+            console.log(`Updating API status for ${apiName}:`, status);
+            return {
+              apiStatuses: {
+                ...state.apiStatuses,
+                [apiName]: status,
+              },
+            };
+          }),
 
-  return (
-    <div className="useapistatusstore">
-      {/* Component implementation */}
-    </div>
-  );
-};
+        resetApiStatus: (apiName: string) =>
+          set((state) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [apiName]: _, ...remainingStatuses } = state.apiStatuses;
+            return { apiStatuses: remainingStatuses };
+          }),
 
-useApiStatusStore.displayName = 'useApiStatusStore';
-
-export default useApiStatusStore;
+        resetAllApiStatuses: () =>
+          set(() => ({
+            apiStatuses: {},
+          })),
+      }),
+      {
+        name: "api-status-store", // Key for localStorage
+        storage: createJSONStorage(() => localStorage), // or localStorage if you want it longer lived
+      }
+    )
+  )
+);

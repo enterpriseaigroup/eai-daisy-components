@@ -2,29 +2,68 @@
  * MSALProvider - Configurator V2 Component
  *
  * Component MSALProvider from MSALAuthProvider.tsx
+ *
+ * @migrated from DAISY v1
  */
 
-import React from 'react';
-import { useConfigurator } from '@configurator/sdk';
+'use client';
 
+import React from "react";
+import { MsalProvider } from "@azure/msal-react";
+import { PublicClientApplication } from "@azure/msal-browser";
+import { getMsalInstance } from "./config";
 
-export interface MSALProviderProps {
+interface MSALProviderProps {
   children: React.ReactNode;
   instance?: PublicClientApplication;
 }
 
-export const MSALProvider: React.FC<MSALProviderProps> = (props) => {
-  const config = useConfigurator();
+// OLD ONE!
+// export const MSALProvider = ({ children, instance }: MSALProviderProps) => {
+//   const [isInitialized, setIsInitialized] = useState(false);
+//   const msalInstance = instance || getMsalInstance();
+//   useEffect(() => {
+//     const initializeMsal = async () => {
+//       try {
+//         await msalInstance.initialize();
+//         setIsInitialized(true);
+//         console.log("MSAL initialized successfully", isInitialized);
+//       } catch (error) {
+//         console.error("Failed to initialize MSAL:", error);
+//       }
+//     };
+//     initializeMsal();
+//   }, [msalInstance, isInitialized]);
+//   // if (!isInitialized) {
+//   //   return <LoginLoader />;
+//   // }
+//   return <MsalProvider instance={msalInstance}>{children}</MsalProvider>;
+// };
 
-  const isInitialized = useConfiguratorState(false);
-
-  return (
-    <div className="msalprovider">
-      {/* Component implementation */}
-    </div>
-  );
+  /**
+   * BUSINESS LOGIC: MSALProvider
+   *
+   * WHY THIS EXISTS:
+   * - Implements business logic requirement
+   *
+   * WHAT IT DOES:
+   * 1. Implements MSALProvider logic
+   * 2. Calls helper functions: getMsalInstance
+   * 3. Returns computed result
+   *
+   * WHAT IT CALLS:
+   * - getMsalInstance() - Function call
+   *
+   * WHY IT CALLS THEM:
+   * - getMsalInstance: Required functionality
+   *
+   * DATA FLOW:
+   * Input: Component state and props
+   * Processing: Calls getMsalInstance to process data
+   * Output: Computed value or side effect
+   *
+   */
+export const MSALProvider = ({ children, instance }: MSALProviderProps) => {
+  const msalInstance = instance || getMsalInstance();
+  return <MsalProvider instance={msalInstance}>{children}</MsalProvider>;
 };
-
-MSALProvider.displayName = 'MSALProvider';
-
-export default MSALProvider;
