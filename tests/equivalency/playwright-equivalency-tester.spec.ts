@@ -4,7 +4,8 @@
  * Uses real browser rendering to validate component migration accuracy
  */
 
-import { test, expect, Page, Locator } from '@playwright/test';
+import type { Page} from '@playwright/test';
+import { Locator, expect, test } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as crypto from 'crypto';
@@ -61,7 +62,7 @@ test.describe('Component Migration Equivalency Tests', () => {
       v2Page,
       'Button',
       '/fixtures/components/v1/Button',
-      '/fixtures/components/v2/Button'
+      '/fixtures/components/v2/Button',
     );
 
     // Assert overall equivalency
@@ -203,26 +204,34 @@ async function testComponentEquivalency(
   v2Page: Page,
   componentName: string,
   v1Path: string,
-  v2Path: string
+  v2Path: string,
 ): Promise<ComponentTestResult> {
   const differences: Difference[] = [];
   let score = 100;
 
   // Test visual rendering
   const visualMatch = await testVisualEquivalency(v1Page, v2Page, differences);
-  if (!visualMatch) score -= 20;
+  if (!visualMatch) {
+score -= 20;
+}
 
   // Test behavior
   const behaviorMatch = await testBehaviorEquivalency(v1Page, v2Page, differences);
-  if (!behaviorMatch) score -= 30;
+  if (!behaviorMatch) {
+score -= 30;
+}
 
   // Test business logic
   const businessLogicMatch = await testBusinessLogicEquivalency(v1Path, v2Path, differences);
-  if (!businessLogicMatch) score -= 35;
+  if (!businessLogicMatch) {
+score -= 35;
+}
 
   // Test performance
   const performanceMatch = await testPerformanceEquivalency(v1Page, v2Page, differences);
-  if (!performanceMatch) score -= 15;
+  if (!performanceMatch) {
+score -= 15;
+}
 
   return {
     component: componentName,
@@ -243,7 +252,7 @@ async function testComponentEquivalency(
 async function testVisualEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[]
+  differences: Difference[],
 ): Promise<boolean> {
   // Implementation would compare screenshots
   return true;
@@ -255,7 +264,7 @@ async function testVisualEquivalency(
 async function testBehaviorEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[]
+  differences: Difference[],
 ): Promise<boolean> {
   // Implementation would test interactions
   return true;
@@ -267,7 +276,7 @@ async function testBehaviorEquivalency(
 async function testBusinessLogicEquivalency(
   v1Path: string,
   v2Path: string,
-  differences: Difference[]
+  differences: Difference[],
 ): Promise<boolean> {
   // Implementation would analyze source code
   return true;
@@ -279,7 +288,7 @@ async function testBusinessLogicEquivalency(
 async function testPerformanceEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[]
+  differences: Difference[],
 ): Promise<boolean> {
   // Implementation would measure performance metrics
   return true;
@@ -290,7 +299,7 @@ async function testPerformanceEquivalency(
  */
 async function compareScreenshots(
   screenshot1: Buffer,
-  screenshot2: Buffer
+  screenshot2: Buffer,
 ): Promise<{ similarity: number; differences: any[] }> {
   // This would use image comparison library like pixelmatch
   // For now, returning mock data

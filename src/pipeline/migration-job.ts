@@ -110,7 +110,7 @@ export class MigrationJob {
       });
       const cssTransformResult = await cssTransformer.transform(
         sourceCode,
-        `${this.config.sourcePath}/${component.sourcePath}`
+        `${this.config.sourcePath}/${component.sourcePath}`,
       );
 
       // Step 2: Generate pseudo-code documentation (for v1 baseline)
@@ -127,7 +127,7 @@ export class MigrationJob {
       const v1Documentation = await pseudoCodeGen.generate(
         cssTransformResult.transformedCode,
         component.name,
-        false // isV2Component = false
+        false, // isV2Component = false
       );
 
       // Use documented v1 code for transformation

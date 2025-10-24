@@ -22,7 +22,7 @@ async function testTransformers() {
   // Read actual DAISY v1 Button component
   const buttonPath = path.resolve(
     __dirname,
-    '../../daisyv1/components/tier2/Button.tsx'
+    '../../daisyv1/components/tier2/Button.tsx',
   );
 
   console.log(`Reading component from: ${buttonPath}`);
@@ -79,7 +79,7 @@ async function testTransformers() {
   // Save CSS-transformed code
   const cssTransformedPath = path.resolve(
     __dirname,
-    '../../tests/transformers/output/Button-css-transformed.tsx'
+    '../../tests/transformers/output/Button-css-transformed.tsx',
   );
   await fs.mkdir(path.dirname(cssTransformedPath), { recursive: true });
   await fs.writeFile(cssTransformedPath, cssResult.transformedCode);
@@ -106,7 +106,7 @@ async function testTransformers() {
   const v1DocResult = await pseudoCodeGen.generate(
     cssResult.transformedCode,
     'Button',
-    false
+    false,
   );
 
   console.log('');
@@ -133,7 +133,7 @@ async function testTransformers() {
   // Save v1 documented code
   const v1DocumentedPath = path.resolve(
     __dirname,
-    '../../tests/transformers/output/Button-v1-documented.tsx'
+    '../../tests/transformers/output/Button-v1-documented.tsx',
   );
   await fs.writeFile(v1DocumentedPath, v1DocResult.documentedCode);
   console.log(`  Saved to: ${v1DocumentedPath}`);
@@ -159,7 +159,7 @@ async function testTransformers() {
   const v2DocResult = await v2PseudoCodeGen.generate(
     v1DocResult.documentedCode,
     'Button',
-    true
+    true,
   );
 
   console.log('');
@@ -171,7 +171,7 @@ async function testTransformers() {
   // Save v2 documented code
   const v2DocumentedPath = path.resolve(
     __dirname,
-    '../../tests/transformers/output/Button-v2-documented.tsx'
+    '../../tests/transformers/output/Button-v2-documented.tsx',
   );
   await fs.writeFile(v2DocumentedPath, v2DocResult.documentedCode);
   console.log(`  Saved to: ${v2DocumentedPath}`);

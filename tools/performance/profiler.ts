@@ -145,11 +145,11 @@ export class PerformanceProfiler extends EventEmitter {
       name: metricName,
       startTime: Date.now(),
     };
-    
+
     if (metadata) {
       metric.metadata = metadata;
     }
-    
+
     session.metrics.set(metricName, metric);
   }
 

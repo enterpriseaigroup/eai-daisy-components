@@ -4,7 +4,7 @@
  * DATE: 2025-10-22
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * DAISY v1 Button Component - Original Implementation
@@ -78,7 +78,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'data-testid': testId,
       ...rest
     },
-    ref
+    ref,
   ) => {
     // Complex state management (to be transformed)
     const [isPressed, setIsPressed] = useState(false);
@@ -133,7 +133,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           });
         }
       },
-      [trackingId, variant, size]
+      [trackingId, variant, size],
     );
 
     // Complex business logic: Enhanced click handling
@@ -167,7 +167,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           setIsPressed(false);
         }, 150);
       },
-      [disabled, loading, onClick, children, trackEvent]
+      [disabled, loading, onClick, children, trackEvent],
     );
 
     // Complex business logic: Tooltip management
@@ -298,14 +298,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </button>
       </div>
     );
-  }
+  },
 );
 
 // DAISY v1 pattern: Higher-order component for theme integration
 export const withDaisyTheme = (
   WrappedButton: React.ForwardRefExoticComponent<
     ButtonProps & React.RefAttributes<HTMLButtonElement>
-  >
+  >,
 ) => {
   return React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const [theme, setTheme] = useState('light');

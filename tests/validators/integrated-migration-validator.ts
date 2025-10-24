@@ -42,7 +42,7 @@ export interface ValidationWarning {
 
 export class IntegratedMigrationValidator {
   private parser: ComponentParser | null = null;
-  private businessLogicAnalyzer: BusinessLogicAnalyzer;
+  private readonly businessLogicAnalyzer: BusinessLogicAnalyzer;
 
   constructor() {
     // Lazy initialization to avoid ESM import issues
@@ -66,7 +66,7 @@ export class IntegratedMigrationValidator {
    */
   public async validateMigration(
     migratedPath: string,
-    originalPath: string
+    originalPath: string,
   ): Promise<IntegratedValidationResult> {
     const componentName = path.basename(migratedPath, path.extname(migratedPath));
     const errors: ValidationError[] = [];
@@ -118,28 +118,28 @@ export class IntegratedMigrationValidator {
         const migratedComponent = this.createComponentDefinition(
           migratedPath,
           componentName,
-          migratedParse
+          migratedParse,
         );
         const originalComponent = this.createComponentDefinition(
           originalPath,
           componentName,
-          originalParse
+          originalParse,
         );
 
         const migratedAnalysis = this.businessLogicAnalyzer.analyzeComponent(
           migratedComponent,
-          migratedSource
+          migratedSource,
         );
         const originalAnalysis = this.businessLogicAnalyzer.analyzeComponent(
           originalComponent,
-          originalSource
+          originalSource,
         );
 
         // Check if business logic is preserved using the existing analyzer
         businessLogicPreserved = this.compareBusinessLogic(
           originalAnalysis,
           migratedAnalysis,
-          errors
+          errors,
         );
       } catch (error) {
         errors.push({
@@ -196,7 +196,7 @@ export class IntegratedMigrationValidator {
   private async parseComponent(
     filePath: string,
     componentName: string,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): Promise<ParseResult | null> {
     try {
       // Create a minimal component definition for parsing
@@ -249,7 +249,7 @@ export class IntegratedMigrationValidator {
   private createComponentDefinition(
     filePath: string,
     componentName: string,
-    parseResult: ParseResult
+    parseResult: ParseResult,
   ): ComponentDefinition {
     return {
       id: componentName,
@@ -283,22 +283,42 @@ export class IntegratedMigrationValidator {
   private extractReactPatterns(parseResult: ParseResult): string[] {
     const patterns: string[] = [];
 
-    if (!parseResult.structure) return patterns;
+    if (!parseResult.structure) {
+return patterns;
+}
 
     const { hooks, composition } = parseResult.structure;
 
     // Check for hook usage
-    if (hooks.some(h => h.type === 'state')) patterns.push('hooks-useState');
-    if (hooks.some(h => h.type === 'effect')) patterns.push('hooks-useEffect');
-    if (hooks.some(h => h.type === 'context')) patterns.push('hooks-useContext');
-    if (hooks.some(h => h.type === 'ref')) patterns.push('hooks-useRef');
-    if (hooks.some(h => h.type === 'memo')) patterns.push('hooks-useMemo');
-    if (hooks.some(h => h.type === 'callback')) patterns.push('hooks-useCallback');
+    if (hooks.some(h => h.type === 'state')) {
+patterns.push('hooks-useState');
+}
+    if (hooks.some(h => h.type === 'effect')) {
+patterns.push('hooks-useEffect');
+}
+    if (hooks.some(h => h.type === 'context')) {
+patterns.push('hooks-useContext');
+}
+    if (hooks.some(h => h.type === 'ref')) {
+patterns.push('hooks-useRef');
+}
+    if (hooks.some(h => h.type === 'memo')) {
+patterns.push('hooks-useMemo');
+}
+    if (hooks.some(h => h.type === 'callback')) {
+patterns.push('hooks-useCallback');
+}
 
     // Check for composition patterns
-    if (composition.forwardRef) patterns.push('forwardRef');
-    if (composition.memo) patterns.push('memo');
-    if (composition.higherOrderComponents.length > 0) patterns.push('hoc');
+    if (composition.forwardRef) {
+patterns.push('forwardRef');
+}
+    if (composition.memo) {
+patterns.push('memo');
+}
+    if (composition.higherOrderComponents.length > 0) {
+patterns.push('hoc');
+}
 
     return patterns;
   }
@@ -307,14 +327,22 @@ export class IntegratedMigrationValidator {
    * Determine component complexity
    */
   private determineComplexity(parseResult: ParseResult): 'simple' | 'moderate' | 'complex' | 'critical' {
-    if (!parseResult.structure) return 'simple';
+    if (!parseResult.structure) {
+return 'simple';
+}
 
     const { hooks, methods } = parseResult.structure;
     const totalElements = hooks.length + methods.length;
 
-    if (totalElements > 20) return 'critical';
-    if (totalElements > 10) return 'complex';
-    if (totalElements > 5) return 'moderate';
+    if (totalElements > 20) {
+return 'critical';
+}
+    if (totalElements > 10) {
+return 'complex';
+}
+    if (totalElements > 5) {
+return 'moderate';
+}
     return 'simple';
   }
 
@@ -324,7 +352,7 @@ export class IntegratedMigrationValidator {
   private compareBusinessLogic(
     originalAnalysis: any,
     migratedAnalysis: any,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): boolean {
     // Compare function counts
     if (originalAnalysis.functions.length !== migratedAnalysis.functions.length) {

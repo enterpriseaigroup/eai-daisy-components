@@ -516,7 +516,7 @@ export class MigrationTracker {
       totalWarnings: records.reduce((sum, r) => sum + r.warnings.length, 0),
       ...(session.endTime ? { endTime: session.endTime } : {}),
     };
-    
+
     return summary;
   }
 

@@ -64,7 +64,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   public async analyze(
     originalPath: string,
-    migratedPath: string
+    migratedPath: string,
   ): Promise<BusinessLogicAnalysisResult> {
     // Parse both components
     const originalAST = await this.parseComponent(originalPath);
@@ -124,7 +124,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   public async analyzeWithAST(
     originalPath: string,
-    migratedPath: string
+    migratedPath: string,
   ): Promise<BusinessLogicAnalysisResult> {
     return this.analyze(originalPath, migratedPath);
   }
@@ -222,16 +222,20 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   private extractFunctionInfo(
     node: ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression | ts.MethodDeclaration,
-    name?: string
+    name?: string,
   ): FunctionInfo | null {
-    if (!this.checker) return null;
+    if (!this.checker) {
+return null;
+}
 
     const funcName = name ||
       (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)
         ? node.name?.getText()
         : 'anonymous');
 
-    if (!funcName) return null;
+    if (!funcName) {
+return null;
+}
 
     // Extract parameters
     const parameters = node.parameters.map(param => {
@@ -342,7 +346,9 @@ export class EnhancedBusinessLogicAnalyzer {
     let hasSideEffect = false;
 
     const visit = (n: ts.Node): void => {
-      if (hasSideEffect) return;
+      if (hasSideEffect) {
+return;
+}
 
       // Check for state mutations
       if (ts.isCallExpression(n)) {
@@ -398,7 +404,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   private compareFunctions(
     original: Map<string, FunctionInfo>,
-    migrated: Map<string, FunctionInfo>
+    migrated: Map<string, FunctionInfo>,
   ): {
     missingFunctions: string[];
     changedFunctions: FunctionChange[];
@@ -435,7 +441,7 @@ export class EnhancedBusinessLogicAnalyzer {
           // Deeper analysis needed to determine if change is semantic
           const semanticallyEquivalent = this.checkSemanticEquivalence(
             originalFunc,
-            migratedFunc
+            migratedFunc,
           );
 
           if (!semanticallyEquivalent) {
@@ -471,7 +477,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   private checkSemanticEquivalence(
     func1: FunctionInfo,
-    func2: FunctionInfo
+    func2: FunctionInfo,
   ): boolean {
     // Check if functions have same parameters
     if (func1.parameters.length !== func2.parameters.length) {
@@ -531,7 +537,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   private compareEventHandlers(
     originalAST: ts.SourceFile,
-    migratedAST: ts.SourceFile
+    migratedAST: ts.SourceFile,
   ): boolean {
     const originalHandlers = this.extractEventHandlers(originalAST);
     const migratedHandlers = this.extractEventHandlers(migratedAST);
@@ -584,7 +590,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   private compareValidationLogic(
     originalAST: ts.SourceFile,
-    migratedAST: ts.SourceFile
+    migratedAST: ts.SourceFile,
   ): boolean {
     const originalValidations = this.extractValidationLogic(originalAST);
     const migratedValidations = this.extractValidationLogic(migratedAST);
@@ -629,7 +635,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   private compareStateManagement(
     originalAST: ts.SourceFile,
-    migratedAST: ts.SourceFile
+    migratedAST: ts.SourceFile,
   ): boolean {
     const originalState = this.extractStateManagement(originalAST);
     const migratedState = this.extractStateManagement(migratedAST);
@@ -684,7 +690,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   private async performSemanticAnalysis(
     originalAST: ts.SourceFile,
-    migratedAST: ts.SourceFile
+    migratedAST: ts.SourceFile,
   ): Promise<ASTDifference[]> {
     const differences: ASTDifference[] = [];
 

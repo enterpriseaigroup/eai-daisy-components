@@ -13,8 +13,8 @@ import { ComponentDiscoveryEngine } from '@/engine/discovery';
 import { DependencyResolver } from '@/utils/dependency-resolver';
 import PipelineOrchestrator from '@/pipeline/orchestrator';
 import { MigrationTracker } from '@/utils/migration-tracker';
-import { getGlobalLogger, createSimpleLogger } from '@/utils/logging';
-import type { ComponentDefinition, MigrationStatus, ExtractionConfig } from '@/types';
+import { createSimpleLogger, getGlobalLogger } from '@/utils/logging';
+import type { ComponentDefinition, ExtractionConfig, MigrationStatus } from '@/types';
 
 const logger = getGlobalLogger('MigrateAll');
 
@@ -65,7 +65,7 @@ export class BatchMigrationOrchestrator {
   private readonly resolver: DependencyResolver;
   private readonly orchestrator: PipelineOrchestrator;
   private readonly tracker: MigrationTracker;
-  private logger = createSimpleLogger('BatchMigrationOrchestrator');
+  private readonly logger = createSimpleLogger('BatchMigrationOrchestrator');
 
   constructor() {
     this.orchestrator = new PipelineOrchestrator();
@@ -259,7 +259,9 @@ export class BatchMigrationOrchestrator {
         const component = batch[j];
         const batchResult = batchResults[j];
 
-        if (!component || !batchResult) continue;
+        if (!component || !batchResult) {
+continue;
+}
 
         if (batchResult.status === 'fulfilled' && batchResult.value.success) {
           result.successful++;

@@ -7,7 +7,8 @@
  * PRESERVED: All business logic from v1 maintained with identical functionality
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { validateButtonProps } from './validators';
 import { trackClick } from './analytics';
 
@@ -284,9 +285,15 @@ export const Button: React.FC<ButtonProps> = ({
     classes.push(variantClasses[variant]);
     classes.push(sizeClasses[size]);
 
-    if (disabled) classes.push('opacity-60 cursor-not-allowed');
-    if (loading) classes.push('cursor-wait');
-    if (fullWidth) classes.push('w-full');
+    if (disabled) {
+classes.push('opacity-60 cursor-not-allowed');
+}
+    if (loading) {
+classes.push('cursor-wait');
+}
+    if (fullWidth) {
+classes.push('w-full');
+}
 
     return classes.filter(Boolean).join(' ');
   }, [variant, size, disabled, loading, fullWidth, isHovered]);

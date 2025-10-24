@@ -4,7 +4,7 @@
  * Uses the REAL pipeline to validate migration metrics
  */
 
-import { describe, it, expect, beforeAll } from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { IntegratedMigrationValidator } from '../validators/integrated-migration-validator';
@@ -67,7 +67,7 @@ describe('Integrated Production Readiness Validation', () => {
       for (const component of components) {
         const result = await migrationValidator.validateMigration(
           component.v2,
-          component.v1
+          component.v1,
         );
 
         results.push({
@@ -85,7 +85,7 @@ describe('Integrated Production Readiness Validation', () => {
 
       console.log('\n=== Migration Success Rate ===');
       console.log(`Success Rate: ${successRate.toFixed(1)}%`);
-      console.log(`Target: ≥95%`);
+      console.log('Target: ≥95%');
       console.log(`Status: ${successRate >= 95 ? '✅ PASS' : '❌ FAIL'}`);
 
       console.log('\nDetailed Results:');
@@ -108,7 +108,7 @@ describe('Integrated Production Readiness Validation', () => {
 
       console.log('\n=== Business Logic Preservation ===');
       console.log(`Preserved: ${result.checks.businessLogicPreserved ? '✅' : '❌'}`);
-      console.log(`Target: 100%`);
+      console.log('Target: 100%');
 
       if (!result.checks.businessLogicPreserved) {
         console.log('\nBusiness Logic Errors:');
@@ -151,7 +151,7 @@ describe('Integrated Production Readiness Validation', () => {
       console.log('\n=== Throughput Measurement ===');
       console.log(`Total Duration: ${profile.totalDuration.toFixed(2)}ms`);
       console.log(`Components Per Hour: ${profile.throughput.componentsPerHour.toFixed(1)}`);
-      console.log(`Target: ≥10 components/hour`);
+      console.log('Target: ≥10 components/hour');
       console.log(`Status: ${profile.throughput.meetsTarget ? '✅ PASS' : '❌ FAIL'}`);
 
       if (profile.phases.length > 0) {
@@ -182,7 +182,7 @@ describe('Integrated Production Readiness Validation', () => {
       console.log('Step 1: Validating migration...');
       const validationResult = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       console.log(`  File Exists: ${validationResult.checks.fileExists ? '✅' : '❌'}`);

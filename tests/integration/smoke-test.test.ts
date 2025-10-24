@@ -2,7 +2,7 @@
  * Smoke test to verify test infrastructure is working
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 

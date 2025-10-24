@@ -10,7 +10,8 @@
  */
 
 import { parse } from '@typescript-eslint/typescript-estree';
-import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/typescript-estree';
+import type { TSESTree } from '@typescript-eslint/typescript-estree';
+import { AST_NODE_TYPES } from '@typescript-eslint/typescript-estree';
 import { type Logger, createSimpleLogger } from '../../utils/logging.js';
 
 export interface PseudoCodeGeneratorOptions {
@@ -77,8 +78,8 @@ export interface BusinessLogicBlock {
  * documentation for all business logic blocks.
  */
 export class PseudoCodeGenerator {
-  private logger: Logger;
-  private options: PseudoCodeGeneratorOptions;
+  private readonly logger: Logger;
+  private readonly options: PseudoCodeGeneratorOptions;
 
   constructor(options: Partial<PseudoCodeGeneratorOptions> = {}, logger?: Logger) {
     this.logger = logger || createSimpleLogger('PseudoCodeGenerator');
@@ -100,7 +101,7 @@ export class PseudoCodeGenerator {
   public async generate(
     componentCode: string,
     componentName: string,
-    isV2Component: boolean = false
+    isV2Component: boolean = false,
   ): Promise<PseudoCodeResult> {
     this.logger.info(`Generating pseudo-code documentation for: ${componentName}`);
 
@@ -136,7 +137,7 @@ export class PseudoCodeGenerator {
         documentedCode = this.insertDocumentation(
           documentedCode,
           block.startLine,
-          documentation
+          documentation,
         );
 
         blocksDocumented.push({
@@ -167,7 +168,7 @@ export class PseudoCodeGenerator {
    */
   private findBusinessLogicBlocks(
     ast: TSESTree.Program,
-    sourceCode: string
+    sourceCode: string,
   ): AnalyzedBlock[] {
     const blocks: AnalyzedBlock[] = [];
 
@@ -376,7 +377,7 @@ export class PseudoCodeGenerator {
    */
   private inferUseEffectPurpose(callback: TSESTree.Node, sourceCode: string): string {
     // Look for common patterns
-    const code = sourceCode.substring(callback.range![0], callback.range![1]);
+    const code = sourceCode.substring(callback.range[0], callback.range[1]);
 
     if (code.includes('track') || code.includes('analytics')) {
       return 'Analytics Tracking';
@@ -450,81 +451,81 @@ export class PseudoCodeGenerator {
     const sections: string[] = [];
 
     // Header
-    sections.push(`  /**`);
+    sections.push('  /**');
     sections.push(`   * BUSINESS LOGIC: ${block.name}`);
-    sections.push(`   *`);
+    sections.push('   *');
 
     // WHY THIS EXISTS
     if (this.options.includeWhySection) {
-      sections.push(`   * WHY THIS EXISTS:`);
+      sections.push('   * WHY THIS EXISTS:');
       sections.push(`   * - ${this.generateWhySection(block)}`);
-      sections.push(`   *`);
+      sections.push('   *');
     }
 
     // WHAT IT DOES
     if (this.options.includeWhatSection) {
-      sections.push(`   * WHAT IT DOES:`);
+      sections.push('   * WHAT IT DOES:');
       const steps = this.generateWhatSection(block);
       steps.forEach((step, i) => {
         sections.push(`   * ${i + 1}. ${step}`);
       });
-      sections.push(`   *`);
+      sections.push('   *');
     }
 
     // WHAT IT CALLS
     if (this.options.includeCallsSection && block.calls.length > 0) {
-      sections.push(`   * WHAT IT CALLS:`);
+      sections.push('   * WHAT IT CALLS:');
       block.calls.forEach(call => {
         sections.push(`   * - ${call}() - Function call`);
       });
-      sections.push(`   *`);
+      sections.push('   *');
     }
 
     // WHY IT CALLS THEM
     if (this.options.includeCallsSection && block.calls.length > 0) {
-      sections.push(`   * WHY IT CALLS THEM:`);
+      sections.push('   * WHY IT CALLS THEM:');
       block.calls.forEach(call => {
         sections.push(`   * - ${call}: ${this.inferCallPurpose(call, block)}`);
       });
-      sections.push(`   *`);
+      sections.push('   *');
     }
 
     // DATA FLOW
     if (this.options.includeDataFlowSection) {
-      sections.push(`   * DATA FLOW:`);
+      sections.push('   * DATA FLOW:');
       sections.push(`   * Input: ${this.inferInputs(block)}`);
       sections.push(`   * Processing: ${this.inferProcessing(block)}`);
       sections.push(`   * Output: ${this.inferOutput(block)}`);
-      sections.push(`   *`);
+      sections.push('   *');
     }
 
     // DEPENDENCIES
     if (this.options.includeDependenciesSection && block.dependencies.length > 0) {
-      sections.push(`   * DEPENDENCIES:`);
+      sections.push('   * DEPENDENCIES:');
       block.dependencies.forEach(dep => {
         sections.push(`   * - ${dep}: Triggers when ${dep} changes`);
       });
-      sections.push(`   *`);
+      sections.push('   *');
     }
 
     // SPECIAL BEHAVIOR
     if (this.options.includeSpecialBehaviorSection) {
       const specialBehavior = this.inferSpecialBehavior(block);
       if (specialBehavior) {
-        sections.push(`   * SPECIAL BEHAVIOR:`);
+        sections.push('   * SPECIAL BEHAVIOR:');
         sections.push(`   * - ${specialBehavior}`);
-        sections.push(`   *`);
+        sections.push('   *');
       }
     }
 
     // MIGRATION NOTE (v2 only)
     if (isV2 && this.options.addMigrationNotes) {
-      sections.push(`   * MIGRATION NOTE:`);
-      sections.push(`   * - This logic is PRESERVED from v1 - no changes during migration`);
-      sections.push(`   *`);
+      sections.push('   * MIGRATION NOTE:');
+      sections.push('   * - This logic is PRESERVED from v1 - no changes during migration');
+      sections.push('   *');
     }
 
-    sections.push(`   */`);
+    sections.push('   */');
 
     return sections.join('\n');
   }
@@ -685,7 +686,7 @@ interface AnalyzedBlock {
  */
 export function createPseudoCodeGenerator(
   options?: Partial<PseudoCodeGeneratorOptions>,
-  logger?: Logger
+  logger?: Logger,
 ): PseudoCodeGenerator {
   return new PseudoCodeGenerator(options, logger);
 }

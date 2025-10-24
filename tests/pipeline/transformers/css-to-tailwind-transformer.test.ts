@@ -4,13 +4,13 @@
  * Tests CSS parsing, property mappings, className replacements, and error handling
  */
 
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import {
-  CSSToTailwindTransformer,
   type CSSToTailwindOptions,
   type CSSToTailwindResult,
+  CSSToTailwindTransformer,
 } from '../../../src/pipeline/transformers/css-to-tailwind-transformer';
 
 // Mock fs module

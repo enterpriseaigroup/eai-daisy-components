@@ -5,7 +5,7 @@
  */
 
 import { performance } from 'perf_hooks';
-import { PipelineOrchestrator, type PipelineResult, type PipelineProgress } from '@/pipeline/orchestrator';
+import { PipelineOrchestrator, type PipelineProgress, type PipelineResult } from '@/pipeline/orchestrator';
 import type { ExtractionConfig } from '@/types';
 
 export interface PerformanceProfile {
@@ -27,7 +27,7 @@ export interface PhaseMetrics {
 
 export class IntegratedPerformanceProfiler {
   private readonly targetComponentsPerHour: number;
-  private phaseTimings: Map<string, number> = new Map();
+  private readonly phaseTimings: Map<string, number> = new Map();
 
   constructor(targetComponentsPerHour: number = 10) {
     this.targetComponentsPerHour = targetComponentsPerHour;
@@ -38,7 +38,7 @@ export class IntegratedPerformanceProfiler {
    */
   public async profileMigration(
     sourcePath: string,
-    config?: Partial<ExtractionConfig>
+    config?: Partial<ExtractionConfig>,
   ): Promise<PerformanceProfile> {
     console.log(`Profiling migration for: ${sourcePath}`);
 
@@ -120,7 +120,7 @@ export class IntegratedPerformanceProfiler {
    * Profile batch migration
    */
   public async profileBatchMigration(
-    sourcePaths: string[]
+    sourcePaths: string[],
   ): Promise<{
     totalTime: number;
     averageTime: number;
@@ -174,7 +174,7 @@ export class IntegratedPerformanceProfiler {
 
     for (const phase of profile.phases) {
       lines.push(
-        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`
+        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`,
       );
     }
 
@@ -196,7 +196,7 @@ export class IntegratedPerformanceProfiler {
  * Factory function
  */
 export function createIntegratedPerformanceProfiler(
-  targetComponentsPerHour?: number
+  targetComponentsPerHour?: number,
 ): IntegratedPerformanceProfiler {
   return new IntegratedPerformanceProfiler(targetComponentsPerHour);
 }

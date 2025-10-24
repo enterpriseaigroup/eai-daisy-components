@@ -71,7 +71,7 @@ export interface CSSConversion {
  * to equivalent Tailwind classes, and updates component code.
  */
 export class CSSToTailwindTransformer {
-  private logger: Logger;
+  private readonly logger: Logger;
 
   constructor(_options: Partial<CSSToTailwindOptions> = {}, logger?: Logger) {
     this.logger = logger || createSimpleLogger('CSSToTailwindTransformer');
@@ -83,7 +83,7 @@ export class CSSToTailwindTransformer {
    */
   public async transform(
     componentCode: string,
-    componentPath: string
+    componentPath: string,
   ): Promise<CSSToTailwindResult> {
     this.logger.info(`Transforming CSS to Tailwind for: ${componentPath}`);
 
@@ -144,7 +144,15 @@ export class CSSToTailwindTransformer {
    */
   private findCSSImports(code: string): CSSImport[] {
     const imports: CSSImport[] = [];
-    const patterns = [
+    
+    // Remove all comments to avoid matching commented imports
+    let activeCode = code;
+    
+    // Remove single-line comments
+    activeCode = activeCode.replace(/\/\/.*$/gm, '');
+    
+    // Remove multi-line comments
+    activeCode = activeCode.replace(/\/\*[\s\S]*?\*\//g, '');    const patterns = [
       // Direct CSS imports: import './Button.css'
       /import\s+['"]([^'"]+\.css)['"]/g,
       // CSS Module imports: import styles from './Button.module.css'
@@ -155,7 +163,7 @@ export class CSSToTailwindTransformer {
 
     for (const pattern of patterns) {
       let match;
-      while ((match = pattern.exec(code)) !== null) {
+      while ((match = pattern.exec(activeCode)) !== null) {
         if (match[1]?.endsWith('.css') || match[1]?.endsWith('.module.css')) {
           // Direct import
           imports.push({
@@ -191,7 +199,7 @@ export class CSSToTailwindTransformer {
    */
   private async analyzeCSSFiles(
     imports: CSSImport[],
-    componentPath: string
+    componentPath: string,
   ): Promise<CSSFileAnalysis[]> {
     const analyses: CSSFileAnalysis[] = [];
 
@@ -216,7 +224,7 @@ export class CSSToTailwindTransformer {
   private analyzeCSSContent(
     cssContent: string,
     filePath: string,
-    importType: 'direct' | 'module' | 'named'
+    importType: 'direct' | 'module' | 'named',
   ): CSSFileAnalysis {
     const conversions: CSSConversion[] = [];
 
@@ -344,6 +352,13 @@ export class CSSToTailwindTransformer {
    * Convert spacing values to Tailwind
    */
   private convertSpacing(prefix: string, value: string): string {
+    // Convert px to rem for standardization
+    let normalized = value;
+    if (value.endsWith('px')) {
+      const px = parseInt(value);
+      normalized = `${px / 16}rem`; // 16px = 1rem
+    }
+
     const spacingMap: Record<string, string> = {
       '0': '0',
       '0.125rem': '0.5',
@@ -356,9 +371,21 @@ export class CSSToTailwindTransformer {
       '2rem': '8',
       '2.5rem': '10',
       '3rem': '12',
+      // Px mappings
+      '4px': '1',
+      '8px': '2',
+      '12px': '3',
+      '16px': '4',
+      '20px': '5',
+      '24px': '6',
+      '32px': '8',
+      '40px': '10',
+      '48px': '12',
     };
 
-    return spacingMap[value] ? `${prefix}-${spacingMap[value]}` : `${prefix}-[${value}]`;
+    return spacingMap[value] || spacingMap[normalized]
+      ? `${prefix}-${spacingMap[value] || spacingMap[normalized]}`
+      : `${prefix}-[${value}]`;
   }
 
   /**
@@ -409,6 +436,13 @@ export class CSSToTailwindTransformer {
       '1.125rem': 'text-lg',
       '1.25rem': 'text-xl',
       '1.5rem': 'text-2xl',
+      // Px mappings
+      '12px': 'text-xs',
+      '14px': 'text-sm',
+      '16px': 'text-base',
+      '18px': 'text-lg',
+      '20px': 'text-xl',
+      '24px': 'text-2xl',
     };
 
     return sizeMap[value] || `text-[${value}]`;
@@ -420,6 +454,7 @@ export class CSSToTailwindTransformer {
   private convertFontWeight(value: string): string {
     const weightMap: Record<string, string> = {
       '100': 'font-thin',
+      'bold': 'font-bold',
       '200': 'font-extralight',
       '300': 'font-light',
       '400': 'font-normal',
@@ -475,15 +510,53 @@ export class CSSToTailwindTransformer {
       // Replace className="class-name" with Tailwind classes
       const patterns = [
         // className="class-name"
-        new RegExp(`className=["']${className}["']`, 'g'),
+        {
+          pattern: new RegExp(`className=["']${this.escapeRegex(className)}["']`, 'g'),
+          replacement: `className="${tailwindClasses}"`,
+        },
+        // className="class-name other-class"
+        {
+          pattern: new RegExp(`className=["']([^"']*\\s)?${this.escapeRegex(className)}(\\s[^"']*)?["']`, 'g'),
+          replacement: (_match: string, before: string = '', after: string = '') => {
+            const before_trimmed = before.trim();
+            const after_trimmed = after.trim();
+            const parts = [before_trimmed, tailwindClasses, after_trimmed].filter(Boolean);
+            return `className="${parts.join(' ')}"`;
+          },
+        },
         // className={styles['class-name']}
-        new RegExp(`className=\\{styles\\['${className}'\\]\\}`, 'g'),
+        {
+          pattern: new RegExp(`className=\\{styles\\['${this.escapeRegex(className)}'\\]\\}`, 'g'),
+          replacement: `className="${tailwindClasses}"`,
+        },
         // className={styles.className}
-        new RegExp(`className=\\{styles\\.${className.replace(/-/g, '_')}\\}`, 'g'),
+        {
+          pattern: new RegExp(`className=\\{styles\\.${this.escapeRegex(className.replace(/-/g, '_'))}\\}`, 'g'),
+          replacement: `className="${tailwindClasses}"`,
+        },
+        // className={`${styles.className}`}
+        {
+          pattern: new RegExp(`className=\\{\`\\$\\{styles\\.${this.escapeRegex(className.replace(/-/g, '_'))}\\}\`\\}`, 'g'),
+          replacement: `className="${tailwindClasses}"`,
+        },
+        // className={`some-class ${styles.className}`}
+        {
+          pattern: new RegExp('className=\\{`([^`]*\\s)?\\$\\{styles\\.' + this.escapeRegex(className.replace(/-/g, '_')) + '\\}(\\s[^`]*)?`\\}', 'g'),
+          replacement: (_match: string, before: string = '', after: string = '') => {
+            const before_trimmed = before.trim();
+            const after_trimmed = after.trim();
+            const parts = [before_trimmed, tailwindClasses, after_trimmed].filter(Boolean);
+            return `className="${parts.join(' ')}"`;
+          },
+        },
       ];
 
-      for (const pattern of patterns) {
-        result = result.replace(pattern, `className="${tailwindClasses}"`);
+      for (const { pattern, replacement } of patterns) {
+        if (typeof replacement === 'function') {
+          result = result.replace(pattern, replacement as (...args: string[]) => string);
+        } else {
+          result = result.replace(pattern, replacement);
+        }
       }
     }
 

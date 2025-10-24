@@ -5,10 +5,10 @@
  * not just counts of properties.
  */
 
-import React from 'react';
-import { render, fireEvent, waitFor, RenderResult } from '@testing-library/react';
+import type React from 'react';
+import { RenderResult, fireEvent, render, waitFor } from '@testing-library/react';
 import { JSDOM } from 'jsdom';
-import * as ts from 'typescript';
+import type * as ts from 'typescript';
 import * as babel from '@babel/core';
 import type { ComponentDefinition } from '@/types';
 
@@ -51,7 +51,7 @@ export interface ComponentTestCase {
 }
 
 export class EnhancedEquivalencyTester {
-  private compiledComponents: Map<string, React.ComponentType<any>> = new Map();
+  private readonly compiledComponents: Map<string, React.ComponentType<any>> = new Map();
 
   /**
    * Main entry point for testing equivalency
@@ -59,7 +59,7 @@ export class EnhancedEquivalencyTester {
   public async testEquivalency(
     v1ComponentPath: string,
     v2ComponentPath: string,
-    testCases: ComponentTestCase[]
+    testCases: ComponentTestCase[],
   ): Promise<EnhancedEquivalencyResult> {
     const differences: DetailedDifference[] = [];
 
@@ -72,14 +72,14 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences
+      differences,
     );
 
     // Step 3: Test props compatibility
     const propsMatch = await this.testPropsCompatibility(
       v1Component,
       v2Component,
-      differences
+      differences,
     );
 
     // Step 4: Test behavior equivalency
@@ -87,7 +87,7 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences
+      differences,
     );
 
     // Step 5: Test state management
@@ -95,7 +95,7 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences
+      differences,
     );
 
     // Step 6: Test performance
@@ -103,14 +103,14 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences
+      differences,
     );
 
     // Step 7: Test business logic preservation
     const businessLogicMatch = await this.testBusinessLogicPreservation(
       v1ComponentPath,
       v2ComponentPath,
-      differences
+      differences,
     );
 
     // Calculate overall score
@@ -150,7 +150,7 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     let allMatch = true;
 
@@ -208,7 +208,7 @@ export class EnhancedEquivalencyTester {
   private async testPropsCompatibility(
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     // Extract prop types from components
     const v1Props = this.extractPropTypes(v1Component);
@@ -270,12 +270,14 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     let allMatch = true;
 
     for (const testCase of testCases) {
-      if (!testCase.interactions) continue;
+      if (!testCase.interactions) {
+continue;
+}
 
       // Track callback invocations
       const v1Callbacks = this.trackCallbacks(testCase.props);
@@ -358,7 +360,7 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     // Test useState hooks
     // Test useEffect hooks
@@ -374,7 +376,7 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     let allMatch = true;
 
@@ -414,7 +416,7 @@ export class EnhancedEquivalencyTester {
   private async testBusinessLogicPreservation(
     v1Path: string,
     v2Path: string,
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     // Parse both components using TypeScript compiler API
     const v1AST = await this.parseComponent(v1Path);
@@ -492,12 +494,16 @@ export class EnhancedEquivalencyTester {
       const attrs: Record<string, string> = {};
       ['aria-label', 'aria-busy', 'role', 'aria-describedby'].forEach(attr => {
         const value = el.getAttribute(attr);
-        if (value) attrs[attr] = value;
+        if (value) {
+attrs[attr] = value;
+}
       });
 
       if (Object.keys(attrs).length > 0) {
         const key = el.tagName.toLowerCase();
-        if (!attributes[key]) attributes[key] = [];
+        if (!attributes[key]) {
+attributes[key] = [];
+}
         attributes[key].push(JSON.stringify(attrs));
       }
     });
@@ -623,7 +629,9 @@ export class EnhancedEquivalencyTester {
       const grouped = this.groupDifferencesBySeverity(differences);
 
       for (const [severity, diffs] of Object.entries(grouped)) {
-        if (diffs.length === 0) continue;
+        if (diffs.length === 0) {
+continue;
+}
 
         report.push(`### ${severity.toUpperCase()} (${diffs.length})`);
         report.push('');

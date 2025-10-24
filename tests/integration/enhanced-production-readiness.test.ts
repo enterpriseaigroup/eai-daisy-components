@@ -5,7 +5,7 @@
  * to accurately validate migration quality metrics
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 
@@ -39,7 +39,7 @@ describe('Enhanced Production Readiness Validation', () => {
     // Cleanup temporary files
     await fs.rm(path.join(process.cwd(), 'dist-bundle-test'), {
       recursive: true,
-      force: true
+      force: true,
     }).catch(() => {});
   });
 
@@ -47,7 +47,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should validate component compilation', async () => {
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       expect(result.success).toBe(true);
@@ -58,7 +58,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should validate TypeScript types are preserved', async () => {
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       expect(result.checks.typesValid).toBe(true);
@@ -68,7 +68,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should validate runtime behavior', async () => {
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       expect(result.checks.runtimeValid).toBe(true);
@@ -87,7 +87,7 @@ describe('Enhanced Production Readiness Validation', () => {
       for (const component of components) {
         const result = await migrationValidator.validateMigration(
           component.v2,
-          component.v1
+          component.v1,
         );
 
         if (result.success) {
@@ -118,7 +118,7 @@ describe('Enhanced Production Readiness Validation', () => {
       const result = await equivalencyTester.testEquivalency(
         v1ButtonPath,
         v2ButtonPath,
-        testCases
+        testCases,
       );
 
       expect(result.score).toBeGreaterThanOrEqual(95);
@@ -147,7 +147,7 @@ describe('Enhanced Production Readiness Validation', () => {
       const result = await equivalencyTester.testEquivalency(
         v1ButtonPath,
         v2ButtonPath,
-        testCases
+        testCases,
       );
 
       expect(result.details.behaviorMatch).toBe(true);
@@ -157,7 +157,7 @@ describe('Enhanced Production Readiness Validation', () => {
       const result = await equivalencyTester.testEquivalency(
         v1ButtonPath,
         v2ButtonPath,
-        []
+        [],
       );
 
       expect(result.details.stateMatch).toBe(true);
@@ -167,7 +167,7 @@ describe('Enhanced Production Readiness Validation', () => {
       const result = await equivalencyTester.testEquivalency(
         v1ButtonPath,
         v2ButtonPath,
-        []
+        [],
       );
 
       if (result.differences.length > 0) {
@@ -186,7 +186,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should measure actual minified + gzipped bundle size', async () => {
       const comparison = await bundleAnalyzer.compareBundles(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       console.log(`v1 Bundle Size: ${comparison.v1.gzippedSize} bytes`);
@@ -200,7 +200,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should validate bundle size constraint', async () => {
       const comparison = await bundleAnalyzer.compareBundles(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       expect(comparison.meetsTarget).toBe(true);
@@ -224,7 +224,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should provide optimization recommendations when needed', async () => {
       const comparison = await bundleAnalyzer.compareBundles(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       if (!comparison.meetsTarget) {
@@ -252,7 +252,7 @@ describe('Enhanced Production Readiness Validation', () => {
       // Simulate actual migration process
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       const migrationTime = Date.now() - startTime;
@@ -270,7 +270,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should identify performance bottlenecks', async () => {
       const profile = await performanceProfiler.profileMigration(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       expect(profile.bottlenecks).toBeDefined();
@@ -294,8 +294,8 @@ describe('Enhanced Production Readiness Validation', () => {
       // Process components in parallel
       await Promise.all(
         components.map(c =>
-          migrationValidator.validateMigration(c.v2, c.v1)
-        )
+          migrationValidator.validateMigration(c.v2, c.v1),
+        ),
       );
 
       const totalTime = Date.now() - startTime;
@@ -312,7 +312,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should validate all business logic functions are preserved', async () => {
       const analysis = await businessLogicAnalyzer.analyze(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       expect(analysis.functionsPreserved).toBe(true);
@@ -329,7 +329,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should validate event handlers are preserved', async () => {
       const analysis = await businessLogicAnalyzer.analyze(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       expect(analysis.eventHandlersPreserved).toBe(true);
@@ -338,7 +338,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should validate validation logic is preserved', async () => {
       const analysis = await businessLogicAnalyzer.analyze(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       expect(analysis.validationLogicPreserved).toBe(true);
@@ -347,7 +347,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should validate state management patterns are preserved', async () => {
       const analysis = await businessLogicAnalyzer.analyze(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       expect(analysis.stateManagementPreserved).toBe(true);
@@ -356,7 +356,7 @@ describe('Enhanced Production Readiness Validation', () => {
     it('should use AST analysis for semantic comparison', async () => {
       const analysis = await businessLogicAnalyzer.analyzeWithAST(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       expect(analysis.semanticEquivalence).toBe(true);
@@ -369,26 +369,26 @@ describe('Enhanced Production Readiness Validation', () => {
       // Validate migration
       const migrationResult = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       // Test equivalency
       const equivalencyResult = await equivalencyTester.testEquivalency(
         v1ButtonPath,
         v2ButtonPath,
-        []
+        [],
       );
 
       // Analyze bundle size
       const bundleComparison = await bundleAnalyzer.compareBundles(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       // Analyze business logic
       const businessLogicAnalysis = await businessLogicAnalyzer.analyze(
         v1ButtonPath,
-        v2ButtonPath
+        v2ButtonPath,
       );
 
       // All critical metrics must pass
@@ -422,12 +422,12 @@ describe('Enhanced Production Readiness Validation', () => {
         const result = await equivalencyTester.testEquivalency(
           v1ButtonPath,
           v2ButtonPath,
-          []
+          [],
         );
 
         await fs.writeFile(
           goldenMasterPath,
-          JSON.stringify(result, null, 2)
+          JSON.stringify(result, null, 2),
         );
       }
 
@@ -436,7 +436,7 @@ describe('Enhanced Production Readiness Validation', () => {
       const currentResult = await equivalencyTester.testEquivalency(
         v1ButtonPath,
         v2ButtonPath,
-        []
+        [],
       );
 
       expect(currentResult.score).toBeGreaterThanOrEqual(goldenMaster.score);

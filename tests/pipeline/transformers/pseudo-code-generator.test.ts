@@ -4,7 +4,7 @@
  * Tests AST parsing, business logic detection, documentation generation, and edge cases
  */
 
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import {
   PseudoCodeGenerator,
   type PseudoCodeOptions,

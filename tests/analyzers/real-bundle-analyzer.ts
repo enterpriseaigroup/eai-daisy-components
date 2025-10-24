@@ -108,7 +108,7 @@ export class RealBundleAnalyzer {
    */
   public async compareBundles(
     v1Path: string,
-    v2Path: string
+    v2Path: string,
   ): Promise<BundleComparison> {
     const v1Analysis = await this.analyzeBundle(v1Path);
     const v2Analysis = await this.analyzeBundle(v2Path);
@@ -257,7 +257,7 @@ export class RealBundleAnalyzer {
           return;
         }
 
-        resolve(stats!);
+        resolve(stats);
       });
     });
   }
@@ -365,7 +365,7 @@ export class RealBundleAnalyzer {
    */
   private async buildBundleWithOptions(
     componentPath: string,
-    optimizationOptions: any
+    optimizationOptions: any,
   ): Promise<webpack.Stats> {
     const outputPath = path.join(process.cwd(), 'dist-bundle-test-temp');
 
@@ -399,8 +399,11 @@ export class RealBundleAnalyzer {
 
     return new Promise((resolve, reject) => {
       webpack(config, (err, stats) => {
-        if (err) reject(err);
-        else resolve(stats!);
+        if (err) {
+reject(err);
+} else {
+resolve(stats);
+}
 
         // Clean up temp directory
         fs.rm(outputPath, { recursive: true }).catch(() => {});
@@ -447,7 +450,7 @@ export class RealBundleAnalyzer {
    */
   private async generateOptimizationRecommendations(
     analysis: BundleAnalysisResult,
-    excessSize: number
+    excessSize: number,
   ): Promise<OptimizationRecommendation[]> {
     const recommendations: OptimizationRecommendation[] = [];
 
@@ -558,8 +561,12 @@ export class RealBundleAnalyzer {
    * Format size for display
    */
   private formatSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024) {
+return `${bytes} B`;
+}
+    if (bytes < 1024 * 1024) {
+return `${(bytes / 1024).toFixed(1)} KB`;
+}
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   }
 
@@ -576,7 +583,7 @@ export class RealBundleAnalyzer {
  * Factory function to create analyzer instance
  */
 export function createRealBundleAnalyzer(
-  maxSizeIncreasePercent?: number
+  maxSizeIncreasePercent?: number,
 ): RealBundleAnalyzer {
   return new RealBundleAnalyzer(maxSizeIncreasePercent);
 }

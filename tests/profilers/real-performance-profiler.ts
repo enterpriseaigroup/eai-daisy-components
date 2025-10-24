@@ -4,7 +4,7 @@
  * Actually measures component migration performance
  */
 
-import { performance, PerformanceObserver } from 'perf_hooks';
+import { PerformanceObserver, performance } from 'perf_hooks';
 import * as v8 from 'v8';
 import * as os from 'os';
 
@@ -54,10 +54,10 @@ export interface CPUMetrics {
 
 export class RealPerformanceProfiler {
   private readonly targetComponentsPerHour: number;
-  private marks: Map<string, number> = new Map();
-  private measures: Map<string, PhaseMetrics[]> = new Map();
-  private memorySnapshots: Map<string, any> = new Map();
-  private gcStats: { count: number; time: number } = { count: 0, time: 0 };
+  private readonly marks: Map<string, number> = new Map();
+  private readonly measures: Map<string, PhaseMetrics[]> = new Map();
+  private readonly memorySnapshots: Map<string, any> = new Map();
+  private readonly gcStats: { count: number; time: number } = { count: 0, time: 0 };
 
   constructor(targetComponentsPerHour: number = 10) {
     this.targetComponentsPerHour = targetComponentsPerHour;
@@ -91,7 +91,7 @@ export class RealPerformanceProfiler {
    */
   public async profileMigration(
     v1Path: string,
-    v2Path: string
+    v2Path: string,
   ): Promise<PerformanceProfile> {
     const componentName = this.extractComponentName(v1Path);
     const sessionId = `migration-${componentName}-${Date.now()}`;
@@ -232,7 +232,7 @@ export class RealPerformanceProfiler {
       heapUsedEnd: endSnapshot.memoryUsage.heapUsed,
       heapUsedPeak: Math.max(
         startSnapshot.heapStatistics.used_heap_size,
-        endSnapshot.heapStatistics.used_heap_size
+        endSnapshot.heapStatistics.used_heap_size,
       ),
       external: endSnapshot.memoryUsage.external,
       gcTime: this.gcStats.time,
@@ -246,7 +246,7 @@ export class RealPerformanceProfiler {
   private calculateCPUMetrics(
     startCPU: NodeJS.CpuUsage,
     endCPU: NodeJS.CpuUsage,
-    duration: number
+    duration: number,
   ): CPUMetrics {
     const userTime = endCPU.user / 1000; // Convert to ms
     const systemTime = endCPU.system / 1000;
@@ -373,7 +373,7 @@ export class RealPerformanceProfiler {
 
     for (const phase of profile.phases) {
       lines.push(
-        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`
+        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`,
       );
     }
 
@@ -392,14 +392,14 @@ export class RealPerformanceProfiler {
     }
 
     lines.push('## Resource Usage', '');
-    lines.push(`**Memory:**`);
+    lines.push('**Memory:**');
     lines.push(`- Heap Start: ${(profile.memoryUsage.heapUsedStart / 1024 / 1024).toFixed(2)} MB`);
     lines.push(`- Heap End: ${(profile.memoryUsage.heapUsedEnd / 1024 / 1024).toFixed(2)} MB`);
     lines.push(`- Heap Peak: ${(profile.memoryUsage.heapUsedPeak / 1024 / 1024).toFixed(2)} MB`);
     lines.push(`- GC Count: ${profile.memoryUsage.gcCount}`);
     lines.push(`- GC Time: ${profile.memoryUsage.gcTime.toFixed(2)}ms`);
     lines.push('');
-    lines.push(`**CPU:**`);
+    lines.push('**CPU:**');
     lines.push(`- User Time: ${profile.cpuUsage.userTime.toFixed(2)}ms`);
     lines.push(`- System Time: ${profile.cpuUsage.systemTime.toFixed(2)}ms`);
     lines.push(`- Utilization: ${profile.cpuUsage.utilizationPercentage.toFixed(1)}%`);
@@ -411,7 +411,7 @@ export class RealPerformanceProfiler {
    * Profile batch migration
    */
   public async profileBatchMigration(
-    components: Array<{ v1: string; v2: string }>
+    components: Array<{ v1: string; v2: string }>,
   ): Promise<{
     totalTime: number;
     averageTime: number;
@@ -447,7 +447,7 @@ export class RealPerformanceProfiler {
    */
   public async profileParallelMigration(
     components: Array<{ v1: string; v2: string }>,
-    maxConcurrency: number = os.cpus().length
+    maxConcurrency: number = os.cpus().length,
   ): Promise<{
     totalTime: number;
     averageTime: number;
@@ -461,7 +461,7 @@ export class RealPerformanceProfiler {
     const results = await this.processInBatches(
       components,
       async (component) => this.profileMigration(component.v1, component.v2),
-      maxConcurrency
+      maxConcurrency,
     );
 
     const totalTime = performance.now() - startTime;
@@ -486,7 +486,7 @@ export class RealPerformanceProfiler {
   private async processInBatches<T, R>(
     items: T[],
     processor: (item: T) => Promise<R>,
-    maxConcurrency: number
+    maxConcurrency: number,
   ): Promise<R[]> {
     const results: R[] = [];
     const executing: Promise<void>[] = [];

@@ -17,7 +17,7 @@ export function trackClick(event: ClickEvent): void {
   // Store in session for testing
   if (typeof window !== 'undefined') {
     const events = JSON.parse(
-      window.sessionStorage.getItem('analytics_events') || '[]'
+      window.sessionStorage.getItem('analytics_events') || '[]',
     );
     events.push(event);
     window.sessionStorage.setItem('analytics_events', JSON.stringify(events));
