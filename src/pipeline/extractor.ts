@@ -88,7 +88,7 @@ export class ComponentExtractor {
    */
   public async extractComponent(
     filePath: string,
-    options: ExtractorOptions = {},
+    options: ExtractorOptions = {}
   ): Promise<ExtractionResult> {
     const startTime = Date.now();
     const warnings: string[] = [];
@@ -138,7 +138,7 @@ export class ComponentExtractor {
       const complexity = this.calculateComplexity(
         content,
         businessLogic,
-        reactPatterns,
+        reactPatterns
       );
 
       // Extract metadata
@@ -183,7 +183,7 @@ export class ComponentExtractor {
 
       this.logger.error(
         `Failed to extract component from ${filePath}`,
-        error as Error,
+        error as Error
       );
 
       // Return minimal component definition for failed extraction
@@ -223,7 +223,7 @@ export class ComponentExtractor {
    */
   public async extractFromDirectory(
     directoryPath: string,
-    options: ExtractorOptions = {},
+    options: ExtractorOptions = {}
   ): Promise<ExtractionResult[]> {
     this.logger.info(`Extracting components from directory ${directoryPath}`);
 
@@ -241,7 +241,7 @@ export class ComponentExtractor {
 
     const successCount = results.filter(r => r.success).length;
     this.logger.info(
-      `Extracted ${successCount}/${componentFiles.length} components successfully`,
+      `Extracted ${successCount}/${componentFiles.length} components successfully`
     );
 
     return results;
@@ -280,7 +280,7 @@ export class ComponentExtractor {
   private extractComponentName(content: string, fileName: string): string {
     // Try export default
     const defaultExportMatch = content.match(
-      /export\s+default\s+(?:function\s+)?([A-Z][a-zA-Z0-9]*)/,
+      /export\s+default\s+(?:function\s+)?([A-Z][a-zA-Z0-9]*)/
     );
     if (defaultExportMatch?.[1]) {
       return defaultExportMatch[1];
@@ -288,7 +288,7 @@ export class ComponentExtractor {
 
     // Try named export
     const namedExportMatch = content.match(
-      /export\s+(?:const|function|class)\s+([A-Z][a-zA-Z0-9]*)/,
+      /export\s+(?:const|function|class)\s+([A-Z][a-zA-Z0-9]*)/
     );
     if (namedExportMatch?.[1]) {
       return namedExportMatch[1];
@@ -296,7 +296,7 @@ export class ComponentExtractor {
 
     // Try function/class declaration
     const declarationMatch = content.match(
-      /(?:function|class)\s+([A-Z][a-zA-Z0-9]*)/,
+      /(?:function|class)\s+([A-Z][a-zA-Z0-9]*)/
     );
     if (declarationMatch?.[1]) {
       return declarationMatch[1];
@@ -354,7 +354,7 @@ export class ComponentExtractor {
         .split('\n')
         .map(line => line.trim())
         .filter(
-          line => line && !line.startsWith('//') && !line.startsWith('/*'),
+          line => line && !line.startsWith('//') && !line.startsWith('/*')
         );
 
       for (const line of propLines) {
@@ -388,7 +388,7 @@ export class ComponentExtractor {
    */
   private extractPropDescription(
     content: string,
-    propName: string,
+    propName: string
   ): string | undefined {
     const regex = new RegExp(`\\*\\s*@param\\s+${propName}\\s+-?\\s*(.+)`, 'i');
     const match = content.match(regex);
@@ -432,7 +432,7 @@ export class ComponentExtractor {
         complexity,
         externalDependencies: this.extractExternalDependencies(
           content,
-          functionName,
+          functionName
         ),
       });
     }
@@ -461,11 +461,11 @@ export class ComponentExtractor {
    */
   private extractFunctionSignature(
     content: string,
-    functionName: string,
+    functionName: string
   ): string {
     const regex = new RegExp(
       `(?:const|function)\\s+${functionName}\\s*=?\\s*(?:async\\s*)?\\([^)]*\\)(?:\\s*:\\s*[^{]+)?`,
-      'g',
+      'g'
     );
     const match = regex.exec(content);
     return match?.[0] || `function ${functionName}()`;
@@ -521,11 +521,11 @@ export class ComponentExtractor {
    */
   private extractFunctionPurpose(
     content: string,
-    functionName: string,
+    functionName: string
   ): string {
     const regex = new RegExp(
       `\\/\\*\\*([^*]*(?:\\*(?!\\/)[^*]*)*)\\*\\/\\s*(?:const|function)\\s+${functionName}`,
-      's',
+      's'
     );
     const match = content.match(regex);
 
@@ -546,11 +546,11 @@ export class ComponentExtractor {
    */
   private estimateFunctionComplexity(
     content: string,
-    functionName: string,
+    functionName: string
   ): ComplexityLevel {
     const functionRegex = new RegExp(
       `(?:const|function)\\s+${functionName}[\\s\\S]*?(?=\\n(?:const|function|export|$))`,
-      'g',
+      'g'
     );
     const functionMatch = content.match(functionRegex);
 
@@ -581,7 +581,7 @@ export class ComponentExtractor {
    */
   private extractExternalDependencies(
     content: string,
-    _functionName: string,
+    _functionName: string
   ): string[] {
     const dependencies: string[] = [];
 
@@ -667,7 +667,7 @@ export class ComponentExtractor {
    * Classify dependency type
    */
   private classifyDependency(
-    importPath: string,
+    importPath: string
   ): 'component' | 'utility' | 'service' | 'external' {
     if (importPath.startsWith('.') || importPath.startsWith('/')) {
       if (importPath.includes('component')) {
@@ -695,11 +695,11 @@ export class ComponentExtractor {
   private calculateComplexity(
     content: string,
     businessLogic: BusinessLogicDefinition[],
-    reactPatterns: ReactPattern[],
+    reactPatterns: ReactPattern[]
   ): ComplexityLevel {
     const lines = content.split('\n').length;
     const logicComplexity = businessLogic.filter(
-      bl => bl.complexity === 'complex' || bl.complexity === 'critical',
+      bl => bl.complexity === 'complex' || bl.complexity === 'critical'
     ).length;
     const patternCount = reactPatterns.length;
 
@@ -721,7 +721,7 @@ export class ComponentExtractor {
   private extractMetadata(
     content: string,
     fileInfo: { size: number; modifiedAt: Date; createdAt: Date },
-    extractDocs: boolean,
+    extractDocs: boolean
   ): ComponentMetadata {
     const author = this.extractAuthor(content);
     const documentation = extractDocs
@@ -782,7 +782,7 @@ export function createExtractor(): ComponentExtractor {
  */
 export async function extractComponent(
   filePath: string,
-  options?: ExtractorOptions,
+  options?: ExtractorOptions
 ): Promise<ExtractionResult> {
   const extractor = createExtractor();
   return extractor.extractComponent(filePath, options);
@@ -793,7 +793,7 @@ export async function extractComponent(
  */
 export async function extractFromDirectory(
   directoryPath: string,
-  options?: ExtractorOptions,
+  options?: ExtractorOptions
 ): Promise<ExtractionResult[]> {
   const extractor = createExtractor();
   return extractor.extractFromDirectory(directoryPath, options);

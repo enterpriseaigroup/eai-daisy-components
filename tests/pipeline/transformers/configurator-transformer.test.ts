@@ -113,7 +113,7 @@ describe('ConfiguratorTransformer', () => {
 
       const result = await transformer.transform(
         complexComponent,
-        'complex code',
+        'complex code'
       );
       expect(result.strategy).toBe('manual-review-required');
     });
@@ -129,7 +129,7 @@ describe('ConfiguratorTransformer', () => {
         });
 
       await expect(
-        transformer.transform(mockComponent, 'code'),
+        transformer.transform(mockComponent, 'code')
       ).rejects.toThrow();
     });
   });
@@ -183,7 +183,7 @@ describe('ConfiguratorTransformer', () => {
     it('should transform props', async () => {
       const result = await transformer.transform(mockComponent, '');
       const propTransforms = result.transformations.filter(
-        t => t.type === 'prop',
+        t => t.type === 'prop'
       );
       expect(propTransforms.length).toBeGreaterThan(0);
     });
@@ -191,7 +191,7 @@ describe('ConfiguratorTransformer', () => {
     it('should transform hooks', async () => {
       const result = await transformer.transform(mockComponent, '');
       const hookTransforms = result.transformations.filter(
-        t => t.type === 'state',
+        t => t.type === 'state'
       );
       expect(hookTransforms.length).toBeGreaterThan(0);
     });
@@ -199,7 +199,7 @@ describe('ConfiguratorTransformer', () => {
     it('should transform event handlers', async () => {
       const result = await transformer.transform(mockComponent, '');
       const handlerTransforms = result.transformations.filter(
-        t => t.type === 'handler',
+        t => t.type === 'handler'
       );
       expect(handlerTransforms.length).toBeGreaterThan(0);
     });
@@ -207,7 +207,7 @@ describe('ConfiguratorTransformer', () => {
     it('should transform side effects', async () => {
       const result = await transformer.transform(mockComponent, '');
       const effectTransforms = result.transformations.filter(
-        t => t.type === 'effect',
+        t => t.type === 'effect'
       );
       expect(effectTransforms.length).toBeGreaterThan(0);
     });
@@ -215,7 +215,7 @@ describe('ConfiguratorTransformer', () => {
     it('should transform validations', async () => {
       const result = await transformer.transform(mockComponent, '');
       const validationTransforms = result.transformations.filter(
-        t => t.type === 'validation',
+        t => t.type === 'validation'
       );
       expect(validationTransforms.length).toBeGreaterThan(0);
     });

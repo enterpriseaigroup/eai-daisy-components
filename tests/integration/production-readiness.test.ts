@@ -40,7 +40,7 @@ describe('Production Readiness Validation', () => {
       const analysis = await bundleOptimizer.analyzeBundleSize(
         'TestComponent',
         '/test/v1',
-        '/test/v2',
+        '/test/v2'
       );
 
       expect(analysis).toHaveProperty('componentName');
@@ -75,7 +75,7 @@ describe('Production Readiness Validation', () => {
             priority: expect.any(String),
             description: expect.any(String),
           }),
-        ]),
+        ])
       );
     });
 
@@ -271,7 +271,7 @@ describe('Production Readiness Validation', () => {
       const analysis = await bundleOptimizer.analyzeBundleSize(
         'NonExistent',
         '/nonexistent/v1',
-        '/nonexistent/v2',
+        '/nonexistent/v2'
       );
 
       expect(analysis.v1Size).toBe(0);
@@ -342,12 +342,12 @@ describe('Production Readiness Validation', () => {
             issues: [],
           },
         ],
-        'Production Team',
+        'Production Team'
       );
 
       const document = await certifier.generateCertificationDocument(
         result,
-        '/tmp/test-prod-cert.md',
+        '/tmp/test-prod-cert.md'
       );
 
       expect(document).toContain('Component Migration Certification');

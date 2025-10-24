@@ -222,13 +222,13 @@ const extractCommand: CLICommand = {
         'Source and output directories must be specified',
         'configuration',
         'high',
-        { operation: 'extract-validation' },
+        { operation: 'extract-validation' }
       );
     }
 
     if (!options.dryRun && !options.force) {
       const confirmed = await confirmAction(
-        `This will process components from ${sourceDir} and write to ${outputDir}. Continue?`,
+        `This will process components from ${sourceDir} and write to ${outputDir}. Continue?`
       );
       if (!confirmed) {
         logger.info('Operation cancelled by user');
@@ -281,7 +281,7 @@ const scanCommand: CLICommand = {
           'Source directory must be specified',
           'configuration',
           'high',
-          { operation: 'scan-validation' },
+          { operation: 'scan-validation' }
         );
       }
 
@@ -304,8 +304,8 @@ const scanCommand: CLICommand = {
                 directory: sourceDir,
               },
               null,
-              2,
-            ),
+              2
+            )
           );
         } else if (options.format === 'csv') {
           console.log('Component,Status,Issues');
@@ -364,7 +364,7 @@ const initCommand: CLICommand = {
 
       console.log(styles.green('\n✓ Configuration initialized successfully!'));
       console.log(
-        `\nEdit ${styles.cyan(configPath)} to customize your extraction settings.`,
+        `\nEdit ${styles.cyan(configPath)} to customize your extraction settings.`
       );
     } catch (error) {
       spinner.fail('Configuration initialization failed');
@@ -403,7 +403,7 @@ export class CLIBuilder {
       .option(
         '--log-level <level>',
         'Set log level (debug, info, warn, error)',
-        'info',
+        'info'
       );
   }
 
@@ -430,7 +430,7 @@ export class CLIBuilder {
         command.option(
           flags,
           description,
-          defaultValue as string | boolean | string[],
+          defaultValue as string | boolean | string[]
         );
       } else {
         command.option(flags, description);
@@ -464,7 +464,7 @@ export class CLIBuilder {
    */
   private async executeCommand(
     commandDef: CLICommand,
-    options: CLIOptions,
+    options: CLIOptions
   ): Promise<void> {
     try {
       // Create context
@@ -478,8 +478,8 @@ export class CLIBuilder {
       } else {
         console.error(
           styles.red(
-            `\nCommand failed: ${error instanceof Error ? error.message : String(error)}`,
-          ),
+            `\nCommand failed: ${error instanceof Error ? error.message : String(error)}`
+          )
         );
       }
 
@@ -491,7 +491,7 @@ export class CLIBuilder {
    * Create command execution context
    */
   private async createCommandContext(
-    options: CLIOptions,
+    options: CLIOptions
   ): Promise<CommandContext> {
     const configManager = new ConfigurationManager();
     const config = options.config

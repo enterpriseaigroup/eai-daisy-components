@@ -30,7 +30,7 @@ export interface MigrationNotes {
 export async function generateMigrationDocumentation(
   component: ComponentDefinition,
   notes: MigrationNotes,
-  outputDir: string,
+  outputDir: string
 ): Promise<string> {
   const docPath = join(outputDir, `${component.name}-migration.md`);
 
@@ -103,7 +103,7 @@ ${t.after}
 \`\`\`
 
 **Rationale:** ${t.rationale}
-`,
+`
     )
     .join('\n');
 }

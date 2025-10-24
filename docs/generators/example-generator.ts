@@ -16,7 +16,7 @@ import type { ComponentDefinition } from '@/types';
  */
 export async function generateUsageExamples(
   component: ComponentDefinition,
-  outputDir: string,
+  outputDir: string
 ): Promise<string> {
   const examplePath = join(outputDir, `${component.name}-examples.tsx`);
 

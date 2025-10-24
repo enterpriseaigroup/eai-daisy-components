@@ -149,7 +149,7 @@ export class BatchMigrationOrchestrator {
    * Execute batch migration
    */
   public async migrate(
-    options: BatchMigrationOptions,
+    options: BatchMigrationOptions
   ): Promise<BatchMigrationResult> {
     const startTime = Date.now();
 
@@ -168,7 +168,7 @@ export class BatchMigrationOrchestrator {
 
       if (discoveryResult.errors.length > 0) {
         throw new Error(
-          `Discovery failed: ${discoveryResult.errors.map(e => e.message).join(', ')}`,
+          `Discovery failed: ${discoveryResult.errors.map(e => e.message).join(', ')}`
         );
       }
 
@@ -211,7 +211,7 @@ export class BatchMigrationOrchestrator {
       const result = await this.migrateComponents(
         orderedComponents,
         options,
-        sessionId,
+        sessionId
       );
 
       // Complete session
@@ -232,7 +232,7 @@ export class BatchMigrationOrchestrator {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       logger.error(
-        'Batch migration failed: ' + errorMessage + ` (duration: ${duration}ms)`,
+        'Batch migration failed: ' + errorMessage + ` (duration: ${duration}ms)`
       );
       throw error;
     }
@@ -244,7 +244,7 @@ export class BatchMigrationOrchestrator {
   private async migrateComponents(
     components: ComponentDefinition[],
     options: BatchMigrationOptions,
-    sessionId: string,
+    sessionId: string
   ): Promise<Omit<BatchMigrationResult, 'duration'>> {
     const result: Omit<BatchMigrationResult, 'duration'> = {
       total: components.length,
@@ -266,8 +266,8 @@ export class BatchMigrationOrchestrator {
       // Process batch in parallel
       const batchResults = await Promise.allSettled(
         batch.map(component =>
-          this.migrateComponent(component, options, sessionId),
-        ),
+          this.migrateComponent(component, options, sessionId)
+        )
       );
 
       // Aggregate results
@@ -317,7 +317,7 @@ export class BatchMigrationOrchestrator {
   private async migrateComponent(
     component: ComponentDefinition,
     options: BatchMigrationOptions,
-    _sessionId: string,
+    _sessionId: string
   ): Promise<{ success: boolean; error?: string }> {
     if (options.dryRun) {
       logger.info(`[DRY RUN] Would migrate ${component.name}`);
@@ -399,7 +399,7 @@ export class BatchMigrationOrchestrator {
       // Record completion
       this.tracker.updateStatus(
         component.id,
-        result.success ? 'completed' : 'failed',
+        result.success ? 'completed' : 'failed'
       );
 
       if (!result.success && result.errors.length > 0) {
@@ -429,7 +429,7 @@ export class BatchMigrationOrchestrator {
    */
   private applyFilters(
     components: ComponentDefinition[],
-    options: BatchMigrationOptions,
+    options: BatchMigrationOptions
   ): ComponentDefinition[] {
     let filtered = components;
 
@@ -445,7 +445,7 @@ export class BatchMigrationOrchestrator {
    */
   private async generateReports(
     sessionId: string,
-    outputDir: string,
+    outputDir: string
   ): Promise<void> {
     try {
       logger.info('Generating migration reports...');
@@ -464,7 +464,7 @@ export class BatchMigrationOrchestrator {
       const jsonReport = JSON.stringify(summary, null, 2);
       const jsonPath = path.join(
         reportDir,
-        `migration-report-${sessionId}.json`,
+        `migration-report-${sessionId}.json`
       );
       await fs.writeFile(jsonPath, jsonReport);
       logger.info(`Generated JSON report: ${jsonPath}`);
@@ -509,11 +509,11 @@ export function createMigrateAllCommand(): Command {
     .description('Migrate all DAISY v1 components to Configurator v2')
     .requiredOption(
       '-s, --source <dir>',
-      'Source directory for DAISY v1 components',
+      'Source directory for DAISY v1 components'
     )
     .requiredOption(
       '-o, --output <dir>',
-      'Output directory for migrated components',
+      'Output directory for migrated components'
     )
     .requiredOption('-b, --baseline <dir>', 'Baseline preservation directory')
     .option('-p, --parallelism <number>', 'Maximum parallel migrations', '4')

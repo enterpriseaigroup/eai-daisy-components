@@ -62,7 +62,7 @@ test.describe('Component Migration Equivalency Tests', () => {
       v2Page,
       'Button',
       '/fixtures/components/v1/Button',
-      '/fixtures/components/v2/Button',
+      '/fixtures/components/v2/Button'
     );
 
     // Assert overall equivalency
@@ -187,15 +187,15 @@ test.describe('Component Migration Equivalency Tests', () => {
 
     // v2 should not be significantly slower
     expect(v2Metrics.renderTime).toBeLessThanOrEqual(
-      v1Metrics.renderTime * 1.2,
+      v1Metrics.renderTime * 1.2
     );
     expect(v2Metrics.interactionResponseTime).toBeLessThanOrEqual(
-      v1Metrics.interactionResponseTime * 1.2,
+      v1Metrics.interactionResponseTime * 1.2
     );
 
     // Memory usage should be comparable
     expect(v2Metrics.memoryUsage).toBeLessThanOrEqual(
-      v1Metrics.memoryUsage * 1.3,
+      v1Metrics.memoryUsage * 1.3
     );
   });
 
@@ -209,7 +209,7 @@ test.describe('Component Migration Equivalency Tests', () => {
     expect(v2Accessibility.ariaLabels).toEqual(v1Accessibility.ariaLabels);
     expect(v2Accessibility.roles).toEqual(v1Accessibility.roles);
     expect(v2Accessibility.keyboardNavigable).toBe(
-      v1Accessibility.keyboardNavigable,
+      v1Accessibility.keyboardNavigable
     );
   });
 });
@@ -222,7 +222,7 @@ async function testComponentEquivalency(
   v2Page: Page,
   componentName: string,
   v1Path: string,
-  v2Path: string,
+  v2Path: string
 ): Promise<ComponentTestResult> {
   const differences: Difference[] = [];
   let score = 100;
@@ -237,7 +237,7 @@ async function testComponentEquivalency(
   const behaviorMatch = await testBehaviorEquivalency(
     v1Page,
     v2Page,
-    differences,
+    differences
   );
   if (!behaviorMatch) {
     score -= 30;
@@ -247,7 +247,7 @@ async function testComponentEquivalency(
   const businessLogicMatch = await testBusinessLogicEquivalency(
     v1Path,
     v2Path,
-    differences,
+    differences
   );
   if (!businessLogicMatch) {
     score -= 35;
@@ -257,7 +257,7 @@ async function testComponentEquivalency(
   const performanceMatch = await testPerformanceEquivalency(
     v1Page,
     v2Page,
-    differences,
+    differences
   );
   if (!performanceMatch) {
     score -= 15;
@@ -282,7 +282,7 @@ async function testComponentEquivalency(
 async function testVisualEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[],
+  differences: Difference[]
 ): Promise<boolean> {
   // Implementation would compare screenshots
   return true;
@@ -294,7 +294,7 @@ async function testVisualEquivalency(
 async function testBehaviorEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[],
+  differences: Difference[]
 ): Promise<boolean> {
   // Implementation would test interactions
   return true;
@@ -306,7 +306,7 @@ async function testBehaviorEquivalency(
 async function testBusinessLogicEquivalency(
   v1Path: string,
   v2Path: string,
-  differences: Difference[],
+  differences: Difference[]
 ): Promise<boolean> {
   // Implementation would analyze source code
   return true;
@@ -318,7 +318,7 @@ async function testBusinessLogicEquivalency(
 async function testPerformanceEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[],
+  differences: Difference[]
 ): Promise<boolean> {
   // Implementation would measure performance metrics
   return true;
@@ -329,7 +329,7 @@ async function testPerformanceEquivalency(
  */
 async function compareScreenshots(
   screenshot1: Buffer,
-  screenshot2: Buffer,
+  screenshot2: Buffer
 ): Promise<{ similarity: number; differences: any[] }> {
   // This would use image comparison library like pixelmatch
   // For now, returning mock data
@@ -481,7 +481,7 @@ async function testAnalyticsTracking(page: Page): Promise<any> {
   // Get tracked events
   const events = await page.evaluate(() => {
     return JSON.parse(
-      window.sessionStorage.getItem('analytics_events') || '[]',
+      window.sessionStorage.getItem('analytics_events') || '[]'
     );
   });
 

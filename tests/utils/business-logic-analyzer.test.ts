@@ -62,7 +62,7 @@ describe('BusinessLogicAnalyzer', () => {
         'const [state, dispatch] = useReducer(reducer, initialState);';
       const result = analyzer.analyzeComponent(mockComponent, code);
       expect(result.stateManagement.some(s => s.type === 'useReducer')).toBe(
-        true,
+        true
       );
     });
 

@@ -74,11 +74,11 @@ export class RealBundleAnalyzer {
    * Analyze bundle size for a component
    */
   public async analyzeBundle(
-    componentPath: string,
+    componentPath: string
   ): Promise<BundleAnalysisResult> {
     const componentName = path.basename(
       componentPath,
-      path.extname(componentPath),
+      path.extname(componentPath)
     );
     console.log(`Analyzing bundle for: ${componentName}`);
 
@@ -119,7 +119,7 @@ export class RealBundleAnalyzer {
    */
   public async compareBundles(
     v1Path: string,
-    v2Path: string,
+    v2Path: string
   ): Promise<BundleComparison> {
     const v1Analysis = await this.analyzeBundle(v1Path);
     const v2Analysis = await this.analyzeBundle(v2Path);
@@ -135,7 +135,7 @@ export class RealBundleAnalyzer {
       ? []
       : await this.generateOptimizationRecommendations(
           v2Analysis,
-          sizeIncrease,
+          sizeIncrease
         );
 
     return {
@@ -284,7 +284,7 @@ export class RealBundleAnalyzer {
     const outputPath = path.join(
       process.cwd(),
       'dist-bundle-test',
-      'main.bundle.js',
+      'main.bundle.js'
     );
 
     try {
@@ -302,7 +302,7 @@ export class RealBundleAnalyzer {
     const outputPath = path.join(
       process.cwd(),
       'dist-bundle-test',
-      'main.bundle.js',
+      'main.bundle.js'
     );
 
     try {
@@ -321,7 +321,7 @@ export class RealBundleAnalyzer {
     const outputPath = path.join(
       process.cwd(),
       'dist-bundle-test',
-      'main.bundle.js',
+      'main.bundle.js'
     );
 
     try {
@@ -337,7 +337,7 @@ export class RealBundleAnalyzer {
    * Extract dependency information from webpack stats
    */
   private async extractDependencies(
-    stats: webpack.Stats,
+    stats: webpack.Stats
   ): Promise<DependencyInfo[]> {
     const statsJson = stats.toJson({ modules: true });
     const modules = statsJson.modules || [];
@@ -347,7 +347,7 @@ export class RealBundleAnalyzer {
     for (const module of modules) {
       if (module.name?.includes('node_modules')) {
         const packageMatch = module.name.match(
-          /node_modules[\\\\/](@?[^\\\\/]+(?:[\\\\/][^\\\\/]+)?)/,
+          /node_modules[\\\\/](@?[^\\\\/]+(?:[\\\\/][^\\\\/]+)?)/
         );
         if (packageMatch) {
           const packageName = packageMatch[1];
@@ -359,7 +359,7 @@ export class RealBundleAnalyzer {
 
     const totalSize = Array.from(dependencies.values()).reduce(
       (a, b) => a + b,
-      0,
+      0
     );
 
     return Array.from(dependencies.entries())
@@ -376,7 +376,7 @@ export class RealBundleAnalyzer {
    * Calculate tree-shaking savings
    */
   private async calculateTreeshakingSavings(
-    componentPath: string,
+    componentPath: string
   ): Promise<number> {
     // Build without tree-shaking
     const withoutTreeShaking = await this.buildBundleWithOptions(
@@ -384,7 +384,7 @@ export class RealBundleAnalyzer {
       {
         usedExports: false,
         sideEffects: true,
-      },
+      }
     );
 
     // Build with tree-shaking
@@ -404,7 +404,7 @@ export class RealBundleAnalyzer {
    */
   private async buildBundleWithOptions(
     componentPath: string,
-    optimizationOptions: any,
+    optimizationOptions: any
   ): Promise<webpack.Stats> {
     const outputPath = path.join(process.cwd(), 'dist-bundle-test-temp');
 
@@ -489,7 +489,7 @@ export class RealBundleAnalyzer {
    */
   private async generateOptimizationRecommendations(
     analysis: BundleAnalysisResult,
-    excessSize: number,
+    excessSize: number
   ): Promise<OptimizationRecommendation[]> {
     const recommendations: OptimizationRecommendation[] = [];
 
@@ -578,7 +578,7 @@ export class RealBundleAnalyzer {
       lines.push('## Top Dependencies (v2)', '');
       for (const dep of comparison.v2.dependencies.slice(0, 5)) {
         lines.push(
-          `- **${dep.name}:** ${this.formatSize(dep.size)} (${dep.percentage.toFixed(1)}%)`,
+          `- **${dep.name}:** ${this.formatSize(dep.size)} (${dep.percentage.toFixed(1)}%)`
         );
       }
       lines.push('');
@@ -591,7 +591,7 @@ export class RealBundleAnalyzer {
         lines.push(`- ${rec.description}`);
         if (rec.estimatedSavings > 0) {
           lines.push(
-            `- Estimated savings: ${this.formatSize(rec.estimatedSavings)}`,
+            `- Estimated savings: ${this.formatSize(rec.estimatedSavings)}`
           );
         }
         lines.push('');
@@ -627,7 +627,7 @@ export class RealBundleAnalyzer {
  * Factory function to create analyzer instance
  */
 export function createRealBundleAnalyzer(
-  maxSizeIncreasePercent?: number,
+  maxSizeIncreasePercent?: number
 ): RealBundleAnalyzer {
   return new RealBundleAnalyzer(maxSizeIncreasePercent);
 }

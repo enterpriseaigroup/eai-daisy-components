@@ -48,7 +48,7 @@ export const Component = () => {
       expect(result.success).toBe(true);
       expect(result.blocksDocumented.length).toBeGreaterThan(0);
       expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(
-        true,
+        true
       );
     });
 
@@ -69,7 +69,7 @@ export const Component = () => {
 
       expect(result.success).toBe(true);
       expect(result.blocksDocumented.some(b => b.type === 'useCallback')).toBe(
-        true,
+        true
       );
     });
 
@@ -90,7 +90,7 @@ export const Component = ({ items }: { items: number[] }) => {
 
       expect(result.success).toBe(true);
       expect(result.blocksDocumented.some(b => b.type === 'useMemo')).toBe(
-        true,
+        true
       );
     });
 
@@ -109,7 +109,7 @@ export function formatCurrency(amount: number): string {
 
       expect(result.success).toBe(true);
       expect(
-        result.blocksDocumented.filter(b => b.type === 'function').length,
+        result.blocksDocumented.filter(b => b.type === 'function').length
       ).toBe(2);
     });
 
@@ -169,7 +169,7 @@ export const Component = () => {
 
       expect(result.success).toBe(true);
       expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(
-        true,
+        true
       );
     });
   });
@@ -387,7 +387,7 @@ export const Component = () => {
 
       expect(result.success).toBe(true);
       expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(
-        true,
+        true
       );
       expect(result.documentedCode).toContain('cleanup');
     });
@@ -425,7 +425,7 @@ export async function fetchUserData(userId: string): Promise<any> {
 
       expect(result.success).toBe(true);
       expect(
-        result.blocksDocumented.some(b => b.name === 'fetchUserData'),
+        result.blocksDocumented.some(b => b.name === 'fetchUserData')
       ).toBe(true);
     });
 
@@ -465,7 +465,7 @@ export function calculateDiscount(price: number, isPremium: boolean): number {
 
       expect(result.success).toBe(true);
       expect(
-        result.blocksDocumented.some(b => b.name === 'calculateDiscount'),
+        result.blocksDocumented.some(b => b.name === 'calculateDiscount')
       ).toBe(true);
     });
   });
@@ -487,7 +487,7 @@ export function getUserName(user: User): string {
 
       expect(result.success).toBe(true);
       expect(result.blocksDocumented.some(b => b.name === 'getUserName')).toBe(
-        true,
+        true
       );
     });
 
@@ -548,7 +548,7 @@ export const Component = () => {
 
       expect(result.success).toBe(true);
       const effectBlock = result.blocksDocumented.find(
-        b => b.type === 'useEffect',
+        b => b.type === 'useEffect'
       );
       expect(effectBlock?.confidence).toBeGreaterThan(0.7);
     });
@@ -620,7 +620,7 @@ export function longFunction() {
 
       expect(result.success).toBe(true);
       expect(result.blocksDocumented.some(b => b.name === 'longFunction')).toBe(
-        true,
+        true
       );
     });
 
@@ -662,7 +662,7 @@ export const Component = () => {
 
       expect(result.success).toBe(true);
       const effectBlock = result.blocksDocumented.find(
-        b => b.type === 'useEffect',
+        b => b.type === 'useEffect'
       );
       expect(effectBlock?.lineNumber).toBeGreaterThan(0);
       expect(effectBlock?.lineNumber).toBeLessThan(15);

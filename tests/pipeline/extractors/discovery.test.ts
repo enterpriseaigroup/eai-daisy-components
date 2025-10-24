@@ -193,7 +193,7 @@ describe('ComponentDiscoveryService', () => {
       });
 
       await expect(service.discoverComponents()).rejects.toThrow(
-        FileSystemError,
+        FileSystemError
       );
     });
 
@@ -480,7 +480,7 @@ describe('Utility Functions', () => {
 
       const results = await discoverComponentsByType(
         mockExtractionConfig,
-        'functional',
+        'functional'
       );
       expect(results.length).toBeGreaterThanOrEqual(0);
     });
@@ -503,7 +503,7 @@ describe('Utility Functions', () => {
 
       const results = await discoverComponentsByComplexity(
         mockExtractionConfig,
-        'simple',
+        'simple'
       );
       expect(results.length).toBeGreaterThanOrEqual(0);
     });

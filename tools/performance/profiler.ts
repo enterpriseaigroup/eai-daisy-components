@@ -101,7 +101,7 @@ export class PerformanceProfiler extends EventEmitter {
       componentCount > 0
         ? Array.from(session.componentTimes.values()).reduce(
             (sum, time) => sum + time,
-            0,
+            0
           ) / componentCount
         : 0;
 
@@ -134,7 +134,7 @@ export class PerformanceProfiler extends EventEmitter {
   public startMetric(
     sessionId: string,
     metricName: string,
-    metadata?: Record<string, unknown>,
+    metadata?: Record<string, unknown>
   ): void {
     const session = this.sessions.get(sessionId);
     if (!session) {
@@ -185,7 +185,7 @@ export class PerformanceProfiler extends EventEmitter {
   public recordComponentTime(
     sessionId: string,
     componentName: string,
-    duration: number,
+    duration: number
   ): void {
     const session = this.sessions.get(sessionId);
     if (!session) {
@@ -286,13 +286,13 @@ export class PerformanceProfiler extends EventEmitter {
 
       default:
         suggestions.push(
-          `Review ${phase} phase for optimization opportunities`,
+          `Review ${phase} phase for optimization opportunities`
         );
     }
 
     if (percentage > 40) {
       suggestions.push(
-        `⚠️ ${phase} phase is a critical bottleneck (${percentage.toFixed(1)}% of total time)`,
+        `⚠️ ${phase} phase is a critical bottleneck (${percentage.toFixed(1)}% of total time)`
       );
     }
 
@@ -324,7 +324,7 @@ ${!profile.meetsGoal ? `\n⚠️ **Action Required**: Need ${hoursToMeet.toFixed
 |------|-----------|----------|
 ${profile.slowestComponents
   .map(
-    (c, i) => `| ${i + 1} | ${c.name} | ${this.formatDuration(c.duration)} |`,
+    (c, i) => `| ${i + 1} | ${c.name} | ${this.formatDuration(c.duration)} |`
   )
   .join('\n')}
 
@@ -338,7 +338,7 @@ ${profile.bottlenecks
 
 **Optimization Suggestions**:
 ${b.suggestions.map(s => `- ${s}`).join('\n')}
-`,
+`
   )
   .join('\n')}
 
@@ -372,41 +372,41 @@ ${this.generateRecommendations(profile)
 
     if (!profile.meetsGoal) {
       recommendations.push(
-        '🎯 Focus on optimizing the highest percentage bottlenecks first',
+        '🎯 Focus on optimizing the highest percentage bottlenecks first'
       );
       recommendations.push(
-        '⚡ Implement parallel processing for independent operations',
+        '⚡ Implement parallel processing for independent operations'
       );
       recommendations.push(
-        '💾 Add caching for expensive repeated computations',
+        '💾 Add caching for expensive repeated computations'
       );
     }
 
     if (profile.averageComponentTime > 360000) {
       // 6 minutes
       recommendations.push(
-        '🔍 Investigate components taking >6 minutes - may indicate issues',
+        '🔍 Investigate components taking >6 minutes - may indicate issues'
       );
     }
 
     if (profile.bottlenecks.length === 0) {
       recommendations.push(
-        '✅ No significant bottlenecks detected - performance is well-balanced',
+        '✅ No significant bottlenecks detected - performance is well-balanced'
       );
     } else if (
       profile.bottlenecks[0] &&
       profile.bottlenecks[0].percentage > 50
     ) {
       recommendations.push(
-        `⚠️ ${profile.bottlenecks[0].phase} phase dominates execution - critical optimization target`,
+        `⚠️ ${profile.bottlenecks[0].phase} phase dominates execution - critical optimization target`
       );
     }
 
     recommendations.push(
-      '📊 Continue monitoring performance metrics over time',
+      '📊 Continue monitoring performance metrics over time'
     );
     recommendations.push(
-      '🔬 Profile individual component migrations for deeper insights',
+      '🔬 Profile individual component migrations for deeper insights'
     );
 
     return recommendations;
@@ -438,7 +438,7 @@ ${this.generateRecommendations(profile)
    * Get session metrics
    */
   public getSessionMetrics(
-    sessionId: string,
+    sessionId: string
   ): Map<string, PerformanceMetric> | null {
     const session = this.sessions.get(sessionId);
     return session ? session.metrics : null;
@@ -449,7 +449,7 @@ ${this.generateRecommendations(profile)
  * Create performance profiler
  */
 export function createProfiler(
-  targetComponentsPerHour: number = 10,
+  targetComponentsPerHour: number = 10
 ): PerformanceProfiler {
   return new PerformanceProfiler(targetComponentsPerHour);
 }
