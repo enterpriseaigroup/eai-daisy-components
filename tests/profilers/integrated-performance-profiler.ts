@@ -42,7 +42,7 @@ export class IntegratedPerformanceProfiler {
    */
   public async profileMigration(
     sourcePath: string,
-    config?: Partial<ExtractionConfig>
+    config?: Partial<ExtractionConfig>,
   ): Promise<PerformanceProfile> {
     console.log(`Profiling migration for: ${sourcePath}`);
 
@@ -77,7 +77,7 @@ export class IntegratedPerformanceProfiler {
       },
       onProgress: (progress: PipelineProgress) => {
         console.log(
-          `Progress: ${progress.overallProgress.toFixed(1)}% - ${progress.currentOperation}`
+          `Progress: ${progress.overallProgress.toFixed(1)}% - ${progress.currentOperation}`,
         );
       },
     });
@@ -178,7 +178,7 @@ export class IntegratedPerformanceProfiler {
 
     for (const phase of profile.phases) {
       lines.push(
-        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`
+        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`,
       );
     }
 
@@ -188,10 +188,10 @@ export class IntegratedPerformanceProfiler {
       lines.push('');
       lines.push(`- Success: ${profile.pipelineResult.success ? '✅' : '❌'}`);
       lines.push(
-        `- Components Discovered: ${profile.pipelineResult.progress.stats.componentsDiscovered}`
+        `- Components Discovered: ${profile.pipelineResult.progress.stats.componentsDiscovered}`,
       );
       lines.push(
-        `- Components Parsed: ${profile.pipelineResult.progress.stats.componentsParsed}`
+        `- Components Parsed: ${profile.pipelineResult.progress.stats.componentsParsed}`,
       );
       lines.push(`- Errors: ${profile.pipelineResult.errors.length}`);
     }
@@ -204,7 +204,7 @@ export class IntegratedPerformanceProfiler {
  * Factory function
  */
 export function createIntegratedPerformanceProfiler(
-  targetComponentsPerHour?: number
+  targetComponentsPerHour?: number,
 ): IntegratedPerformanceProfiler {
   return new IntegratedPerformanceProfiler(targetComponentsPerHour);
 }

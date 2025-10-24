@@ -222,7 +222,7 @@ describe('Full Migration Integration', () => {
       const result = certifier.certify(validations, 'Test User');
       const document = await certifier.generateCertificationDocument(
         result,
-        '/tmp/test-cert.md'
+        '/tmp/test-cert.md',
       );
 
       expect(document).toContain('# Component Migration Certification');

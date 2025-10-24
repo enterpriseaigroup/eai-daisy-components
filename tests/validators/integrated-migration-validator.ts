@@ -66,11 +66,11 @@ export class IntegratedMigrationValidator {
    */
   public async validateMigration(
     migratedPath: string,
-    originalPath: string
+    originalPath: string,
   ): Promise<IntegratedValidationResult> {
     const componentName = path.basename(
       migratedPath,
-      path.extname(migratedPath)
+      path.extname(migratedPath),
     );
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
@@ -105,12 +105,12 @@ export class IntegratedMigrationValidator {
     const migratedParse = await this.parseComponent(
       migratedPath,
       componentName,
-      errors
+      errors,
     );
     const originalParse = await this.parseComponent(
       originalPath,
       componentName,
-      errors
+      errors,
     );
     const parseTime = Date.now() - parseStartTime;
 
@@ -129,28 +129,28 @@ export class IntegratedMigrationValidator {
         const migratedComponent = this.createComponentDefinition(
           migratedPath,
           componentName,
-          migratedParse
+          migratedParse,
         );
         const originalComponent = this.createComponentDefinition(
           originalPath,
           componentName,
-          originalParse
+          originalParse,
         );
 
         const migratedAnalysis = this.businessLogicAnalyzer.analyzeComponent(
           migratedComponent,
-          migratedSource
+          migratedSource,
         );
         const originalAnalysis = this.businessLogicAnalyzer.analyzeComponent(
           originalComponent,
-          originalSource
+          originalSource,
         );
 
         // Check if business logic is preserved using the existing analyzer
         businessLogicPreserved = this.compareBusinessLogic(
           originalAnalysis,
           migratedAnalysis,
-          errors
+          errors,
         );
       } catch (error) {
         errors.push({
@@ -189,7 +189,7 @@ export class IntegratedMigrationValidator {
    */
   private async checkFileExists(
     filePath: string,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): Promise<boolean> {
     try {
       await fs.access(filePath);
@@ -210,7 +210,7 @@ export class IntegratedMigrationValidator {
   private async parseComponent(
     filePath: string,
     componentName: string,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): Promise<ParseResult | null> {
     try {
       // Create a minimal component definition for parsing
@@ -263,7 +263,7 @@ export class IntegratedMigrationValidator {
   private createComponentDefinition(
     filePath: string,
     componentName: string,
-    parseResult: ParseResult
+    parseResult: ParseResult,
   ): ComponentDefinition {
     return {
       id: componentName,
@@ -342,7 +342,7 @@ export class IntegratedMigrationValidator {
    * Determine component complexity
    */
   private determineComplexity(
-    parseResult: ParseResult
+    parseResult: ParseResult,
   ): 'simple' | 'moderate' | 'complex' | 'critical' {
     if (!parseResult.structure) {
       return 'simple';
@@ -369,7 +369,7 @@ export class IntegratedMigrationValidator {
   private compareBusinessLogic(
     originalAnalysis: any,
     migratedAnalysis: any,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): boolean {
     // Compare function counts
     if (

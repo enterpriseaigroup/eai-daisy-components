@@ -107,7 +107,7 @@ export class PublishPipeline {
       }
 
       this.logger.info(
-        `Package published successfully: ${packageJson.name}@${packageJson.version}`
+        `Package published successfully: ${packageJson.name}@${packageJson.version}`,
       );
 
       return {
@@ -233,7 +233,7 @@ export class PublishPipeline {
    * Publish multiple packages
    */
   public async publishBatch(
-    packagesOptions: PublishOptions[]
+    packagesOptions: PublishOptions[],
   ): Promise<PublishResult[]> {
     const results: PublishResult[] = [];
 
@@ -273,7 +273,7 @@ export function createPublishPipeline(): PublishPipeline {
  * Publish package to NPM
  */
 export async function publishPackage(
-  options: PublishOptions
+  options: PublishOptions,
 ): Promise<PublishResult> {
   const pipeline = createPublishPipeline();
   return pipeline.publish(options);

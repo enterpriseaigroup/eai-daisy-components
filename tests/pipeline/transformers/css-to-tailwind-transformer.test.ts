@@ -122,10 +122,10 @@ export const Component = () => <div className="container">Test</div>;
       expect(result.convertedRules).toHaveLength(1);
       expect(result.convertedRules[0].tailwindClasses).toContain('flex');
       expect(result.convertedRules[0].tailwindClasses).toContain(
-        'items-center'
+        'items-center',
       );
       expect(result.convertedRules[0].tailwindClasses).toContain(
-        'justify-between'
+        'justify-between',
       );
     });
 
@@ -149,10 +149,10 @@ export const Component = () => <div className="button">Test</div>;
 
       expect(result.success).toBe(true);
       expect(result.convertedRules[0].tailwindClasses).toContain(
-        'bg-[#007bff]'
+        'bg-[#007bff]',
       );
       expect(result.convertedRules[0].tailwindClasses).toContain(
-        'text-[#ffffff]'
+        'text-[#ffffff]',
       );
     });
 
@@ -439,7 +439,7 @@ export const Component = () => <div className="box">Test</div>;
 
       const result = await lowFidelityTransformer.transform(
         code,
-        '/test/Component.tsx'
+        '/test/Component.tsx',
       );
 
       expect(result.success).toBe(true);
@@ -472,7 +472,7 @@ export const Component = () => <div className="custom">Test</div>;
 
       const result = await configTransformer.transform(
         code,
-        '/test/Component.tsx'
+        '/test/Component.tsx',
       );
 
       expect(result.success).toBe(true);
