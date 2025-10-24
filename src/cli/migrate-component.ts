@@ -87,6 +87,7 @@ export async function runMigrationCLI(): Promise<void> {
   }
 }
 
-if (require.main === module) {
+// Run if executed directly (ESM compatible)
+if (import.meta.url === `file://${process.argv[1]}`) {
   runMigrationCLI().catch(console.error);
 }
