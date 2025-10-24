@@ -75,6 +75,9 @@ export class V2ComponentGenerator {
       utilities: [],
     };
 
+    // Note: Components with duplicate names across tiers will overwrite
+    // The last processed version (highest tier) wins
+    // This is expected behavior - keeps the most complex/complete version
     const outputPath = join(
       this.config.outputPath,
       'src',
