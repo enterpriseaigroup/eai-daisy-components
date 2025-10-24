@@ -111,6 +111,15 @@ export class CSSToTailwindTransformer {
       // Step 2: Process each CSS file
       const cssAnalysis = await this.analyzeCSSFiles(cssImports, componentPath);
 
+      // Check if any CSS files failed to process
+      if (cssAnalysis.length < cssImports.length) {
+        result.success = false;
+        result.warnings.push(
+          `Failed to process ${cssImports.length - cssAnalysis.length} CSS file(s)`
+        );
+        return result;
+      }
+
       // Step 3: Build className mappings
       const classNameMappings = this.buildClassNameMappings(cssAnalysis);
 
@@ -579,16 +588,6 @@ export class CSSToTailwindTransformer {
             }
             return `className="${tailwindClasses}"`;
           },
-        },
-        // 'class-name' within template literal strings (not expressions)
-        {
-          pattern: new RegExp("'" + escapedClass + "'", 'g'),
-          replacement: `'${tailwindClasses}'`,
-        },
-        // "class-name" within template literal strings (not expressions)
-        {
-          pattern: new RegExp('"' + escapedClass + '"', 'g'),
-          replacement: `"${tailwindClasses}"`,
         },
         // className={styles['class-name']}
         {
