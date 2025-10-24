@@ -2,15 +2,21 @@
 
 ## Overview
 
-This sequence diagram illustrates the end-to-end authentication and authorization flow for accessing DPHI API resources through the Public API. The flow demonstrates a multi-layered security approach that combines user authentication via Entra (Microsoft Identity Platform) with tenant-based access control managed through PayloadCMS.
+This sequence diagram illustrates the end-to-end authentication and authorization flow for accessing third-party API resources (e.g., DPHI) through the Public API. The flow demonstrates a multi-layered security approach that combines user authentication via Entra (Microsoft Identity Platform) with tenant-based access control and business logic execution managed through PayloadCMS.
+
+**Key Architectural Principle**: Public API is a lightweight RESTful gateway that handles authentication/authorization but delegates complex business logic (API credential management, third-party API orchestration) to PayloadCMS.
 
 ## System Components
 
 - **Browser**: The user's web browser displaying the application UI
 - **App Service**: The application server that delivers web pages and components (e.g., Next.js, React SSR)
 - **Entra**: Microsoft's identity and access management service (formerly Azure AD)
-- **Public API**: The backend API gateway that orchestrates authentication and authorization
-- **PayloadCMS**: Content management system that stores tenant configurations and access permissions
+- **Public API**: Lightweight RESTful API gateway that handles authentication/authorization but delegates business logic to PayloadCMS
+- **PayloadCMS**: Content management system with business logic that:
+  - Stores tenant configurations and access permissions
+  - Manages encrypted API credentials per tenant
+  - Executes third-party API calls on behalf of Public API
+  - Maps component types (e.g., "GetAddress") to API providers (e.g., "DPHI")
 - **DPHI API**: The downstream data provider API (planned for Mid-2025 integration)
 
 ## Flow Description
@@ -39,24 +45,32 @@ The flow is divided into two main phases:
 
 When the user interacts with the GetAddress component (e.g., enters an address):
 
-1. **Request Submission**: GetAddress component in browser sends POST request directly to Public API at `/request-dphi-creds` with:
+1. **Request Submission**: GetAddress component in browser sends POST request directly to Public API at `/get-address` with:
    - The address data in the request body
    - User's bearer token in the Authorization header (from session)
-   - A hardcoded API key in the X-API-Key header
+   - A hardcoded API key in the X-API-Key header identifying the tenant
+   - Component type identifier (e.g., "GetAddress")
 
 2. **Token Validation**: Public API validates the user's token with Entra
    - If invalid → returns 401 Unauthorized to browser
    - If valid → proceeds to tenant access check
 
-3. **Tenant Access Control**: Public API checks with PayloadCMS to verify:
-   - The user (identified by token subject/sub claim) has access to the tenant
-   - The provided API key is valid for the tenant
+3. **Tenant Access Control & API Routing**: Public API makes a RESTful call to PayloadCMS at `/execute-api-call` with:
+   - User identity (from token subject/sub claim)
+   - Tenant API key
+   - Component type (e.g., "GetAddress" which maps to API type "DPHI")
+   - Request payload (address data)
 
-4. **DPHI Credential Management**:
-   - If authorized → PayloadCMS returns encrypted DPHI credentials
-   - Public API uses these credentials to call DPHI's GetAddress endpoint
-   - Results are returned directly to the browser component
-   - If not authorized → returns 403 Forbidden to browser
+4. **PayloadCMS Business Logic Execution**:
+   - Verifies user has access to the tenant
+   - Validates the API key is valid for the tenant
+   - Looks up the API type configuration (e.g., "DPHI") stored on the tenant
+   - Retrieves encrypted DPHI API credentials from tenant configuration
+   - Makes the actual call to DPHI API with the credentials and address data
+   - Returns the DPHI response to Public API
+   - If not authorized → returns 403 Forbidden
+
+5. **Response**: Public API passes the result back to the browser component
 
 ## Security Features
 
@@ -105,8 +119,8 @@ sequenceDiagram
   AppService-->>Browser: 200 OK + Deliver GetAddress page (with both tokens)
 
   Note over Browser,DPHI: PHASE 2: Component API Calls (App Service not involved)
-  Browser->>PublicAPI: POST /request-dphi-creds
-    note right of Browser: GetAddress component makes direct call<br/>body: { address }<br/>headers: Authorization: Bearer <entraToken>,<br/>X-Payload-Token: <payloadToken>,<br/>X-API-Key: <hardcoded>
+  Browser->>PublicAPI: POST /get-address
+    note right of Browser: GetAddress component makes direct call<br/>body: { address, componentType: "GetAddress" }<br/>headers: Authorization: Bearer <entraToken>,<br/>X-Payload-Token: <payloadToken>,<br/>X-API-Key: <hardcoded>
 
   Note right of PublicAPI: Step 1: validate user token with Entra
   PublicAPI->>Entra: Validate token / introspect
@@ -122,12 +136,16 @@ sequenceDiagram
     Payload-->>PublicAPI: 200 OK (new payload_user_token)
     PublicAPI-->>Browser: 401 + New tokens (client retries with new tokens)
   else token valid
-    Note right of PublicAPI: Step 2: check tenant/API-key access in PayloadCMS
-    PublicAPI->>Payload: GET /tenants/{tenantId}/access?apiKey=X-API-Key&user=<sub>
+    Note right of PublicAPI: Step 2: Delegate to PayloadCMS for business logic
+    PublicAPI->>Payload: POST /execute-api-call
+      note right of PublicAPI: body: {<br/>  user: <sub>,<br/>  apiKey: X-API-Key,<br/>  componentType: "GetAddress",<br/>  payload: { address }<br/>}
+
+    Note right of Payload: PayloadCMS executes business logic
     alt user has tenant access
-      Payload-->>PublicAPI: 200 OK -> tenant allowed, return DPHI creds (encrypted)
-      PublicAPI->>DPHI: POST /GetAddress (use returned DPHI creds + address)  %% Mid2025
-      DPHI-->>PublicAPI: 200 OK (address result)
+      Note right of Payload: 1. Verify user access to tenant<br/>2. Validate API key<br/>3. Lookup API type "DPHI" from componentType<br/>4. Retrieve encrypted DPHI credentials<br/>5. Call DPHI API
+      Payload->>DPHI: POST /GetAddress (DPHI creds + address)  %% Mid2025
+      DPHI-->>Payload: 200 OK (address result)
+      Payload-->>PublicAPI: 200 OK (address result from DPHI)
       PublicAPI-->>Browser: 200 OK (address result)
     else user not authorized for tenant
       Payload-->>PublicAPI: 403 Forbidden
