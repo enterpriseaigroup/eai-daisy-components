@@ -16,7 +16,7 @@ import type { ComponentDefinition } from '@/types';
  */
 export async function generateAPIDocumentation(
   component: ComponentDefinition,
-  outputDir: string,
+  outputDir: string
 ): Promise<string> {
   const docPath = join(outputDir, `${component.name}-api.md`);
 

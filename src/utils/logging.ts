@@ -165,17 +165,17 @@ export class DetailedFormatter implements LogFormatter {
     if (entry.source) {
       const sourceInfo = [];
       if (entry.source.component) {
-sourceInfo.push(`component=${entry.source.component}`);
-}
+        sourceInfo.push(`component=${entry.source.component}`);
+      }
       if (entry.source.file) {
-sourceInfo.push(`file=${entry.source.file}`);
-}
+        sourceInfo.push(`file=${entry.source.file}`);
+      }
       if (entry.source.function) {
-sourceInfo.push(`function=${entry.source.function}`);
-}
+        sourceInfo.push(`function=${entry.source.function}`);
+      }
       if (entry.source.line) {
-sourceInfo.push(`line=${entry.source.line}`);
-}
+        sourceInfo.push(`line=${entry.source.line}`);
+      }
 
       if (sourceInfo.length > 0) {
         message += ` [${sourceInfo.join(', ')}]`;
@@ -264,7 +264,7 @@ export class StructuredFormatter implements LogFormatter {
     if (entry.error) {
       fields.push(`error_name=${entry.error.name}`);
       fields.push(
-        `error_message="${entry.error.message.replace(/"/g, '\\"')}"`,
+        `error_message="${entry.error.message.replace(/"/g, '\\"')}"`
       );
     }
 
@@ -332,10 +332,10 @@ export class FileOutputTarget implements LogOutputTarget {
       return new Promise((resolve, reject) => {
         stream.write(formattedEntry + '\n', error => {
           if (error) {
-reject(error);
-} else {
-resolve();
-}
+            reject(error);
+          } else {
+            resolve();
+          }
         });
       });
     } catch (error) {
@@ -382,7 +382,7 @@ export class JsonFileOutputTarget implements LogOutputTarget {
 
   constructor(
     filePath: string,
-    private readonly batchSize: number = 100,
+    private readonly batchSize: number = 100
   ) {
     this.filePath = resolve(filePath);
   }
@@ -400,8 +400,8 @@ export class JsonFileOutputTarget implements LogOutputTarget {
 
   public async flush(): Promise<void> {
     if (this.entries.length === 0) {
-return;
-}
+      return;
+    }
 
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
@@ -452,9 +452,12 @@ export class Logger {
   public error(
     message: string,
     error?: Error,
-    context?: Record<string, unknown>,
+    context?: Record<string, unknown>
   ): void {
-    this.log('error', message, { ...(error ? { error } : {}), ...(context ? { context } : {}) });
+    this.log('error', message, {
+      ...(error ? { error } : {}),
+      ...(context ? { context } : {}),
+    });
   }
 
   /**
@@ -483,7 +486,7 @@ export class Logger {
    */
   public async measurePerformance<T>(
     operation: string,
-    fn: () => Promise<T>,
+    fn: () => Promise<T>
   ): Promise<T> {
     const startTime = Date.now();
     const startMemory = process.memoryUsage().heapUsed;
@@ -542,7 +545,7 @@ export class Logger {
       context?: Record<string, unknown>;
       source?: LogSource;
       correlationId?: string;
-    } = {},
+    } = {}
   ): void {
     // Check if level should be logged
     if (this.logLevels[level] > this.logLevels[this.config.level]) {
@@ -559,21 +562,25 @@ export class Logger {
       },
       ...(options.error ? { error: options.error } : {}),
       ...(options.source ? { source: options.source } : {}),
-      ...(options.correlationId ? { correlationId: options.correlationId } : {}),
+      ...(options.correlationId
+        ? { correlationId: options.correlationId }
+        : {}),
     };
 
     const formattedEntry = this.config.formatter.format(entry);
 
     // Write to all output targets
-    void Promise.all(this.config.outputs.map(async output => {
-      try {
-        await output.write(formattedEntry);
-      } catch (error) {
-        // Fallback to console for output errors
-        console.error('Failed to write log entry:', error);
-        console.error('Original log entry:', formattedEntry);
-      }
-    }));
+    void Promise.all(
+      this.config.outputs.map(async output => {
+        try {
+          await output.write(formattedEntry);
+        } catch (error) {
+          // Fallback to console for output errors
+          console.error('Failed to write log entry:', error);
+          console.error('Original log entry:', formattedEntry);
+        }
+      })
+    );
   }
 }
 
@@ -611,7 +618,7 @@ export class LoggingManager {
    */
   private createLogger(
     name: string,
-    overrides?: Partial<LoggerConfig>,
+    overrides?: Partial<LoggerConfig>
   ): Logger {
     const formatter = this.createFormatter(this.globalConfig.format);
     const outputs = this.createOutputTargets(this.globalConfig.outputs);
@@ -657,15 +664,15 @@ export class LoggingManager {
           return new ConsoleOutputTarget();
         case 'file':
           return new FileOutputTarget(
-            join(process.cwd(), 'logs', 'pipeline.log'),
+            join(process.cwd(), 'logs', 'pipeline.log')
           );
         case 'json':
           return new JsonFileOutputTarget(
-            join(process.cwd(), 'logs', 'pipeline.json'),
+            join(process.cwd(), 'logs', 'pipeline.json')
           );
         case 'structured':
           return new FileOutputTarget(
-            join(process.cwd(), 'logs', 'pipeline.structured'),
+            join(process.cwd(), 'logs', 'pipeline.structured')
           );
         default:
           return new ConsoleOutputTarget();
@@ -725,7 +732,7 @@ export function createLoggingManager(config: LoggingConfig): LoggingManager {
  */
 export function createSimpleLogger(
   name: string,
-  level: LogLevel = 'info',
+  level: LogLevel = 'info'
 ): Logger {
   const config: LoggerConfig = {
     name,
@@ -745,7 +752,7 @@ export function createSimpleLogger(
 export function createFileLogger(
   name: string,
   filePath: string,
-  level: LogLevel = 'info',
+  level: LogLevel = 'info'
 ): Logger {
   const config: LoggerConfig = {
     name,
@@ -780,7 +787,7 @@ let globalLoggingManager: LoggingManager | null = null;
  * Initialize global logging
  */
 export function initializeLogging(
-  config: LoggingConfig = DEFAULT_LOGGING_CONFIG,
+  config: LoggingConfig = DEFAULT_LOGGING_CONFIG
 ): void {
   globalLoggingManager = createLoggingManager(config);
 }

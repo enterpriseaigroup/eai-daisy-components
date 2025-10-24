@@ -120,7 +120,7 @@ export class ConfiguratorTransformer {
    */
   public async transform(
     component: ComponentDefinition,
-    sourceCode: string,
+    sourceCode: string
   ): Promise<TransformationResult> {
     this.logger.info(`Transforming component: ${component.name}`);
 
@@ -136,7 +136,7 @@ export class ConfiguratorTransformer {
         component,
         sourceCode,
         analysis,
-        strategy,
+        strategy
       );
 
       // Create pattern mappings
@@ -145,23 +145,23 @@ export class ConfiguratorTransformer {
       // Create transformed component definition
       const transformed = this.createTransformedComponent(
         component,
-        transformations,
+        transformations
       );
 
       // Validate business logic preservation
       const businessLogicPreserved = this.validateBusinessLogicPreservation(
         analysis,
-        transformations,
+        transformations
       );
 
       const warnings = this.collectWarnings(
         transformations,
-        businessLogicPreserved,
+        businessLogicPreserved
       );
       const requiresManualReview = this.requiresManualReview(
         strategy,
         transformations,
-        businessLogicPreserved,
+        businessLogicPreserved
       );
 
       this.logger.info(`Transformation completed: ${component.name}`, {
@@ -184,7 +184,7 @@ export class ConfiguratorTransformer {
       throw new TransformationError(
         `Failed to transform component: ${component.name}`,
         { component, operation: 'transform' },
-        error as Error,
+        error as Error
       );
     }
   }
@@ -194,7 +194,7 @@ export class ConfiguratorTransformer {
    */
   private determineStrategy(
     component: ComponentDefinition,
-    analysis: BusinessLogicAnalysis,
+    analysis: BusinessLogicAnalysis
   ): MigrationStrategy {
     if (component.complexity === 'simple' && analysis.complexityScore < 20) {
       return 'direct-translation';
@@ -218,7 +218,7 @@ export class ConfiguratorTransformer {
     component: ComponentDefinition,
     _sourceCode: string,
     analysis: BusinessLogicAnalysis,
-    _strategy: MigrationStrategy,
+    _strategy: MigrationStrategy
   ): Promise<CodeTransformation[]> {
     const transformations: CodeTransformation[] = [];
 
@@ -230,7 +230,7 @@ export class ConfiguratorTransformer {
 
     // Transform event handlers
     transformations.push(
-      ...this.transformEventHandlers(analysis.eventHandlers),
+      ...this.transformEventHandlers(analysis.eventHandlers)
     );
 
     // Transform side effects
@@ -259,7 +259,7 @@ export class ConfiguratorTransformer {
    * Transform React hooks to Configurator patterns
    */
   private transformHooks(
-    stateManagement: BusinessLogicAnalysis['stateManagement'],
+    stateManagement: BusinessLogicAnalysis['stateManagement']
   ): CodeTransformation[] {
     return stateManagement.map(state => ({
       type: 'state' as const,
@@ -274,7 +274,7 @@ export class ConfiguratorTransformer {
    * Transform event handlers
    */
   private transformEventHandlers(
-    handlers: BusinessLogicAnalysis['eventHandlers'],
+    handlers: BusinessLogicAnalysis['eventHandlers']
   ): CodeTransformation[] {
     return handlers.map(handler => ({
       type: 'handler' as const,
@@ -289,7 +289,7 @@ export class ConfiguratorTransformer {
    * Transform side effects
    */
   private transformSideEffects(
-    effects: BusinessLogicAnalysis['sideEffects'],
+    effects: BusinessLogicAnalysis['sideEffects']
   ): CodeTransformation[] {
     return effects.map((effect, index) => ({
       type: 'effect' as const,
@@ -304,7 +304,7 @@ export class ConfiguratorTransformer {
    * Transform validation logic
    */
   private transformValidations(
-    validations: BusinessLogicAnalysis['validations'],
+    validations: BusinessLogicAnalysis['validations']
   ): CodeTransformation[] {
     return validations.map(validation => ({
       type: 'validation' as const,
@@ -337,7 +337,7 @@ export class ConfiguratorTransformer {
    */
   private createPatternMappings(
     _component: ComponentDefinition,
-    analysis: BusinessLogicAnalysis,
+    analysis: BusinessLogicAnalysis
   ): PatternMapping[] {
     const mappings: PatternMapping[] = [];
 
@@ -371,7 +371,7 @@ export class ConfiguratorTransformer {
    */
   private createTransformedComponent(
     component: ComponentDefinition,
-    _transformations: CodeTransformation[], // TODO: Use transformations to update component metadata
+    _transformations: CodeTransformation[] // TODO: Use transformations to update component metadata
   ): ComponentDefinition {
     return {
       ...component,
@@ -388,16 +388,16 @@ export class ConfiguratorTransformer {
    */
   private validateBusinessLogicPreservation(
     analysis: BusinessLogicAnalysis,
-    transformations: CodeTransformation[],
+    transformations: CodeTransformation[]
   ): boolean {
     // Check if all critical business logic has transformations
     const criticalRequirements = analysis.preservationRequirements.filter(
-      r => r.critical,
+      r => r.critical
     );
 
     for (const requirement of criticalRequirements) {
       const hasTransformation = transformations.some(t =>
-        t.description.includes(requirement.name),
+        t.description.includes(requirement.name)
       );
 
       if (!hasTransformation) {
@@ -413,7 +413,7 @@ export class ConfiguratorTransformer {
    */
   private collectWarnings(
     _transformations: CodeTransformation[],
-    businessLogicPreserved: boolean,
+    businessLogicPreserved: boolean
   ): string[] {
     const warnings: string[] = [];
 
@@ -434,7 +434,7 @@ export class ConfiguratorTransformer {
   private requiresManualReview(
     strategy: MigrationStrategy,
     transformations: CodeTransformation[],
-    businessLogicPreserved: boolean,
+    businessLogicPreserved: boolean
   ): boolean {
     if (strategy === 'manual-review-required') {
       return true;
@@ -472,7 +472,7 @@ export function createConfiguratorTransformer(): ConfiguratorTransformer {
  */
 export async function transformToConfigurator(
   component: ComponentDefinition,
-  sourceCode: string,
+  sourceCode: string
 ): Promise<TransformationResult> {
   const transformer = createConfiguratorTransformer();
   return transformer.transform(component, sourceCode);

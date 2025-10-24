@@ -121,8 +121,12 @@ export const Component = () => <div className="container">Test</div>;
       expect(result.success).toBe(true);
       expect(result.convertedRules).toHaveLength(1);
       expect(result.convertedRules[0].tailwindClasses).toContain('flex');
-      expect(result.convertedRules[0].tailwindClasses).toContain('items-center');
-      expect(result.convertedRules[0].tailwindClasses).toContain('justify-between');
+      expect(result.convertedRules[0].tailwindClasses).toContain(
+        'items-center'
+      );
+      expect(result.convertedRules[0].tailwindClasses).toContain(
+        'justify-between'
+      );
     });
 
     it('should convert colors with arbitrary values', async () => {
@@ -144,8 +148,12 @@ export const Component = () => <div className="button">Test</div>;
       const result = await transformer.transform(code, '/test/Component.tsx');
 
       expect(result.success).toBe(true);
-      expect(result.convertedRules[0].tailwindClasses).toContain('bg-[#007bff]');
-      expect(result.convertedRules[0].tailwindClasses).toContain('text-[#ffffff]');
+      expect(result.convertedRules[0].tailwindClasses).toContain(
+        'bg-[#007bff]'
+      );
+      expect(result.convertedRules[0].tailwindClasses).toContain(
+        'text-[#ffffff]'
+      );
     });
 
     it('should convert padding and margin', async () => {
@@ -429,7 +437,10 @@ export const Component = () => <div className="box">Test</div>;
       mockReadFile.mockResolvedValue(css);
       mockAccess.mockResolvedValue(undefined);
 
-      const result = await lowFidelityTransformer.transform(code, '/test/Component.tsx');
+      const result = await lowFidelityTransformer.transform(
+        code,
+        '/test/Component.tsx'
+      );
 
       expect(result.success).toBe(true);
       // With preserveVisualFidelity=false, might use closest Tailwind color
@@ -459,7 +470,10 @@ export const Component = () => <div className="custom">Test</div>;
       mockReadFile.mockResolvedValue(css);
       mockAccess.mockResolvedValue(undefined);
 
-      const result = await configTransformer.transform(code, '/test/Component.tsx');
+      const result = await configTransformer.transform(
+        code,
+        '/test/Component.tsx'
+      );
 
       expect(result.success).toBe(true);
       expect(result.tailwindConfigSuggestions.length).toBeGreaterThan(0);

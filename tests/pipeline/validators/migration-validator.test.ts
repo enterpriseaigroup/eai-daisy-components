@@ -133,7 +133,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         mockTransformation,
-        mockGeneration,
+        mockGeneration
       );
 
       expect(result.valid).toBe(true);
@@ -149,7 +149,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         failedTransform,
-        mockGeneration,
+        mockGeneration
       );
 
       expect(result.valid).toBe(false);
@@ -164,7 +164,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         reviewTransform,
-        mockGeneration,
+        mockGeneration
       );
 
       expect(result.warnings.length).toBeGreaterThan(0);
@@ -174,7 +174,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         mockTransformation,
-        mockGeneration,
+        mockGeneration
       );
       expect(result.score).toBeGreaterThanOrEqual(0);
       expect(result.score).toBeLessThanOrEqual(100);
@@ -184,7 +184,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         mockTransformation,
-        mockGeneration,
+        mockGeneration
       );
       expect(result.typesSafe).toBe(true);
     });
@@ -193,7 +193,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         mockTransformation,
-        mockGeneration,
+        mockGeneration
       );
       expect(result.testsPass).toBe(true);
     });
@@ -210,7 +210,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         warnTransform,
-        mockGeneration,
+        mockGeneration
       );
       expect(result.warnings.length).toBeGreaterThanOrEqual(1);
     });
@@ -223,7 +223,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         failedTransform,
-        mockGeneration,
+        mockGeneration
       );
 
       expect(result.score).toBeLessThan(100);
@@ -237,7 +237,7 @@ describe('MigrationValidator', () => {
       const result = await validator.validate(
         mockComponent,
         warnTransform,
-        mockGeneration,
+        mockGeneration
       );
 
       expect(result.score).toBeLessThan(100);

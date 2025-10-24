@@ -215,7 +215,7 @@ export class BusinessLogicAnalyzer {
    */
   public analyzeComponent(
     component: ComponentDefinition,
-    sourceCode: string,
+    sourceCode: string
   ): BusinessLogicAnalysis {
     this.logger.debug(`Analyzing business logic: ${component.name}`);
 
@@ -265,7 +265,7 @@ export class BusinessLogicAnalyzer {
    */
   private analyzeFunctions(
     sourceCode: string,
-    component: ComponentDefinition,
+    component: ComponentDefinition
   ): BusinessLogicDefinition[] {
     // Start with component's existing business logic
     const functions: BusinessLogicDefinition[] = [...component.businessLogic];
@@ -293,7 +293,7 @@ export class BusinessLogicAnalyzer {
             complexity: this.assessFunctionComplexity(sourceCode, functionName),
             externalDependencies: this.extractDependencies(
               sourceCode,
-              functionName,
+              functionName
             ),
           });
         }
@@ -311,7 +311,7 @@ export class BusinessLogicAnalyzer {
 
     // useState patterns
     const useStateMatches = sourceCode.matchAll(
-      /const\s*\[(\w+),\s*(\w+)\]\s*=\s*useState(?:<([^>]+)>)?\s*\(([^)]*)\)/g,
+      /const\s*\[(\w+),\s*(\w+)\]\s*=\s*useState(?:<([^>]+)>)?\s*\(([^)]*)\)/g
     );
 
     for (const match of useStateMatches) {
@@ -329,7 +329,7 @@ export class BusinessLogicAnalyzer {
 
     // useReducer patterns
     const useReducerMatches = sourceCode.matchAll(
-      /const\s*\[(\w+),\s*(\w+)\]\s*=\s*useReducer\s*\(([^,]+),\s*([^)]+)\)/g,
+      /const\s*\[(\w+),\s*(\w+)\]\s*=\s*useReducer\s*\(([^,]+),\s*([^)]+)\)/g
     );
 
     for (const match of useReducerMatches) {
@@ -356,7 +356,7 @@ export class BusinessLogicAnalyzer {
 
     // useEffect patterns
     const effectMatches = sourceCode.matchAll(
-      /useEffect\s*\(\s*\(\)\s*=>\s*\{([^}]+)\}(?:,\s*\[([^\]]*)\])?\)/gs,
+      /useEffect\s*\(\s*\(\)\s*=>\s*\{([^}]+)\}(?:,\s*\[([^\]]*)\])?\)/gs
     );
 
     for (const match of effectMatches) {
@@ -464,7 +464,7 @@ export class BusinessLogicAnalyzer {
 
     // Look for conditional logic that represents business rules
     const conditionalMatches = sourceCode.matchAll(
-      /if\s*\(([^)]+)\)\s*\{([^}]+)\}/g,
+      /if\s*\(([^)]+)\)\s*\{([^}]+)\}/g
     );
 
     for (const match of conditionalMatches) {
@@ -489,7 +489,7 @@ export class BusinessLogicAnalyzer {
    * Calculate complexity score
    */
   private calculateComplexityScore(
-    analysis: Partial<BusinessLogicAnalysis>,
+    analysis: Partial<BusinessLogicAnalysis>
   ): number {
     let score = 0;
 
@@ -508,7 +508,7 @@ export class BusinessLogicAnalyzer {
    * Identify preservation requirements
    */
   private identifyPreservationRequirements(
-    analysis: Partial<BusinessLogicAnalysis>,
+    analysis: Partial<BusinessLogicAnalysis>
   ): PreservationRequirement[] {
     const requirements: PreservationRequirement[] = [];
 
@@ -554,7 +554,7 @@ export class BusinessLogicAnalyzer {
    */
   private extractParameters(
     _sourceCode: string,
-    _startIndex: number,
+    _startIndex: number
   ): ParameterDefinition[] {
     // Simplified parameter extraction - reserved for future enhancement
     return [];
@@ -565,28 +565,28 @@ export class BusinessLogicAnalyzer {
    */
   private assessFunctionComplexity(
     sourceCode: string,
-    functionName: string,
+    functionName: string
   ): ComplexityLevel {
     const functionStart = sourceCode.indexOf(functionName);
     if (functionStart === -1) {
-return 'simple';
-}
+      return 'simple';
+    }
 
     const functionCode = sourceCode.substring(
       functionStart,
-      functionStart + 500,
+      functionStart + 500
     );
     const lines = functionCode.split('\n').length;
 
     if (lines > 50) {
-return 'critical';
-}
+      return 'critical';
+    }
     if (lines > 20) {
-return 'complex';
-}
+      return 'complex';
+    }
     if (lines > 10) {
-return 'moderate';
-}
+      return 'moderate';
+    }
     return 'simple';
   }
 
@@ -595,7 +595,7 @@ return 'moderate';
    */
   private extractDependencies(
     _sourceCode: string,
-    _functionName: string,
+    _functionName: string
   ): string[] {
     // Reserved for future dependency analysis enhancement
     return [];
@@ -646,7 +646,7 @@ export function createBusinessLogicAnalyzer(): BusinessLogicAnalyzer {
  */
 export function analyzeBusinessLogic(
   component: ComponentDefinition,
-  sourceCode: string,
+  sourceCode: string
 ): BusinessLogicAnalysis {
   const analyzer = createBusinessLogicAnalyzer();
   return analyzer.analyzeComponent(component, sourceCode);
@@ -661,7 +661,7 @@ export function analyzeBusinessLogic(
  */
 export function isBusinessLogicPreserved(
   original: BusinessLogicAnalysis,
-  migrated: BusinessLogicAnalysis,
+  migrated: BusinessLogicAnalysis
 ): boolean {
   // Check function count
   if (original.functions.length !== migrated.functions.length) {

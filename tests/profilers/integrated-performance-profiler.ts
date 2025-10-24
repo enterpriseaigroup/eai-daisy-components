@@ -5,7 +5,11 @@
  */
 
 import { performance } from 'perf_hooks';
-import { PipelineOrchestrator, type PipelineProgress, type PipelineResult } from '@/pipeline/orchestrator';
+import {
+  PipelineOrchestrator,
+  type PipelineProgress,
+  type PipelineResult,
+} from '@/pipeline/orchestrator';
 import type { ExtractionConfig } from '@/types';
 
 export interface PerformanceProfile {
@@ -38,7 +42,7 @@ export class IntegratedPerformanceProfiler {
    */
   public async profileMigration(
     sourcePath: string,
-    config?: Partial<ExtractionConfig>,
+    config?: Partial<ExtractionConfig>
   ): Promise<PerformanceProfile> {
     console.log(`Profiling migration for: ${sourcePath}`);
 
@@ -62,17 +66,19 @@ export class IntegratedPerformanceProfiler {
     let currentPhaseStart: number = 0;
 
     orchestrator.addEventHandler({
-      onPhaseStart: (phase) => {
+      onPhaseStart: phase => {
         currentPhaseStart = performance.now();
         console.log(`Phase started: ${phase}`);
       },
-      onPhaseComplete: (phase) => {
+      onPhaseComplete: phase => {
         const duration = performance.now() - currentPhaseStart;
         this.phaseTimings.set(phase, duration);
         console.log(`Phase completed: ${phase} (${duration.toFixed(2)}ms)`);
       },
       onProgress: (progress: PipelineProgress) => {
-        console.log(`Progress: ${progress.overallProgress.toFixed(1)}% - ${progress.currentOperation}`);
+        console.log(
+          `Progress: ${progress.overallProgress.toFixed(1)}% - ${progress.currentOperation}`
+        );
       },
     });
 
@@ -100,7 +106,7 @@ export class IntegratedPerformanceProfiler {
     // For single component files, use totalDuration to calculate how many could be processed per hour
     // If pipeline discovered multiple components, use that count; otherwise assume 1 component processed
     const componentsProcessed = result.progress.stats.componentsDiscovered || 1;
-    const componentsPerHour = (componentsProcessed / (totalDuration / 3600000));
+    const componentsPerHour = componentsProcessed / (totalDuration / 3600000);
 
     const meetsTarget = componentsPerHour >= this.targetComponentsPerHour;
 
@@ -119,9 +125,7 @@ export class IntegratedPerformanceProfiler {
   /**
    * Profile batch migration
    */
-  public async profileBatchMigration(
-    sourcePaths: string[],
-  ): Promise<{
+  public async profileBatchMigration(sourcePaths: string[]): Promise<{
     totalTime: number;
     averageTime: number;
     throughput: number;
@@ -142,7 +146,7 @@ export class IntegratedPerformanceProfiler {
 
     const totalTime = performance.now() - startTime;
     const averageTime = totalTime / sourcePaths.length;
-    const throughput = (3600000 / averageTime);
+    const throughput = 3600000 / averageTime;
     const meetsTarget = throughput >= this.targetComponentsPerHour;
 
     return {
@@ -174,7 +178,7 @@ export class IntegratedPerformanceProfiler {
 
     for (const phase of profile.phases) {
       lines.push(
-        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`,
+        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`
       );
     }
 
@@ -183,8 +187,12 @@ export class IntegratedPerformanceProfiler {
       lines.push('## Pipeline Results');
       lines.push('');
       lines.push(`- Success: ${profile.pipelineResult.success ? '✅' : '❌'}`);
-      lines.push(`- Components Discovered: ${profile.pipelineResult.progress.stats.componentsDiscovered}`);
-      lines.push(`- Components Parsed: ${profile.pipelineResult.progress.stats.componentsParsed}`);
+      lines.push(
+        `- Components Discovered: ${profile.pipelineResult.progress.stats.componentsDiscovered}`
+      );
+      lines.push(
+        `- Components Parsed: ${profile.pipelineResult.progress.stats.componentsParsed}`
+      );
       lines.push(`- Errors: ${profile.pipelineResult.errors.length}`);
     }
 
@@ -196,7 +204,7 @@ export class IntegratedPerformanceProfiler {
  * Factory function
  */
 export function createIntegratedPerformanceProfiler(
-  targetComponentsPerHour?: number,
+  targetComponentsPerHour?: number
 ): IntegratedPerformanceProfiler {
   return new IntegratedPerformanceProfiler(targetComponentsPerHour);
 }

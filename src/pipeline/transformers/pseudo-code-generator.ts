@@ -81,7 +81,10 @@ export class PseudoCodeGenerator {
   private readonly logger: Logger;
   private readonly options: PseudoCodeGeneratorOptions;
 
-  constructor(options: Partial<PseudoCodeGeneratorOptions> = {}, logger?: Logger) {
+  constructor(
+    options: Partial<PseudoCodeGeneratorOptions> = {},
+    logger?: Logger
+  ) {
     this.logger = logger || createSimpleLogger('PseudoCodeGenerator');
     this.options = {
       includeWhySection: true,
@@ -101,10 +104,12 @@ export class PseudoCodeGenerator {
   public generate(
     componentCode: string,
     componentName: string,
-    isV2Component: boolean = false,
+    isV2Component: boolean = false
   ): Promise<PseudoCodeResult> {
     return Promise.resolve().then(() => {
-      this.logger.info(`Generating pseudo-code documentation for: ${componentName}`);
+      this.logger.info(
+        `Generating pseudo-code documentation for: ${componentName}`
+      );
 
       const result: PseudoCodeResult = {
         success: false,
@@ -134,11 +139,14 @@ export class PseudoCodeGenerator {
 
         // Process blocks in reverse order to maintain line numbers
         for (const block of blocks.reverse()) {
-          const documentation = this.generateDocumentation(block, isV2Component);
+          const documentation = this.generateDocumentation(
+            block,
+            isV2Component
+          );
           documentedCode = this.insertDocumentation(
             documentedCode,
             block.startLine,
-            documentation,
+            documentation
           );
 
           blocksDocumented.push({
@@ -154,11 +162,15 @@ export class PseudoCodeGenerator {
         result.blocksDocumented = blocksDocumented.reverse();
         result.success = true;
 
-        this.logger.info(`Generated documentation for ${blocks.length} business logic blocks`);
+        this.logger.info(
+          `Generated documentation for ${blocks.length} business logic blocks`
+        );
       } catch (error) {
         const errorObj = error instanceof Error ? error : undefined;
         this.logger.error('Pseudo-code generation failed', errorObj);
-        result.warnings.push(`Generation failed: ${error instanceof Error ? error.message : String(error)}`);
+        result.warnings.push(
+          `Generation failed: ${error instanceof Error ? error.message : String(error)}`
+        );
       }
 
       return result;
@@ -170,7 +182,7 @@ export class PseudoCodeGenerator {
    */
   private findBusinessLogicBlocks(
     ast: TSESTree.Program,
-    sourceCode: string,
+    sourceCode: string
   ): AnalyzedBlock[] {
     const blocks: AnalyzedBlock[] = [];
 
@@ -208,7 +220,10 @@ export class PseudoCodeGenerator {
       }
 
       // Arrow function expressions (exported helpers)
-      if (node.type === AST_NODE_TYPES.VariableDeclaration && node.declarations.length > 0) {
+      if (
+        node.type === AST_NODE_TYPES.VariableDeclaration &&
+        node.declarations.length > 0
+      ) {
         const firstDecl = node.declarations[0];
         if (firstDecl.init?.type === AST_NODE_TYPES.ArrowFunctionExpression) {
           blocks.push(this.analyzeExportedFunction(node, sourceCode));
@@ -235,7 +250,10 @@ export class PseudoCodeGenerator {
   /**
    * Analyze useEffect block
    */
-  private analyzeUseEffect(node: TSESTree.CallExpression, _sourceCode: string): AnalyzedBlock {
+  private analyzeUseEffect(
+    node: TSESTree.CallExpression,
+    _sourceCode: string
+  ): AnalyzedBlock {
     const callback = node.arguments[0];
     const deps = node.arguments[1];
 
@@ -268,14 +286,17 @@ export class PseudoCodeGenerator {
   private analyzeUseCallback(
     node: TSESTree.CallExpression,
     _sourceCode: string,
-    parent?: TSESTree.Node,
+    parent?: TSESTree.Node
   ): AnalyzedBlock {
     const callback = node.arguments[0];
     const deps = node.arguments[1];
 
     // Try to get function name from variable declaration
     let name = 'Anonymous Callback';
-    if (parent?.type === AST_NODE_TYPES.VariableDeclarator && parent.id.type === AST_NODE_TYPES.Identifier) {
+    if (
+      parent?.type === AST_NODE_TYPES.VariableDeclarator &&
+      parent.id.type === AST_NODE_TYPES.Identifier
+    ) {
       name = parent.id.name;
     }
 
@@ -308,13 +329,16 @@ export class PseudoCodeGenerator {
   private analyzeUseMemo(
     node: TSESTree.CallExpression,
     _sourceCode: string,
-    parent?: TSESTree.Node,
+    parent?: TSESTree.Node
   ): AnalyzedBlock {
     const callback = node.arguments[0];
     const deps = node.arguments[1];
 
     let name = 'Memoized Value';
-    if (parent?.type === AST_NODE_TYPES.VariableDeclarator && parent.id.type === AST_NODE_TYPES.Identifier) {
+    if (
+      parent?.type === AST_NODE_TYPES.VariableDeclarator &&
+      parent.id.type === AST_NODE_TYPES.Identifier
+    ) {
       name = parent.id.name;
     }
 
@@ -344,7 +368,10 @@ export class PseudoCodeGenerator {
   /**
    * Analyze function declaration
    */
-  private analyzeFunctionDeclaration(node: TSESTree.FunctionDeclaration, _sourceCode: string): AnalyzedBlock {
+  private analyzeFunctionDeclaration(
+    node: TSESTree.FunctionDeclaration,
+    _sourceCode: string
+  ): AnalyzedBlock {
     return {
       type: 'function',
       name: node.id?.name || 'Anonymous',
@@ -359,9 +386,15 @@ export class PseudoCodeGenerator {
   /**
    * Analyze exported function
    */
-  private analyzeExportedFunction(node: TSESTree.VariableDeclaration, _sourceCode: string): AnalyzedBlock {
+  private analyzeExportedFunction(
+    node: TSESTree.VariableDeclaration,
+    _sourceCode: string
+  ): AnalyzedBlock {
     const declarator = node.declarations[0];
-    const name = declarator.id.type === AST_NODE_TYPES.Identifier ? declarator.id.name : 'Anonymous';
+    const name =
+      declarator.id.type === AST_NODE_TYPES.Identifier
+        ? declarator.id.name
+        : 'Anonymous';
 
     return {
       type: 'function',
@@ -377,7 +410,10 @@ export class PseudoCodeGenerator {
   /**
    * Infer useEffect purpose from callback code
    */
-  private inferUseEffectPurpose(callback: TSESTree.Node, sourceCode: string): string {
+  private inferUseEffectPurpose(
+    callback: TSESTree.Node,
+    sourceCode: string
+  ): string {
     // Look for common patterns
     const code = sourceCode.substring(callback.range[0], callback.range[1]);
 
@@ -387,7 +423,11 @@ export class PseudoCodeGenerator {
     if (code.includes('validat')) {
       return 'Validation';
     }
-    if (code.includes('fetch') || code.includes('api') || code.includes('load')) {
+    if (
+      code.includes('fetch') ||
+      code.includes('api') ||
+      code.includes('load')
+    ) {
       return 'Data Fetching';
     }
     if (code.includes('subscribe') || code.includes('listener')) {
@@ -411,8 +451,14 @@ export class PseudoCodeGenerator {
         if (n.callee.type === AST_NODE_TYPES.Identifier) {
           calls.push(n.callee.name);
         } else if (n.callee.type === AST_NODE_TYPES.MemberExpression) {
-          const obj = n.callee.object.type === AST_NODE_TYPES.Identifier ? n.callee.object.name : '';
-          const prop = n.callee.property.type === AST_NODE_TYPES.Identifier ? n.callee.property.name : '';
+          const obj =
+            n.callee.object.type === AST_NODE_TYPES.Identifier
+              ? n.callee.object.name
+              : '';
+          const prop =
+            n.callee.property.type === AST_NODE_TYPES.Identifier
+              ? n.callee.property.name
+              : '';
           calls.push(`${obj}.${prop}`);
         }
       }
@@ -442,7 +488,10 @@ export class PseudoCodeGenerator {
     }
 
     return deps.elements
-      .filter((el): el is TSESTree.Identifier => el?.type === AST_NODE_TYPES.Identifier)
+      .filter(
+        (el): el is TSESTree.Identifier =>
+          el?.type === AST_NODE_TYPES.Identifier
+      )
       .map(el => el.name);
   }
 
@@ -502,7 +551,10 @@ export class PseudoCodeGenerator {
     }
 
     // DEPENDENCIES
-    if (this.options.includeDependenciesSection && block.dependencies.length > 0) {
+    if (
+      this.options.includeDependenciesSection &&
+      block.dependencies.length > 0
+    ) {
       sections.push('   * DEPENDENCIES:');
       block.dependencies.forEach(dep => {
         sections.push(`   * - ${dep}: Triggers when ${dep} changes`);
@@ -523,7 +575,9 @@ export class PseudoCodeGenerator {
     // MIGRATION NOTE (v2 only)
     if (isV2 && this.options.addMigrationNotes) {
       sections.push('   * MIGRATION NOTE:');
-      sections.push('   * - This logic is PRESERVED from v1 - no changes during migration');
+      sections.push(
+        '   * - This logic is PRESERVED from v1 - no changes during migration'
+      );
       sections.push('   *');
     }
 
@@ -537,8 +591,9 @@ export class PseudoCodeGenerator {
    */
   private generateWhySection(block: AnalyzedBlock): string {
     const purposes: Record<string, string> = {
-      'Analytics Tracking': 'Product analytics requirement to track user interactions',
-      'Validation': 'Ensures data integrity and catches errors early',
+      'Analytics Tracking':
+        'Product analytics requirement to track user interactions',
+      Validation: 'Ensures data integrity and catches errors early',
       'Data Fetching': 'Loads required data from external sources',
       'Event Subscription': 'Listens for and responds to system events',
       'Cleanup Effect': 'Prevents memory leaks and cleans up resources',
@@ -581,13 +636,16 @@ export class PseudoCodeGenerator {
   /**
    * Infer why a function is called
    */
-  private inferCallPurpose(functionName: string, _block: AnalyzedBlock): string {
+  private inferCallPurpose(
+    functionName: string,
+    _block: AnalyzedBlock
+  ): string {
     const purposes: Record<string, string> = {
-      'track': 'Analytics tracking',
-      'validate': 'Data validation',
-      'fetch': 'Data fetching',
-      'set': 'State update',
-      'preventDefault': 'Prevent default behavior',
+      track: 'Analytics tracking',
+      validate: 'Data validation',
+      fetch: 'Data fetching',
+      set: 'State update',
+      preventDefault: 'Prevent default behavior',
       'console.log': 'Debugging output',
       'console.warn': 'Warning notification',
       'console.error': 'Error logging',
@@ -651,7 +709,11 @@ export class PseudoCodeGenerator {
   /**
    * Insert documentation before a line
    */
-  private insertDocumentation(code: string, lineNumber: number, documentation: string): string {
+  private insertDocumentation(
+    code: string,
+    lineNumber: number,
+    documentation: string
+  ): string {
     const lines = code.split('\n');
     const targetIndex = lineNumber - 1;
 
@@ -688,7 +750,7 @@ interface AnalyzedBlock {
  */
 export function createPseudoCodeGenerator(
   options?: Partial<PseudoCodeGeneratorOptions>,
-  logger?: Logger,
+  logger?: Logger
 ): PseudoCodeGenerator {
   return new PseudoCodeGenerator(options, logger);
 }

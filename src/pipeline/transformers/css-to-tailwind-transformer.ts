@@ -83,7 +83,7 @@ export class CSSToTailwindTransformer {
    */
   public async transform(
     componentCode: string,
-    componentPath: string,
+    componentPath: string
   ): Promise<CSSToTailwindResult> {
     this.logger.info(`Transforming CSS to Tailwind for: ${componentPath}`);
 
@@ -116,7 +116,10 @@ export class CSSToTailwindTransformer {
 
       // Step 4: Replace className references in component
       let transformedCode = componentCode;
-      transformedCode = this.replaceClassNames(transformedCode, classNameMappings);
+      transformedCode = this.replaceClassNames(
+        transformedCode,
+        classNameMappings
+      );
 
       // Step 5: Remove CSS imports
       transformedCode = this.removeCSSImports(transformedCode, cssImports);
@@ -129,11 +132,15 @@ export class CSSToTailwindTransformer {
       result.processedFiles = cssAnalysis.map(a => a.filePath);
       result.success = true;
 
-      this.logger.info(`Successfully transformed ${cssImports.length} CSS imports to Tailwind`);
+      this.logger.info(
+        `Successfully transformed ${cssImports.length} CSS imports to Tailwind`
+      );
     } catch (error) {
       const errorObj = error instanceof Error ? error : undefined;
       this.logger.error('CSS to Tailwind transformation failed', errorObj);
-      result.warnings.push(`Transformation failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.warnings.push(
+        `Transformation failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
 
     return result;
@@ -152,7 +159,8 @@ export class CSSToTailwindTransformer {
     activeCode = activeCode.replace(/\/\/.*$/gm, '');
 
     // Remove multi-line comments
-    activeCode = activeCode.replace(/\/\*[\s\S]*?\*\//g, '');    const patterns = [
+    activeCode = activeCode.replace(/\/\*[\s\S]*?\*\//g, '');
+    const patterns = [
       // Direct CSS imports: import './Button.css'
       /import\s+['"]([^'"]+\.css)['"]/g,
       // CSS Module imports: import styles from './Button.module.css'
@@ -199,7 +207,7 @@ export class CSSToTailwindTransformer {
    */
   private async analyzeCSSFiles(
     imports: CSSImport[],
-    componentPath: string,
+    componentPath: string
   ): Promise<CSSFileAnalysis[]> {
     const analyses: CSSFileAnalysis[] = [];
 
@@ -208,7 +216,11 @@ export class CSSToTailwindTransformer {
 
       try {
         const cssContent = await fs.readFile(cssPath, 'utf-8');
-        const analysis = this.analyzeCSSContent(cssContent, cssPath, cssImport.type);
+        const analysis = this.analyzeCSSContent(
+          cssContent,
+          cssPath,
+          cssImport.type
+        );
         analyses.push(analysis);
       } catch (error) {
         this.logger.warn(`Could not read CSS file: ${cssPath}`);
@@ -224,7 +236,7 @@ export class CSSToTailwindTransformer {
   private analyzeCSSContent(
     cssContent: string,
     filePath: string,
-    importType: 'direct' | 'module' | 'named',
+    importType: 'direct' | 'module' | 'named'
   ): CSSFileAnalysis {
     const conversions: CSSConversion[] = [];
 
@@ -262,7 +274,10 @@ export class CSSToTailwindTransformer {
    */
   private convertCSSRulesToTailwind(cssRules: string): string {
     const classes: string[] = [];
-    const rules = cssRules.split(';').map(r => r.trim()).filter(r => r);
+    const rules = cssRules
+      .split(';')
+      .map(r => r.trim())
+      .filter(r => r);
 
     for (const rule of rules) {
       const [property, value] = rule.split(':').map(s => s.trim());
@@ -282,34 +297,37 @@ export class CSSToTailwindTransformer {
   /**
    * Map CSS property/value to Tailwind class
    */
-  private mapCSSPropertyToTailwind(property: string, value: string): string | null {
+  private mapCSSPropertyToTailwind(
+    property: string,
+    value: string
+  ): string | null {
     // Common mappings
     const mappings: Record<string, (val: string) => string | null> = {
-      'display': (val) => {
+      display: val => {
         const map: Record<string, string> = {
-          'flex': 'flex',
+          flex: 'flex',
           'inline-flex': 'inline-flex',
-          'inline': 'inline',
-          'block': 'block',
+          inline: 'inline',
+          block: 'block',
           'inline-block': 'inline-block',
-          'grid': 'grid',
-          'none': 'hidden',
+          grid: 'grid',
+          none: 'hidden',
         };
         return map[val] || null;
       },
-      'align-items': (val) => {
+      'align-items': val => {
         const map: Record<string, string> = {
-          'center': 'items-center',
+          center: 'items-center',
           'flex-start': 'items-start',
           'flex-end': 'items-end',
-          'baseline': 'items-baseline',
-          'stretch': 'items-stretch',
+          baseline: 'items-baseline',
+          stretch: 'items-stretch',
         };
         return map[val] || null;
       },
-      'justify-content': (val) => {
+      'justify-content': val => {
         const map: Record<string, string> = {
-          'center': 'justify-center',
+          center: 'justify-center',
           'flex-start': 'justify-start',
           'flex-end': 'justify-end',
           'space-between': 'justify-between',
@@ -317,32 +335,32 @@ export class CSSToTailwindTransformer {
         };
         return map[val] || null;
       },
-      'padding': (val) => this.convertSpacing('p', val),
-      'margin': (val) => this.convertSpacing('m', val),
-      'padding-top': (val) => this.convertSpacing('pt', val),
-      'padding-right': (val) => this.convertSpacing('pr', val),
-      'padding-bottom': (val) => this.convertSpacing('pb', val),
-      'padding-left': (val) => this.convertSpacing('pl', val),
-      'margin-top': (val) => this.convertSpacing('mt', val),
-      'margin-right': (val) => this.convertSpacing('mr', val),
-      'margin-bottom': (val) => this.convertSpacing('mb', val),
-      'margin-left': (val) => this.convertSpacing('ml', val),
-      'background-color': (val) => this.convertColor('bg', val),
-      'color': (val) => this.convertColor('text', val),
-      'border-color': (val) => this.convertColor('border', val),
-      'border': (val) => val === 'none' ? 'border-none' : null,
-      'border-radius': (val) => this.convertBorderRadius(val),
-      'font-size': (val) => this.convertFontSize(val),
-      'font-weight': (val) => this.convertFontWeight(val),
-      'text-align': (val) => `text-${val}`,
-      'cursor': (val) => `cursor-${val}`,
-      'opacity': (val) => `opacity-${Math.round(parseFloat(val) * 100)}`,
-      'width': (val) => val === '100%' ? 'w-full' : this.convertSize('w', val),
-      'height': (val) => this.convertSize('h', val),
-      'min-height': (val) => this.convertSize('min-h', val),
-      'max-width': (val) => this.convertSize('max-w', val),
-      'transition': (val) => this.convertTransition(val),
-      'position': (val) => val,
+      padding: val => this.convertSpacing('p', val),
+      margin: val => this.convertSpacing('m', val),
+      'padding-top': val => this.convertSpacing('pt', val),
+      'padding-right': val => this.convertSpacing('pr', val),
+      'padding-bottom': val => this.convertSpacing('pb', val),
+      'padding-left': val => this.convertSpacing('pl', val),
+      'margin-top': val => this.convertSpacing('mt', val),
+      'margin-right': val => this.convertSpacing('mr', val),
+      'margin-bottom': val => this.convertSpacing('mb', val),
+      'margin-left': val => this.convertSpacing('ml', val),
+      'background-color': val => this.convertColor('bg', val),
+      color: val => this.convertColor('text', val),
+      'border-color': val => this.convertColor('border', val),
+      border: val => (val === 'none' ? 'border-none' : null),
+      'border-radius': val => this.convertBorderRadius(val),
+      'font-size': val => this.convertFontSize(val),
+      'font-weight': val => this.convertFontWeight(val),
+      'text-align': val => `text-${val}`,
+      cursor: val => `cursor-${val}`,
+      opacity: val => `opacity-${Math.round(parseFloat(val) * 100)}`,
+      width: val => (val === '100%' ? 'w-full' : this.convertSize('w', val)),
+      height: val => this.convertSize('h', val),
+      'min-height': val => this.convertSize('min-h', val),
+      'max-width': val => this.convertSize('max-w', val),
+      transition: val => this.convertTransition(val),
+      position: val => val,
     };
 
     const mapper = mappings[property];
@@ -400,9 +418,9 @@ export class CSSToTailwindTransformer {
 
     // Standard color names
     const colorMap: Record<string, string> = {
-      'white': `${prefix}-white`,
-      'black': `${prefix}-black`,
-      'transparent': `${prefix}-transparent`,
+      white: `${prefix}-white`,
+      black: `${prefix}-black`,
+      transparent: `${prefix}-transparent`,
     };
 
     return colorMap[value] || `${prefix}-[${value}]`;
@@ -455,7 +473,7 @@ export class CSSToTailwindTransformer {
   private convertFontWeight(value: string): string {
     const weightMap: Record<string, string> = {
       '100': 'font-thin',
-      'bold': 'font-bold',
+      bold: 'font-bold',
       '200': 'font-extralight',
       '300': 'font-light',
       '400': 'font-normal',
@@ -489,7 +507,9 @@ export class CSSToTailwindTransformer {
   /**
    * Build className mappings from CSS analysis
    */
-  private buildClassNameMappings(analyses: CSSFileAnalysis[]): Record<string, string> {
+  private buildClassNameMappings(
+    analyses: CSSFileAnalysis[]
+  ): Record<string, string> {
     const mappings: Record<string, string> = {};
 
     for (const analysis of analyses) {
@@ -504,7 +524,10 @@ export class CSSToTailwindTransformer {
   /**
    * Replace className references in component code
    */
-  private replaceClassNames(code: string, mappings: Record<string, string>): string {
+  private replaceClassNames(
+    code: string,
+    mappings: Record<string, string>
+  ): string {
     let result = code;
 
     for (const [className, tailwindClasses] of Object.entries(mappings)) {
@@ -520,11 +543,22 @@ export class CSSToTailwindTransformer {
         },
         // className="class-name other-class"
         {
-          pattern: new RegExp(`className=["']([^"']*\\s)?${escapedClass}(\\s[^"']*)?["']`, 'g'),
-          replacement: (_match: string, before: string = '', after: string = '') => {
+          pattern: new RegExp(
+            `className=["']([^"']*\\s)?${escapedClass}(\\s[^"']*)?["']`,
+            'g'
+          ),
+          replacement: (
+            _match: string,
+            before: string = '',
+            after: string = ''
+          ) => {
             const before_trimmed = before.trim();
             const after_trimmed = after.trim();
-            const parts = [before_trimmed, tailwindClasses, after_trimmed].filter(Boolean);
+            const parts = [
+              before_trimmed,
+              tailwindClasses,
+              after_trimmed,
+            ].filter(Boolean);
             return `className="${parts.join(' ')}"`;
           },
         },
@@ -535,7 +569,10 @@ export class CSSToTailwindTransformer {
         },
         // className={`class-name ${expr}`} - class at start of template literal
         {
-          pattern: new RegExp('className=\\{`' + escapedClass + '([\\s\\$][^`]*)?`\\}', 'g'),
+          pattern: new RegExp(
+            'className=\\{`' + escapedClass + '([\\s\\$][^`]*)?`\\}',
+            'g'
+          ),
           replacement: (_match: string, after: string = '') => {
             if (after && after.trim()) {
               return `className={\`${tailwindClasses}${after}\`}`;
@@ -555,26 +592,48 @@ export class CSSToTailwindTransformer {
         },
         // className={styles['class-name']}
         {
-          pattern: new RegExp(`className=\\{styles\\['${escapedClass}'\\]\\}`, 'g'),
+          pattern: new RegExp(
+            `className=\\{styles\\['${escapedClass}'\\]\\}`,
+            'g'
+          ),
           replacement: `className="${tailwindClasses}"`,
         },
         // className={styles.className}
         {
-          pattern: new RegExp(`className=\\{styles\\.${escapedCamelCase}\\}`, 'g'),
+          pattern: new RegExp(
+            `className=\\{styles\\.${escapedCamelCase}\\}`,
+            'g'
+          ),
           replacement: `className="${tailwindClasses}"`,
         },
         // className={`${styles.className}`}
         {
-          pattern: new RegExp('className=\\{`\\$\\{styles\\.' + escapedCamelCase + '\\}`\\}', 'g'),
+          pattern: new RegExp(
+            'className=\\{`\\$\\{styles\\.' + escapedCamelCase + '\\}`\\}',
+            'g'
+          ),
           replacement: `className="${tailwindClasses}"`,
         },
         // className={`some-class ${styles.className}`}
         {
-          pattern: new RegExp('className=\\{`([^`]*\\s)?\\$\\{styles\\.' + escapedCamelCase + '\\}(\\s[^`]*)?`\\}', 'g'),
-          replacement: (_match: string, before: string = '', after: string = '') => {
+          pattern: new RegExp(
+            'className=\\{`([^`]*\\s)?\\$\\{styles\\.' +
+              escapedCamelCase +
+              '\\}(\\s[^`]*)?`\\}',
+            'g'
+          ),
+          replacement: (
+            _match: string,
+            before: string = '',
+            after: string = ''
+          ) => {
             const before_trimmed = before.trim();
             const after_trimmed = after.trim();
-            const parts = [before_trimmed, tailwindClasses, after_trimmed].filter(Boolean);
+            const parts = [
+              before_trimmed,
+              tailwindClasses,
+              after_trimmed,
+            ].filter(Boolean);
             return `className="${parts.join(' ')}"`;
           },
         },
@@ -582,7 +641,10 @@ export class CSSToTailwindTransformer {
 
       for (const { pattern, replacement } of patterns) {
         if (typeof replacement === 'function') {
-          result = result.replace(pattern, replacement as (...args: string[]) => string);
+          result = result.replace(
+            pattern,
+            replacement as (...args: string[]) => string
+          );
         } else {
           result = result.replace(pattern, replacement);
         }
@@ -600,7 +662,10 @@ export class CSSToTailwindTransformer {
 
     for (const cssImport of imports) {
       // Remove the entire import line
-      result = result.replace(new RegExp(`^.*${this.escapeRegex(cssImport.statement)}.*$`, 'gm'), '');
+      result = result.replace(
+        new RegExp(`^.*${this.escapeRegex(cssImport.statement)}.*$`, 'gm'),
+        ''
+      );
     }
 
     // Clean up empty lines
@@ -633,7 +698,10 @@ export class CSSToTailwindTransformer {
   /**
    * Calculate confidence level for conversion
    */
-  private calculateConfidence(cssRules: string, tailwindClasses: string): number {
+  private calculateConfidence(
+    cssRules: string,
+    tailwindClasses: string
+  ): number {
     const ruleCount = cssRules.split(';').filter(r => r.trim()).length;
     const classCount = tailwindClasses.split(' ').filter(c => c.trim()).length;
 
@@ -679,7 +747,7 @@ interface CSSFileAnalysis {
  */
 export function createCSSToTailwindTransformer(
   options?: Partial<CSSToTailwindOptions>,
-  logger?: Logger,
+  logger?: Logger
 ): CSSToTailwindTransformer {
   return new CSSToTailwindTransformer(options, logger);
 }

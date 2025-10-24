@@ -14,7 +14,11 @@ import { DependencyResolver } from '@/utils/dependency-resolver';
 import PipelineOrchestrator from '@/pipeline/orchestrator';
 import { MigrationTracker } from '@/utils/migration-tracker';
 import { createSimpleLogger, getGlobalLogger } from '@/utils/logging';
-import type { ComponentDefinition, ExtractionConfig, MigrationStatus } from '@/types';
+import type {
+  ComponentDefinition,
+  ExtractionConfig,
+  MigrationStatus,
+} from '@/types';
 
 const logger = getGlobalLogger('MigrateAll');
 
@@ -144,7 +148,9 @@ export class BatchMigrationOrchestrator {
   /**
    * Execute batch migration
    */
-  public async migrate(options: BatchMigrationOptions): Promise<BatchMigrationResult> {
+  public async migrate(
+    options: BatchMigrationOptions
+  ): Promise<BatchMigrationResult> {
     const startTime = Date.now();
 
     logger.info('Starting batch migration', { options });
@@ -161,7 +167,9 @@ export class BatchMigrationOrchestrator {
       const discoveryResult = await this.discovery.discoverComponents();
 
       if (discoveryResult.errors.length > 0) {
-        throw new Error(`Discovery failed: ${discoveryResult.errors.map(e => e.message).join(', ')}`);
+        throw new Error(
+          `Discovery failed: ${discoveryResult.errors.map(e => e.message).join(', ')}`
+        );
       }
 
       let components = discoveryResult.components;
@@ -203,7 +211,7 @@ export class BatchMigrationOrchestrator {
       const result = await this.migrateComponents(
         orderedComponents,
         options,
-        sessionId,
+        sessionId
       );
 
       // Complete session
@@ -221,8 +229,11 @@ export class BatchMigrationOrchestrator {
       return { ...result, duration };
     } catch (error) {
       const duration = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('Batch migration failed: ' + errorMessage + ` (duration: ${duration}ms)`);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error(
+        'Batch migration failed: ' + errorMessage + ` (duration: ${duration}ms)`
+      );
       throw error;
     }
   }
@@ -233,7 +244,7 @@ export class BatchMigrationOrchestrator {
   private async migrateComponents(
     components: ComponentDefinition[],
     options: BatchMigrationOptions,
-    sessionId: string,
+    sessionId: string
   ): Promise<Omit<BatchMigrationResult, 'duration'>> {
     const result: Omit<BatchMigrationResult, 'duration'> = {
       total: components.length,
@@ -254,7 +265,9 @@ export class BatchMigrationOrchestrator {
 
       // Process batch in parallel
       const batchResults = await Promise.allSettled(
-        batch.map(component => this.migrateComponent(component, options, sessionId)),
+        batch.map(component =>
+          this.migrateComponent(component, options, sessionId)
+        )
       );
 
       // Aggregate results
@@ -277,7 +290,8 @@ export class BatchMigrationOrchestrator {
           result.failed++;
           const error =
             batchResult.status === 'rejected'
-              ? (batchResult.reason as Error).message || String(batchResult.reason)
+              ? (batchResult.reason as Error).message ||
+                String(batchResult.reason)
               : batchResult.value.error;
 
           result.components.push({
@@ -303,7 +317,7 @@ export class BatchMigrationOrchestrator {
   private async migrateComponent(
     component: ComponentDefinition,
     options: BatchMigrationOptions,
-    _sessionId: string,
+    _sessionId: string
   ): Promise<{ success: boolean; error?: string }> {
     if (options.dryRun) {
       logger.info(`[DRY RUN] Would migrate ${component.name}`);
@@ -383,7 +397,10 @@ export class BatchMigrationOrchestrator {
       });
 
       // Record completion
-      this.tracker.updateStatus(component.id, result.success ? 'completed' : 'failed');
+      this.tracker.updateStatus(
+        component.id,
+        result.success ? 'completed' : 'failed'
+      );
 
       if (!result.success && result.errors.length > 0) {
         const firstError = result.errors[0];
@@ -395,7 +412,8 @@ export class BatchMigrationOrchestrator {
 
       return { success: result.success };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       logger.error(`Failed to migrate ${component.name}: ${errorMessage}`);
 
       this.tracker.updateStatus(component.id, 'failed');
@@ -411,7 +429,7 @@ export class BatchMigrationOrchestrator {
    */
   private applyFilters(
     components: ComponentDefinition[],
-    options: BatchMigrationOptions,
+    options: BatchMigrationOptions
   ): ComponentDefinition[] {
     let filtered = components;
 
@@ -425,7 +443,10 @@ export class BatchMigrationOrchestrator {
   /**
    * Generate migration reports
    */
-  private async generateReports(sessionId: string, outputDir: string): Promise<void> {
+  private async generateReports(
+    sessionId: string,
+    outputDir: string
+  ): Promise<void> {
     try {
       logger.info('Generating migration reports...');
 
@@ -441,7 +462,10 @@ export class BatchMigrationOrchestrator {
 
       // Generate JSON report
       const jsonReport = JSON.stringify(summary, null, 2);
-      const jsonPath = path.join(reportDir, `migration-report-${sessionId}.json`);
+      const jsonPath = path.join(
+        reportDir,
+        `migration-report-${sessionId}.json`
+      );
       await fs.writeFile(jsonPath, jsonReport);
       logger.info(`Generated JSON report: ${jsonPath}`);
 
@@ -451,7 +475,8 @@ export class BatchMigrationOrchestrator {
       await fs.writeFile(mdPath, markdownReport);
       logger.info(`Generated Markdown report: ${mdPath}`);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       logger.error('Failed to generate reports: ' + errorMessage);
     }
   }
@@ -482,15 +507,21 @@ export function createMigrateAllCommand(): Command {
 
   command
     .description('Migrate all DAISY v1 components to Configurator v2')
-    .requiredOption('-s, --source <dir>', 'Source directory for DAISY v1 components')
-    .requiredOption('-o, --output <dir>', 'Output directory for migrated components')
+    .requiredOption(
+      '-s, --source <dir>',
+      'Source directory for DAISY v1 components'
+    )
+    .requiredOption(
+      '-o, --output <dir>',
+      'Output directory for migrated components'
+    )
     .requiredOption('-b, --baseline <dir>', 'Baseline preservation directory')
     .option('-p, --parallelism <number>', 'Maximum parallel migrations', '4')
     .option('--continue-on-error', 'Continue migration on error', false)
     .option('--dry-run', 'Dry run mode (no actual migration)', false)
     .option('--tier <tier>', 'Filter by tier')
     .option('--complexity <level>', 'Filter by complexity level')
-    .action(async (options) => {
+    .action(async options => {
       const orchestrator = new BatchMigrationOrchestrator();
 
       try {
@@ -509,7 +540,8 @@ export function createMigrateAllCommand(): Command {
         console.log(JSON.stringify(result, null, 2));
         process.exit(0);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         logger.error('Migration failed: ' + errorMessage);
         process.exit(1);
       }

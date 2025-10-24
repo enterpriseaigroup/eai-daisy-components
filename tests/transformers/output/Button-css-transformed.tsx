@@ -78,7 +78,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'data-testid': testId,
       ...rest
     },
-    ref,
+    ref
   ) => {
     // Complex state management (to be transformed)
     const [isPressed, setIsPressed] = useState(false);
@@ -133,7 +133,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           });
         }
       },
-      [trackingId, variant, size],
+      [trackingId, variant, size]
     );
 
     // Complex business logic: Enhanced click handling
@@ -167,7 +167,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           setIsPressed(false);
         }, 150);
       },
-      [disabled, loading, onClick, children, trackEvent],
+      [disabled, loading, onClick, children, trackEvent]
     );
 
     // Complex business logic: Tooltip management
@@ -229,7 +229,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     return (
-      <div className="relative inline-block">
+      <div className='relative inline-block'>
         <button
           ref={buttonRef}
           type={type}
@@ -251,8 +251,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         >
           {/* DAISY v1 pattern: Complex loading state */}
           {loading && (
-            <span className="inline-flex items-center justify-center w-[16px] h-[16px]" aria-hidden='true'>
-              <svg viewBox='0 0 24 24' className="transition">
+            <span
+              className='inline-flex items-center justify-center w-[16px] h-[16px]'
+              aria-hidden='true'
+            >
+              <svg viewBox='0 0 24 24' className='transition'>
                 <circle
                   cx='12'
                   cy='12'
@@ -287,25 +290,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <div
               ref={tooltipRef}
               id={`${testId || 'button'}-tooltip`}
-              className=""
+              className=''
               role='tooltip'
               aria-hidden={!tooltipVisible}
             >
               {tooltip}
-              <div className="" />
+              <div className='' />
             </div>
           )}
         </button>
       </div>
     );
-  },
+  }
 );
 
 // DAISY v1 pattern: Higher-order component for theme integration
 export const withDaisyTheme = (
   WrappedButton: React.ForwardRefExoticComponent<
     ButtonProps & React.RefAttributes<HTMLButtonElement>
-  >,
+  >
 ) => {
   return React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const [theme, setTheme] = useState('light');

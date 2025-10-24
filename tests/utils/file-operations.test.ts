@@ -64,7 +64,7 @@ describe('FileOperations', () => {
       await writeFile(
         sourceFile,
         'export const Component = () => <div>Test</div>;',
-        'utf-8',
+        'utf-8'
       );
 
       const destination = await fileOps.copyToBaseline(sourceFile, baselineDir);
@@ -82,7 +82,7 @@ describe('FileOperations', () => {
       await writeFile(
         sourceFile,
         'export const Component = () => <div>Test</div>;',
-        'utf-8',
+        'utf-8'
       );
 
       const destination = await fileOps.copyToBaseline(
@@ -90,7 +90,7 @@ describe('FileOperations', () => {
         baselineDir,
         {
           createParents: true,
-        },
+        }
       );
 
       const content = await readFile(destination, 'utf-8');
@@ -106,11 +106,11 @@ describe('FileOperations', () => {
       await writeFile(
         join(baselineDir, 'Component.tsx'),
         'existing content',
-        'utf-8',
+        'utf-8'
       );
 
       await expect(
-        fileOps.copyToBaseline(sourceFile, baselineDir, { overwrite: false }),
+        fileOps.copyToBaseline(sourceFile, baselineDir, { overwrite: false })
       ).rejects.toThrow('already exists');
     });
 
@@ -123,7 +123,7 @@ describe('FileOperations', () => {
       await writeFile(
         join(baselineDir, 'Component.tsx'),
         'old content',
-        'utf-8',
+        'utf-8'
       );
 
       const destination = await fileOps.copyToBaseline(
@@ -131,7 +131,7 @@ describe('FileOperations', () => {
         baselineDir,
         {
           overwrite: true,
-        },
+        }
       );
 
       const content = await readFile(destination, 'utf-8');
@@ -149,7 +149,7 @@ describe('FileOperations', () => {
         baselineDir,
         {
           transformName: name => name.replace('.tsx', '.baseline.tsx'),
-        },
+        }
       );
 
       expect(destination).toBe(join(baselineDir, 'Component.baseline.tsx'));
@@ -189,7 +189,7 @@ export default TestComponent;
       const savedPath = await fileOps.saveMigratedComponent(
         component,
         code,
-        outputDir,
+        outputDir
       );
 
       expect(savedPath).toBe(join(outputDir, 'TestComponent.tsx'));
@@ -220,7 +220,7 @@ export default TestComponent;
       const savedPath = await fileOps.saveMigratedComponent(
         component,
         'code',
-        outputDir,
+        outputDir
       );
 
       const content = await readFile(savedPath, 'utf-8');
@@ -383,7 +383,7 @@ export default TestComponent;
       await writeFile(
         join(outputDir, 'daisyv1', 'baseline.tsx'),
         'baseline',
-        'utf-8',
+        'utf-8'
       );
       await writeFile(join(outputDir, 'migrated.tsx'), 'migrated', 'utf-8');
 
@@ -392,7 +392,7 @@ export default TestComponent;
       // Baseline should exist
       const baselineContent = await readFile(
         join(outputDir, 'daisyv1', 'baseline.tsx'),
-        'utf-8',
+        'utf-8'
       );
       expect(baselineContent).toBe('baseline');
     });
@@ -401,7 +401,7 @@ export default TestComponent;
       const nonExistentDir = join(testDir, 'does-not-exist');
 
       await expect(
-        fileOps.cleanOutputDirectory(nonExistentDir),
+        fileOps.cleanOutputDirectory(nonExistentDir)
       ).resolves.not.toThrow();
     });
   });
@@ -537,7 +537,7 @@ export default TestComponent;
       const savedPath = await saveMigratedComponent(
         component,
         'code',
-        outputDir,
+        outputDir
       );
 
       expect(savedPath).toBeTruthy();

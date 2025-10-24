@@ -72,7 +72,7 @@ export class EnhancedMigrationValidator {
    */
   public async validateMigration(
     componentPath: string,
-    originalPath: string,
+    originalPath: string
   ): Promise<ValidationResult> {
     const componentName = path.basename(componentPath, '.tsx');
     const errors: ValidationError[] = [];
@@ -111,11 +111,16 @@ export class EnhancedMigrationValidator {
     const businessLogicPreserved = await this.validateBusinessLogic(
       componentPath,
       originalPath,
-      errors,
+      errors
     );
 
     return {
-      success: compiles && typesValid && testsPass && runtimeValid && businessLogicPreserved,
+      success:
+        compiles &&
+        typesValid &&
+        testsPass &&
+        runtimeValid &&
+        businessLogicPreserved,
       component: componentName,
       checks: {
         compiles,
@@ -140,7 +145,7 @@ export class EnhancedMigrationValidator {
    */
   private async validateCompilation(
     componentPath: string,
-    errors: ValidationError[],
+    errors: ValidationError[]
   ): Promise<boolean> {
     try {
       // Read the component file
@@ -156,10 +161,15 @@ export class EnhancedMigrationValidator {
       for (const diagnostic of diagnostics) {
         if (diagnostic.category === ts.DiagnosticCategory.Error) {
           const file = diagnostic.file;
-          const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+          const message = ts.flattenDiagnosticMessageText(
+            diagnostic.messageText,
+            '\n'
+          );
 
           if (file && diagnostic.start !== undefined) {
-            const { line, character } = file.getLineAndCharacterOfPosition(diagnostic.start);
+            const { line, character } = file.getLineAndCharacterOfPosition(
+              diagnostic.start
+            );
             errors.push({
               type: 'compilation',
               message,
@@ -191,7 +201,7 @@ export class EnhancedMigrationValidator {
    */
   private async validateTypes(
     componentPath: string,
-    errors: ValidationError[],
+    errors: ValidationError[]
   ): Promise<boolean> {
     try {
       // Use TypeScript compiler API to check types
@@ -220,7 +230,8 @@ export class EnhancedMigrationValidator {
 
           // Check for 'any' types (should be avoided)
           if (type.flags & ts.TypeFlags.Any) {
-            const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+            const { line, character } =
+              sourceFile.getLineAndCharacterOfPosition(node.getStart());
             errors.push({
               type: 'type',
               message: 'Unsafe "any" type detected',
@@ -232,11 +243,16 @@ export class EnhancedMigrationValidator {
 
           // Check function return types are explicit
           if (ts.isFunctionDeclaration(node) || ts.isArrowFunction(node)) {
-            const signature = typeChecker.getSignatureFromDeclaration(node as any);
+            const signature = typeChecker.getSignatureFromDeclaration(
+              node as any
+            );
             if (signature) {
-              const returnType = typeChecker.getReturnTypeOfSignature(signature);
+              const returnType =
+                typeChecker.getReturnTypeOfSignature(signature);
               if (!returnType || returnType.flags & ts.TypeFlags.Any) {
-                const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+                const { line } = sourceFile.getLineAndCharacterOfPosition(
+                  node.getStart()
+                );
                 errors.push({
                   type: 'type',
                   message: 'Function missing explicit return type',
@@ -270,12 +286,15 @@ export class EnhancedMigrationValidator {
    */
   private async runComponentTests(
     componentPath: string,
-    errors: ValidationError[],
+    errors: ValidationError[]
   ): Promise<boolean> {
     try {
       // Look for corresponding test file
       const testPath = componentPath.replace(/\.tsx?$/, '.test.tsx');
-      const testExists = await fs.access(testPath).then(() => true).catch(() => false);
+      const testExists = await fs
+        .access(testPath)
+        .then(() => true)
+        .catch(() => false);
 
       if (!testExists) {
         // Create a basic test file if it doesn't exist
@@ -285,7 +304,7 @@ export class EnhancedMigrationValidator {
       // Run the test
       const { stdout, stderr } = await execAsync(
         `npx jest ${testPath} --no-coverage --silent`,
-        { cwd: process.cwd() },
+        { cwd: process.cwd() }
       );
 
       // Parse test results
@@ -310,8 +329,14 @@ export class EnhancedMigrationValidator {
   /**
    * Create a basic test file for the component
    */
-  private async createBasicTest(componentPath: string, testPath: string): Promise<void> {
-    const componentName = path.basename(componentPath, path.extname(componentPath));
+  private async createBasicTest(
+    componentPath: string,
+    testPath: string
+  ): Promise<void> {
+    const componentName = path.basename(
+      componentPath,
+      path.extname(componentPath)
+    );
 
     const testContent = `
 import React from 'react';
@@ -357,7 +382,7 @@ describe('${componentName}', () => {
       const testPath = componentPath.replace(/\.tsx?$/, '.test.tsx');
       const { stdout } = await execAsync(
         `npx jest ${testPath} --json --no-coverage --silent`,
-        { cwd: process.cwd() },
+        { cwd: process.cwd() }
       );
 
       const results = JSON.parse(stdout);
@@ -415,10 +440,9 @@ module.exports = {
       await fs.writeFile(configPath, webpackConfig);
 
       // Run webpack
-      const { stdout } = await execAsync(
-        `npx webpack --config ${configPath}`,
-        { cwd: process.cwd() },
-      );
+      const { stdout } = await execAsync(`npx webpack --config ${configPath}`, {
+        cwd: process.cwd(),
+      });
 
       // Get bundle size
       const bundlePath = path.join(process.cwd(), 'dist-test', 'bundle.js');
@@ -440,7 +464,7 @@ module.exports = {
    */
   private async validateRuntime(
     componentPath: string,
-    errors: ValidationError[],
+    errors: ValidationError[]
   ): Promise<boolean> {
     try {
       // This would run the component in a headless browser
@@ -454,7 +478,8 @@ module.exports = {
       if (source.includes('.map(') && !source.includes('?.map(')) {
         errors.push({
           type: 'runtime',
-          message: 'Potential null reference error: Array map without null check',
+          message:
+            'Potential null reference error: Array map without null check',
         });
       }
 
@@ -483,7 +508,7 @@ module.exports = {
   private async validateBusinessLogic(
     migratedPath: string,
     originalPath: string,
-    errors: ValidationError[],
+    errors: ValidationError[]
   ): Promise<boolean> {
     try {
       // Parse both files
@@ -491,8 +516,10 @@ module.exports = {
       const originalSource = await fs.readFile(originalPath, 'utf-8');
 
       // Extract business logic functions
-      const migratedFunctions = this.extractBusinessLogicFunctions(migratedSource);
-      const originalFunctions = this.extractBusinessLogicFunctions(originalSource);
+      const migratedFunctions =
+        this.extractBusinessLogicFunctions(migratedSource);
+      const originalFunctions =
+        this.extractBusinessLogicFunctions(originalSource);
 
       // Compare function signatures
       for (const [name, signature] of originalFunctions) {
@@ -553,7 +580,8 @@ module.exports = {
     const functions = new Map<string, string>();
 
     // Extract named functions
-    const functionRegex = /(?:export\s+)?(?:const|function)\s+(\w+)\s*[=:]\s*(?:\([^)]*\)|async\s*\([^)]*\))\s*(?::\s*[^{]+)?\s*=>/g;
+    const functionRegex =
+      /(?:export\s+)?(?:const|function)\s+(\w+)\s*[=:]\s*(?:\([^)]*\)|async\s*\([^)]*\))\s*(?::\s*[^{]+)?\s*=>/g;
     let match;
 
     while ((match = functionRegex.exec(source)) !== null) {
@@ -561,7 +589,8 @@ module.exports = {
     }
 
     // Extract traditional functions
-    const traditionalFunctionRegex = /(?:export\s+)?function\s+(\w+)\s*\([^)]*\)(?:\s*:\s*[^{]+)?\s*{/g;
+    const traditionalFunctionRegex =
+      /(?:export\s+)?function\s+(\w+)\s*\([^)]*\)(?:\s*:\s*[^{]+)?\s*{/g;
     while ((match = traditionalFunctionRegex.exec(source)) !== null) {
       functions.set(match[1], match[0]);
     }

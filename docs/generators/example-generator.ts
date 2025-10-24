@@ -16,7 +16,7 @@ import type { ComponentDefinition } from '@/types';
  */
 export async function generateUsageExamples(
   component: ComponentDefinition,
-  outputDir: string,
+  outputDir: string
 ): Promise<string> {
   const examplePath = join(outputDir, `${component.name}-examples.tsx`);
 
@@ -85,7 +85,11 @@ function generateBasicProps(component: ComponentDefinition): string {
     return '';
   }
 
-  return required.map(p => `      ${p.name}={${getExampleValue(p.type)}}`).join('\n') + '\n';
+  return (
+    required
+      .map(p => `      ${p.name}={${getExampleValue(p.type)}}`)
+      .join('\n') + '\n'
+  );
 }
 
 function generateConfiguratorSetup(_component: ComponentDefinition): string {
@@ -111,29 +115,31 @@ function generateAdvancedSetup(_component: ComponentDefinition): string {
 }
 
 function generateAdvancedProps(component: ComponentDefinition): string {
-  return component.props
-    .map(p => `      ${p.name}={${getExampleValue(p.type)}}`)
-    .join('\n') + '\n';
+  return (
+    component.props
+      .map(p => `      ${p.name}={${getExampleValue(p.type)}}`)
+      .join('\n') + '\n'
+  );
 }
 
 function getExampleValue(type: string): string {
   if (type.includes('string')) {
-return '"example"';
-}
+    return '"example"';
+  }
   if (type.includes('number')) {
-return '42';
-}
+    return '42';
+  }
   if (type.includes('boolean')) {
-return 'true';
-}
+    return 'true';
+  }
   if (type.includes('function') || type.includes('=>')) {
-return 'handleChange';
-}
+    return 'handleChange';
+  }
   if (type.includes('[]')) {
-return '[]';
-}
+    return '[]';
+  }
   if (type.includes('{}')) {
-return '{}';
-}
+    return '{}';
+  }
   return 'undefined';
 }

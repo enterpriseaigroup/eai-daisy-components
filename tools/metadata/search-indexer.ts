@@ -39,11 +39,13 @@ export interface SearchableComponent {
  */
 export async function generateSearchIndex(
   components: ComponentDefinition[],
-  outputDir: string,
+  outputDir: string
 ): Promise<string> {
   const indexPath = join(outputDir, 'component-search-index.json');
 
-  const searchableComponents = components.map(c => extractSearchableMetadata(c));
+  const searchableComponents = components.map(c =>
+    extractSearchableMetadata(c)
+  );
 
   const index: SearchIndex = {
     components: searchableComponents,
@@ -58,7 +60,9 @@ export async function generateSearchIndex(
   return indexPath;
 }
 
-function extractSearchableMetadata(component: ComponentDefinition): SearchableComponent {
+function extractSearchableMetadata(
+  component: ComponentDefinition
+): SearchableComponent {
   return {
     name: component.name,
     type: component.type,
@@ -79,7 +83,12 @@ function generateKeywords(component: ComponentDefinition): string[] {
 
   // Add component name variations
   keywords.add(component.name.toLowerCase());
-  keywords.add(component.name.replace(/([A-Z])/g, ' $1').trim().toLowerCase());
+  keywords.add(
+    component.name
+      .replace(/([A-Z])/g, ' $1')
+      .trim()
+      .toLowerCase()
+  );
 
   // Add type
   keywords.add(component.type);
@@ -132,7 +141,7 @@ function generateTags(component: ComponentDefinition): string[] {
  */
 export async function generateComponentCatalog(
   index: SearchIndex,
-  outputDir: string,
+  outputDir: string
 ): Promise<string> {
   const catalogPath = join(outputDir, 'component-catalog.md');
 
@@ -165,7 +174,9 @@ function generateTierSections(index: SearchIndex): string {
 
   return complexities
     .map(complexity => {
-      const components = index.components.filter(c => c.complexity === complexity);
+      const components = index.components.filter(
+        c => c.complexity === complexity
+      );
       if (components.length === 0) {
         return '';
       }

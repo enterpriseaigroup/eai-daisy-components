@@ -192,23 +192,26 @@ export const Button: React.FC<ButtonProps> = ({
    * - Double-click prevention timing unchanged (500ms)
    * - Analytics tracking preserved exactly
    */
-  const handleClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (disabled || loading) {
-      event.preventDefault();
-      return;
-    }
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled || loading) {
+        event.preventDefault();
+        return;
+      }
 
-    setClickCount(prev => prev + 1);
+      setClickCount(prev => prev + 1);
 
-    // Custom business logic: Double-click prevention (PRESERVED)
-    const button = event.currentTarget;
-    button.disabled = true;
-    setTimeout(() => {
-      button.disabled = false;
-    }, 500);
+      // Custom business logic: Double-click prevention (PRESERVED)
+      const button = event.currentTarget;
+      button.disabled = true;
+      setTimeout(() => {
+        button.disabled = false;
+      }, 500);
 
-    onClick?.(event);
-  }, [disabled, loading, onClick]);
+      onClick?.(event);
+    },
+    [disabled, loading, onClick]
+  );
 
   /**
    * BUSINESS LOGIC 4: Dynamic Class Name Generation (MIGRATED FROM CSS TO TAILWIND)
@@ -264,7 +267,8 @@ export const Button: React.FC<ButtonProps> = ({
    */
   const getClassName = useCallback(() => {
     // Base classes (always applied)
-    const baseClasses = 'inline-flex items-center justify-center px-4 py-2 border-none rounded font-inherit text-base cursor-pointer transition-all duration-200 ease-in-out relative min-h-[40px]';
+    const baseClasses =
+      'inline-flex items-center justify-center px-4 py-2 border-none rounded font-inherit text-base cursor-pointer transition-all duration-200 ease-in-out relative min-h-[40px]';
 
     // Variant classes (color scheme)
     const variantClasses = {
@@ -286,14 +290,14 @@ export const Button: React.FC<ButtonProps> = ({
     classes.push(sizeClasses[size]);
 
     if (disabled) {
-classes.push('opacity-60 cursor-not-allowed');
-}
+      classes.push('opacity-60 cursor-not-allowed');
+    }
     if (loading) {
-classes.push('cursor-wait');
-}
+      classes.push('cursor-wait');
+    }
     if (fullWidth) {
-classes.push('w-full');
-}
+      classes.push('w-full');
+    }
 
     return classes.filter(Boolean).join(' ');
   }, [variant, size, disabled, loading, fullWidth, isHovered]);
@@ -340,12 +344,15 @@ classes.push('w-full');
    * - This logic is IDENTICAL to v1 - accessibility preserved
    * - Keyboard navigation works exactly the same in v2
    */
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleClick(event as any);
-    }
-  }, [handleClick]);
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handleClick(event as any);
+      }
+    },
+    [handleClick]
+  );
 
   return (
     <button
@@ -361,9 +368,9 @@ classes.push('w-full');
       data-click-count={clickCount}
     >
       {loading && (
-        <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+        <span className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2' />
       )}
-      {icon && <span className="mr-2">{icon}</span>}
+      {icon && <span className='mr-2'>{icon}</span>}
       <span>{label}</span>
     </button>
   );
@@ -433,7 +440,9 @@ export const isButtonDisabled = (props: ButtonProps): boolean => {
  * - This function is IDENTICAL to v1 - no changes
  * - Color values preserved exactly (same hex codes)
  */
-export const getButtonVariantColor = (variant: ButtonProps['variant']): string => {
+export const getButtonVariantColor = (
+  variant: ButtonProps['variant']
+): string => {
   const colorMap = {
     primary: '#007bff',
     secondary: '#6c757d',
@@ -495,7 +504,7 @@ export const getButtonVariantColor = (variant: ButtonProps['variant']): string =
 export const createSubmitHandler = (
   formData: Record<string, any>,
   onSuccess: () => void,
-  onError: (error: Error) => void,
+  onError: (error: Error) => void
 ) => {
   return async () => {
     try {

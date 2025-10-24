@@ -16,7 +16,7 @@ import type { ComponentDefinition } from '@/types';
  */
 export async function generateStorybookStories(
   component: ComponentDefinition,
-  outputDir: string,
+  outputDir: string
 ): Promise<string> {
   const storyPath = join(outputDir, `${component.name}.stories.tsx`);
 
@@ -136,52 +136,52 @@ function generateEdgeCaseArgs(component: ComponentDefinition): string {
 
 function getControlType(type: string): string {
   if (type.includes('string')) {
-return 'text';
-}
+    return 'text';
+  }
   if (type.includes('number')) {
-return 'number';
-}
+    return 'number';
+  }
   if (type.includes('boolean')) {
-return 'boolean';
-}
+    return 'boolean';
+  }
   if (type.includes('function')) {
-return 'action';
-}
+    return 'action';
+  }
   if (type.includes('|')) {
-return 'select';
-}
+    return 'select';
+  }
   return 'object';
 }
 
 function getDefaultValue(type: string): string {
   if (type.includes('string')) {
-return "'Default value'";
-}
+    return "'Default value'";
+  }
   if (type.includes('number')) {
-return '0';
-}
+    return '0';
+  }
   if (type.includes('boolean')) {
-return 'false';
-}
+    return 'false';
+  }
   if (type.includes('function')) {
-return '() => {}';
-}
+    return '() => {}';
+  }
   return 'undefined';
 }
 
 function getInteractiveValue(type: string): string {
   if (type.includes('string')) {
-return "'Interactive example'";
-}
+    return "'Interactive example'";
+  }
   if (type.includes('number')) {
-return '42';
-}
+    return '42';
+  }
   if (type.includes('boolean')) {
-return 'true';
-}
+    return 'true';
+  }
   if (type.includes('function')) {
-return '(e) => console.log(e)';
-}
+    return '(e) => console.log(e)';
+  }
   return '{}';
 }
 
@@ -190,23 +190,23 @@ function getConfiguratorValue(type: string, name: string): string {
     return 'mockConfiguratorContext';
   }
   if (type.includes('function')) {
-return '(data) => configurator.executeAction(data)';
-}
+    return '(data) => configurator.executeAction(data)';
+  }
   return getDefaultValue(type);
 }
 
 function getEdgeCaseValue(type: string): string {
   if (type.includes('string')) {
-return "''";
-}
+    return "''";
+  }
   if (type.includes('number')) {
-return 'Number.MAX_SAFE_INTEGER';
-}
+    return 'Number.MAX_SAFE_INTEGER';
+  }
   if (type.includes('boolean')) {
-return 'true';
-}
+    return 'true';
+  }
   if (type.includes('function')) {
-return '() => { throw new Error("Edge case"); }';
-}
+    return '() => { throw new Error("Edge case"); }';
+  }
   return 'null';
 }

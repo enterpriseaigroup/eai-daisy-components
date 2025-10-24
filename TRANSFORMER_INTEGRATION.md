@@ -76,6 +76,7 @@ Migrated Component (v2)
 **Purpose**: Convert CSS imports and styles to inline Tailwind utility classes.
 
 **Why This Exists**:
+
 - CSS imports (`import './Button.css'`) break TypeScript AST parsing
 - AST parsing is required for:
   - Type checking and compilation validation
@@ -84,6 +85,7 @@ Migrated Component (v2)
 - Tailwind classes preserve exact visual appearance while remaining parseable
 
 **What It Does**:
+
 1. Finds all CSS import statements in component code
 2. Reads and parses CSS files
 3. Converts CSS rules to equivalent Tailwind classes
@@ -92,18 +94,20 @@ Migrated Component (v2)
 6. Adds migration comment header
 
 **Configuration Options**:
+
 ```typescript
 interface CSSToTailwindOptions {
-  preserveVisualFidelity: boolean;    // Default: true
-  useArbitraryValues: boolean;        // Default: true
-  removeCSSFiles: boolean;            // Default: false
-  generateTailwindConfig: boolean;    // Default: false
+  preserveVisualFidelity: boolean; // Default: true
+  useArbitraryValues: boolean; // Default: true
+  removeCSSFiles: boolean; // Default: false
+  generateTailwindConfig: boolean; // Default: false
 }
 ```
 
 **Example Conversion**:
 
 **Before (v1 with CSS)**:
+
 ```typescript
 import './Button.css';
 
@@ -113,6 +117,7 @@ export const Button = () => {
 ```
 
 **Button.css**:
+
 ```css
 .daisy-button {
   display: inline-flex;
@@ -125,6 +130,7 @@ export const Button = () => {
 ```
 
 **After (Tailwind)**:
+
 ```typescript
 /**
  * MIGRATED: CSS imports removed, replaced with Tailwind classes
@@ -143,17 +149,18 @@ export const Button = () => {
 
 **CSS Property Mappings**:
 
-| CSS Property | Tailwind Class | Example |
-|-------------|----------------|---------|
-| `display: flex` | `flex` | N/A |
-| `align-items: center` | `items-center` | N/A |
-| `padding: 0.5rem` | `p-2` | N/A |
+| CSS Property                | Tailwind Class | Example         |
+| --------------------------- | -------------- | --------------- |
+| `display: flex`             | `flex`         | N/A             |
+| `align-items: center`       | `items-center` | N/A             |
+| `padding: 0.5rem`           | `p-2`          | N/A             |
 | `background-color: #007bff` | `bg-[#007bff]` | Arbitrary value |
-| `color: white` | `text-white` | Standard color |
-| `border-radius: 0.25rem` | `rounded` | Standard radius |
-| `font-size: 1rem` | `text-base` | Standard size |
+| `color: white`              | `text-white`   | Standard color  |
+| `border-radius: 0.25rem`    | `rounded`      | Standard radius |
+| `font-size: 1rem`           | `text-base`    | Standard size   |
 
 **Confidence Scoring**:
+
 - 0.9 (90%) - Most CSS rules converted successfully
 - 0.7 (70%) - Some CSS rules converted
 - 0.5 (50%) - Partial conversion, manual review recommended
@@ -165,12 +172,14 @@ export const Button = () => {
 **Purpose**: Automatically generate comprehensive pseudo-code documentation for all business logic blocks.
 
 **Why This Exists**:
+
 - Tests measure business logic preservation but need accurate baselines
 - Developers need to understand what/why/how for each logic block
 - Migration requires documentation showing what changed vs what was preserved
 - Future maintenance requires clear understanding of business logic
 
 **What It Does**:
+
 1. Parses component code using TypeScript AST
 2. Identifies business logic blocks:
    - `useEffect` hooks
@@ -188,19 +197,21 @@ export const Button = () => {
 5. Inserts documentation before each block
 
 **Configuration Options**:
+
 ```typescript
 interface PseudoCodeGeneratorOptions {
-  includeWhySection: boolean;          // Default: true
-  includeWhatSection: boolean;         // Default: true
-  includeCallsSection: boolean;        // Default: true
-  includeDataFlowSection: boolean;     // Default: true
+  includeWhySection: boolean; // Default: true
+  includeWhatSection: boolean; // Default: true
+  includeCallsSection: boolean; // Default: true
+  includeDataFlowSection: boolean; // Default: true
   includeDependenciesSection: boolean; // Default: true
   includeSpecialBehaviorSection: boolean; // Default: true
-  addMigrationNotes: boolean;          // Default: false (true for v2)
+  addMigrationNotes: boolean; // Default: false (true for v2)
 }
 ```
 
 **Documentation Template**:
+
 ```typescript
 /**
  * BUSINESS LOGIC: [Block Name]
@@ -241,6 +252,7 @@ interface PseudoCodeGeneratorOptions {
 **Example Documentation**:
 
 **Before (undocumented)**:
+
 ```typescript
 useEffect(() => {
   if (clickCount > 0) {
@@ -255,6 +267,7 @@ useEffect(() => {
 ```
 
 **After (documented)**:
+
 ```typescript
 /**
  * BUSINESS LOGIC: Analytics Tracking
@@ -301,13 +314,13 @@ useEffect(() => {
 
 The generator uses intelligent pattern detection to infer purpose:
 
-| Pattern | Inferred Purpose |
-|---------|-----------------|
-| `track`, `analytics` | Analytics Tracking |
-| `validat` | Validation |
-| `fetch`, `api`, `load` | Data Fetching |
+| Pattern                 | Inferred Purpose   |
+| ----------------------- | ------------------ |
+| `track`, `analytics`    | Analytics Tracking |
+| `validat`               | Validation         |
+| `fetch`, `api`, `load`  | Data Fetching      |
 | `subscribe`, `listener` | Event Subscription |
-| `cleanup`, `return` | Cleanup Effect |
+| `cleanup`, `return`     | Cleanup Effect     |
 
 ## Integration Points
 
@@ -319,6 +332,7 @@ The generator uses intelligent pattern detection to infer purpose:
 The transformers are automatically applied via `MigrationJob.migrateComponent()`.
 
 **Execution Flow**:
+
 1. User runs `migrate-component` CLI
 2. `MigrationJob` is created with config
 3. For each component:
@@ -338,6 +352,7 @@ The transformers are automatically applied via `MigrationJob.migrateComponent()`
 Same transformers applied to all components in batch.
 
 **Execution Flow**:
+
 1. User runs `migrate-all` CLI
 2. Discover all components in source directory
 3. For each component (same as single migration):
@@ -346,6 +361,7 @@ Same transformers applied to all components in batch.
 ## File Locations
 
 ### New Transformer Files
+
 ```
 src/pipeline/transformers/
 ├── css-to-tailwind-transformer.ts     (740 lines) ✨ NEW
@@ -354,12 +370,14 @@ src/pipeline/transformers/
 ```
 
 ### Modified Integration Files
+
 ```
 src/pipeline/
 └── migration-job.ts                   (modified) ✅ UPDATED
 ```
 
 ### Supporting Documentation
+
 ```
 docs/
 ├── TEST_FIXTURE_COMPLETION.md         (completion summary)
@@ -428,18 +446,21 @@ npm run migrate-all --validate
 ## Benefits
 
 ### For Testing
+
 - ✅ Components are TypeScript-parseable (no CSS import errors)
 - ✅ Business logic preservation can be accurately measured
 - ✅ Test fixtures have comprehensive documentation
 - ✅ Migration validation works with real AST parsing
 
 ### For Developers
+
 - ✅ Clear documentation of what/why/how for all business logic
 - ✅ Migration notes show what changed vs what was preserved
 - ✅ Visual appearance preserved exactly (Tailwind arbitrary values)
 - ✅ No manual CSS conversion required
 
 ### For Maintainability
+
 - ✅ Self-documenting code reduces knowledge debt
 - ✅ Future changes understand context and dependencies
 - ✅ Migration tracking shows history of changes
@@ -448,16 +469,19 @@ npm run migrate-all --validate
 ## Performance Impact
 
 ### CSS-to-Tailwind Transformer
+
 - **Parse Time**: ~5-10ms per component
 - **Conversion Time**: ~2-5ms per CSS rule
 - **Total Overhead**: ~20-50ms per component
 
 ### Pseudo-Code Generator
+
 - **AST Parse Time**: ~10-15ms per component
 - **Analysis Time**: ~5-10ms per business logic block
 - **Total Overhead**: ~50-100ms per component
 
 ### Combined Impact
+
 - **Total Additional Time**: ~70-150ms per component
 - **For 100 components**: ~7-15 seconds additional time
 - **Negligible Impact**: <1% of total migration time
@@ -465,12 +489,14 @@ npm run migrate-all --validate
 ## Testing
 
 ### Test Fixtures Enhanced
+
 - ✅ `tests/fixtures/components/v1/Button.tsx` - Converted to Tailwind
 - ✅ `tests/fixtures/components/v2/Button.tsx` - Converted to Tailwind
 - ✅ Both fixtures have comprehensive pseudo-code documentation
 - ✅ All 9/9 production readiness tests passing
 
 ### Test Coverage Needed
+
 - ⏳ Unit tests for CSS-to-Tailwind transformer
 - ⏳ Unit tests for Pseudo-Code generator
 - ⏳ Integration tests with real migration pipeline
@@ -481,6 +507,7 @@ npm run migrate-all --validate
 ## Known Limitations
 
 ### CSS-to-Tailwind Transformer
+
 1. **Complex Selectors**: Nested selectors (`.parent .child`) not fully supported
 2. **Media Queries**: Responsive breakpoints require manual review
 3. **Pseudo-Classes**: `:hover`, `:focus` converted with `hover:` prefix but may need adjustment
@@ -490,6 +517,7 @@ npm run migrate-all --validate
 **Mitigation**: Transformer reports warnings for unconverted styles, allowing manual review.
 
 ### Pseudo-Code Generator
+
 1. **Complex Logic**: Highly nested or complex logic may get generic documentation
 2. **Pattern Detection**: Relies on naming conventions and common patterns
 3. **Context Understanding**: Cannot infer business requirements without comments
@@ -500,17 +528,20 @@ npm run migrate-all --validate
 ## Future Enhancements
 
 ### Phase 1 (Current Release)
+
 - ✅ CSS-to-Tailwind conversion
 - ✅ Pseudo-code documentation generation
 - ✅ Integration into migration pipeline
 
 ### Phase 2 (Planned)
+
 - ⏳ Advanced CSS selector support (nested, media queries)
 - ⏳ Tailwind config generation for custom values
 - ⏳ Enhanced pattern detection (ML-based)
 - ⏳ Documentation quality scoring
 
 ### Phase 3 (Future)
+
 - ⏳ Visual regression testing integration
 - ⏳ Bundle size impact analysis
 - ⏳ Automated documentation refinement
@@ -519,18 +550,21 @@ npm run migrate-all --validate
 ## Rollout Plan
 
 ### Phase 1: Validation (Week 1)
+
 - ✅ Test with Button fixture
 - ✅ Verify 9/9 tests passing
 - ✅ Document integration
 - ⏳ Create unit tests for transformers
 
 ### Phase 2: Limited Rollout (Week 2)
+
 - ⏳ Test with 5-10 real components
 - ⏳ Collect feedback from developers
 - ⏳ Refine pattern detection
 - ⏳ Fix edge cases
 
 ### Phase 3: Full Rollout (Week 3)
+
 - ⏳ Migrate all tier 1 components (highest value)
 - ⏳ Monitor test pass rates
 - ⏳ Document lessons learned
@@ -539,13 +573,16 @@ npm run migrate-all --validate
 ## Support
 
 ### Questions or Issues
+
 - See [TEST_FIXTURE_COMPLETION.md](TEST_FIXTURE_COMPLETION.md) for test fixture changes
 - See [TEST_IMPROVEMENTS.md](TEST_IMPROVEMENTS.md) for detailed test analysis
 - Check `.specify/specs/001-component-extraction-pipeline/tasks.md` for implementation tasks
 - Review `.specify/memory/constitution.md` Principle VI for testing standards
 
 ### Contributing
+
 Improvements to transformers should:
+
 1. Maintain backward compatibility
 2. Include comprehensive tests
 3. Update documentation

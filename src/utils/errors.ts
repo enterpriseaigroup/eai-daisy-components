@@ -148,7 +148,7 @@ export class PipelineError extends Error {
     severity: ErrorSeverity,
     context: ErrorContext = {},
     userInfo?: Partial<UserErrorInfo>,
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(message);
     this.name = 'PipelineError';
@@ -311,7 +311,7 @@ export class ConfigurationError extends PipelineError {
   constructor(
     message: string,
     context: ErrorContext = {},
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(
       message,
@@ -329,7 +329,7 @@ export class ConfigurationError extends PipelineError {
         ],
         documentationLinks: ['https://docs.example.com/configuration'],
       },
-      originalError,
+      originalError
     );
     this.name = 'ConfigurationError';
   }
@@ -342,7 +342,7 @@ export class FileSystemError extends PipelineError {
   constructor(
     message: string,
     context: ErrorContext = {},
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(
       message,
@@ -359,7 +359,7 @@ export class FileSystemError extends PipelineError {
           'Check for file locks or conflicts',
         ],
       },
-      originalError,
+      originalError
     );
     this.name = 'FileSystemError';
   }
@@ -372,7 +372,7 @@ export class ParsingError extends PipelineError {
   constructor(
     message: string,
     context: ErrorContext = {},
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(
       message,
@@ -390,7 +390,7 @@ export class ParsingError extends PipelineError {
         ],
         documentationLinks: ['https://docs.example.com/component-patterns'],
       },
-      originalError,
+      originalError
     );
     this.name = 'ParsingError';
   }
@@ -403,7 +403,7 @@ export class ValidationError extends PipelineError {
   constructor(
     message: string,
     context: ErrorContext = {},
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(
       message,
@@ -420,7 +420,7 @@ export class ValidationError extends PipelineError {
           'Verify component exports are correct',
         ],
       },
-      originalError,
+      originalError
     );
     this.name = 'ValidationError';
   }
@@ -433,7 +433,7 @@ export class TransformationError extends PipelineError {
   constructor(
     message: string,
     context: ErrorContext = {},
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(
       message,
@@ -452,7 +452,7 @@ export class TransformationError extends PipelineError {
         isKnownIssue: true,
         workaround: 'Consider splitting complex components into smaller parts.',
       },
-      originalError,
+      originalError
     );
     this.name = 'TransformationError';
   }
@@ -465,7 +465,7 @@ export class MemoryError extends PipelineError {
   constructor(
     message: string,
     context: ErrorContext = {},
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(
       message,
@@ -484,7 +484,7 @@ export class MemoryError extends PipelineError {
         isKnownIssue: true,
         workaround: 'Reduce batch size or process components individually.',
       },
-      originalError,
+      originalError
     );
     this.name = 'MemoryError';
   }
@@ -497,7 +497,7 @@ export class TimeoutError extends PipelineError {
   constructor(
     message: string,
     context: ErrorContext = {},
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(
       message,
@@ -514,7 +514,7 @@ export class TimeoutError extends PipelineError {
           'Consider breaking down complex operations',
         ],
       },
-      originalError,
+      originalError
     );
     this.name = 'TimeoutError';
   }
@@ -540,12 +540,12 @@ export class RetryStrategy implements ErrorRecoveryStrategy {
   constructor(
     private readonly maxAttempts: number = 3,
     private readonly baseDelay: number = 1000,
-    private readonly maxDelay: number = 10000,
+    private readonly maxDelay: number = 10000
   ) {}
 
   public async recover(
     _error: PipelineError,
-    context: ErrorContext,
+    context: ErrorContext
   ): Promise<RecoveryResult> {
     const attempt = (context.data?.['attempt'] as number) || 1;
 
@@ -560,7 +560,7 @@ export class RetryStrategy implements ErrorRecoveryStrategy {
     // Calculate delay with exponential backoff
     const delay = Math.min(
       this.baseDelay * Math.pow(2, attempt - 1),
-      this.maxDelay,
+      this.maxDelay
     );
 
     await new Promise(resolve => setTimeout(resolve, delay));
@@ -588,7 +588,7 @@ export class FallbackStrategy implements ErrorRecoveryStrategy {
 
   public recover(
     error: PipelineError,
-    _context: ErrorContext,
+    _context: ErrorContext
   ): Promise<RecoveryResult> {
     return Promise.resolve({
       success: true,
@@ -615,7 +615,7 @@ export class SkipStrategy implements ErrorRecoveryStrategy {
 
   public recover(
     error: PipelineError,
-    _context: ErrorContext,
+    _context: ErrorContext
   ): Promise<RecoveryResult> {
     if (error.severity === 'critical') {
       return Promise.resolve({
@@ -668,7 +668,7 @@ export class ErrorHandler {
    */
   public async handleError(
     error: Error | PipelineError,
-    context: ErrorContext = {},
+    context: ErrorContext = {}
   ): Promise<RecoveryResult | null> {
     // Convert to PipelineError if needed
     const pipelineError =
@@ -693,7 +693,7 @@ export class ErrorHandler {
         } catch (recoveryError) {
           console.warn(
             `Recovery strategy ${strategy.name} failed:`,
-            recoveryError,
+            recoveryError
           );
         }
       }
@@ -754,7 +754,7 @@ export class ErrorHandler {
    */
   private convertToPipelineError(
     error: Error,
-    context: ErrorContext = {},
+    context: ErrorContext = {}
   ): PipelineError {
     // Try to infer category from error type or message
     let category: ErrorCategory = 'runtime';
@@ -785,7 +785,7 @@ export class ErrorHandler {
       severity,
       context,
       undefined,
-      error,
+      error
     );
   }
 
@@ -793,20 +793,20 @@ export class ErrorHandler {
    * Get applicable recovery strategies for error
    */
   private getApplicableStrategies(
-    error: PipelineError,
+    error: PipelineError
   ): ErrorRecoveryStrategy[] {
     return Array.from(this.strategies.values())
       .filter(strategy =>
-        strategy.applicableCategories.includes(error.category),
+        strategy.applicableCategories.includes(error.category)
       )
       .sort((a, b) => {
         // Prioritize auto-recoverable strategies
         if (a.canAutoRecover && !b.canAutoRecover) {
-return -1;
-}
+          return -1;
+        }
         if (!a.canAutoRecover && b.canAutoRecover) {
-return 1;
-}
+          return 1;
+        }
         return 0;
       });
   }
@@ -840,7 +840,7 @@ export function createErrorHandler(): ErrorHandler {
 export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
   fn: T,
   errorHandler: ErrorHandler,
-  context?: ErrorContext,
+  context?: ErrorContext
 ): T {
   return (async (...args: Parameters<T>) => {
     try {
@@ -848,7 +848,7 @@ export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
     } catch (error) {
       const recoveryResult = await errorHandler.handleError(
         error as Error,
-        context,
+        context
       );
 
       if (recoveryResult?.success) {
@@ -875,7 +875,7 @@ export function assert(
   condition: boolean,
   message: string,
   category: ErrorCategory = 'validation',
-  context: ErrorContext = {},
+  context: ErrorContext = {}
 ): asserts condition {
   if (!condition) {
     throw new PipelineError(message, category, 'high', context);
@@ -887,7 +887,7 @@ export function assert(
  */
 export function createValidationError(
   message: string,
-  context: ErrorContext = {},
+  context: ErrorContext = {}
 ): ValidationError {
   return new ValidationError(message, context);
 }
@@ -908,7 +908,7 @@ export function initializeErrorHandling(): void {
   process.on('uncaughtException', error => {
     console.error(
       'Uncaught Exception:',
-      globalErrorHandler?.getUserReport(error),
+      globalErrorHandler?.getUserReport(error)
     );
     process.exit(1);
   });
@@ -917,7 +917,7 @@ export function initializeErrorHandling(): void {
     const error = reason instanceof Error ? reason : new Error(String(reason));
     console.error(
       'Unhandled Rejection:',
-      globalErrorHandler?.getUserReport(error),
+      globalErrorHandler?.getUserReport(error)
     );
   });
 }
@@ -946,7 +946,7 @@ export class ExtractionError extends PipelineError {
   constructor(
     message: string,
     context: ErrorContext = {},
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(
       message,
@@ -962,7 +962,7 @@ export class ExtractionError extends PipelineError {
           'Verify all required imports are present',
         ],
       },
-      originalError,
+      originalError
     );
     this.name = 'ExtractionError';
   }
@@ -975,7 +975,7 @@ export function createError(
   message: string,
   category: ErrorCategory = 'runtime',
   severity: ErrorSeverity = 'medium',
-  context: ErrorContext = {},
+  context: ErrorContext = {}
 ): PipelineError {
   return new PipelineError(message, category, severity, context);
 }

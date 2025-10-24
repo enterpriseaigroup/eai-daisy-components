@@ -6,7 +6,12 @@
  */
 
 import type React from 'react';
-import { RenderResult, fireEvent, render, waitFor } from '@testing-library/react';
+import {
+  RenderResult,
+  fireEvent,
+  render,
+  waitFor,
+} from '@testing-library/react';
 import { JSDOM } from 'jsdom';
 import type * as ts from 'typescript';
 import * as babel from '@babel/core';
@@ -28,7 +33,13 @@ export interface EnhancedEquivalencyResult {
 }
 
 export interface DetailedDifference {
-  type: 'render' | 'props' | 'behavior' | 'state' | 'performance' | 'businessLogic';
+  type:
+    | 'render'
+    | 'props'
+    | 'behavior'
+    | 'state'
+    | 'performance'
+    | 'businessLogic';
   severity: 'critical' | 'high' | 'medium' | 'low';
   description: string;
   expected: any;
@@ -51,7 +62,8 @@ export interface ComponentTestCase {
 }
 
 export class EnhancedEquivalencyTester {
-  private readonly compiledComponents: Map<string, React.ComponentType<any>> = new Map();
+  private readonly compiledComponents: Map<string, React.ComponentType<any>> =
+    new Map();
 
   /**
    * Main entry point for testing equivalency
@@ -59,7 +71,7 @@ export class EnhancedEquivalencyTester {
   public async testEquivalency(
     v1ComponentPath: string,
     v2ComponentPath: string,
-    testCases: ComponentTestCase[],
+    testCases: ComponentTestCase[]
   ): Promise<EnhancedEquivalencyResult> {
     const differences: DetailedDifference[] = [];
 
@@ -72,14 +84,14 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences,
+      differences
     );
 
     // Step 3: Test props compatibility
     const propsMatch = await this.testPropsCompatibility(
       v1Component,
       v2Component,
-      differences,
+      differences
     );
 
     // Step 4: Test behavior equivalency
@@ -87,7 +99,7 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences,
+      differences
     );
 
     // Step 5: Test state management
@@ -95,7 +107,7 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences,
+      differences
     );
 
     // Step 6: Test performance
@@ -103,19 +115,20 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences,
+      differences
     );
 
     // Step 7: Test business logic preservation
     const businessLogicMatch = await this.testBusinessLogicPreservation(
       v1ComponentPath,
       v2ComponentPath,
-      differences,
+      differences
     );
 
     // Calculate overall score
     const score = this.calculateScore(differences);
-    const equivalent = score >= 95 && !differences.some(d => d.severity === 'critical');
+    const equivalent =
+      score >= 95 && !differences.some(d => d.severity === 'critical');
 
     return {
       equivalent,
@@ -136,10 +149,12 @@ export class EnhancedEquivalencyTester {
   /**
    * Compile TypeScript/JSX component to runnable code
    */
-  private async compileComponent(componentPath: string): Promise<React.ComponentType<any>> {
+  private async compileComponent(
+    componentPath: string
+  ): Promise<React.ComponentType<any>> {
     // This would actually read and compile the component
     // For now, returning a placeholder
-    const MockComponent: React.FC<any> = (props) => <div>Mock Component</div>;
+    const MockComponent: React.FC<any> = props => <div>Mock Component</div>;
     return MockComponent;
   }
 
@@ -150,7 +165,7 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[],
+    differences: DetailedDifference[]
   ): Promise<boolean> {
     let allMatch = true;
 
@@ -180,8 +195,12 @@ export class EnhancedEquivalencyTester {
       }
 
       // Compare accessibility attributes
-      const v1Accessibility = this.extractAccessibilityAttributes(v1Result.container);
-      const v2Accessibility = this.extractAccessibilityAttributes(v2Result.container);
+      const v1Accessibility = this.extractAccessibilityAttributes(
+        v1Result.container
+      );
+      const v2Accessibility = this.extractAccessibilityAttributes(
+        v2Result.container
+      );
 
       if (JSON.stringify(v1Accessibility) !== JSON.stringify(v2Accessibility)) {
         differences.push({
@@ -208,7 +227,7 @@ export class EnhancedEquivalencyTester {
   private async testPropsCompatibility(
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
-    differences: DetailedDifference[],
+    differences: DetailedDifference[]
   ): Promise<boolean> {
     // Extract prop types from components
     const v1Props = this.extractPropTypes(v1Component);
@@ -270,14 +289,14 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[],
+    differences: DetailedDifference[]
   ): Promise<boolean> {
     let allMatch = true;
 
     for (const testCase of testCases) {
       if (!testCase.interactions) {
-continue;
-}
+        continue;
+      }
 
       // Track callback invocations
       const v1Callbacks = this.trackCallbacks(testCase.props);
@@ -298,8 +317,12 @@ continue;
             fireEvent.click(v2Element);
             break;
           case 'change':
-            fireEvent.change(v1Element, { target: { value: interaction.value } });
-            fireEvent.change(v2Element, { target: { value: interaction.value } });
+            fireEvent.change(v1Element, {
+              target: { value: interaction.value },
+            });
+            fireEvent.change(v2Element, {
+              target: { value: interaction.value },
+            });
             break;
           case 'keypress':
             fireEvent.keyPress(v1Element, { key: interaction.value });
@@ -360,7 +383,7 @@ continue;
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[],
+    differences: DetailedDifference[]
   ): Promise<boolean> {
     // Test useState hooks
     // Test useEffect hooks
@@ -376,7 +399,7 @@ continue;
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[],
+    differences: DetailedDifference[]
   ): Promise<boolean> {
     let allMatch = true;
 
@@ -416,7 +439,7 @@ continue;
   private async testBusinessLogicPreservation(
     v1Path: string,
     v2Path: string,
-    differences: DetailedDifference[],
+    differences: DetailedDifference[]
   ): Promise<boolean> {
     // Parse both components using TypeScript compiler API
     const v1AST = await this.parseComponent(v1Path);
@@ -473,7 +496,7 @@ continue;
   private normalizeHTML(html: string): string {
     return html
       .replace(/data-testid="[^"]*"/g, '')
-      .replace(/class="[^"]*"/g, (match) => {
+      .replace(/class="[^"]*"/g, match => {
         // Sort class names for consistent comparison
         const classes = match.match(/class="([^"]*)"/)?.[1] || '';
         const sorted = classes.split(' ').sort().join(' ');
@@ -486,24 +509,28 @@ continue;
   /**
    * Helper: Extract accessibility attributes
    */
-  private extractAccessibilityAttributes(container: HTMLElement): Record<string, string[]> {
+  private extractAccessibilityAttributes(
+    container: HTMLElement
+  ): Record<string, string[]> {
     const attributes: Record<string, string[]> = {};
 
-    const elements = container.querySelectorAll('[aria-label], [aria-busy], [role], [aria-describedby]');
-    elements.forEach((el) => {
+    const elements = container.querySelectorAll(
+      '[aria-label], [aria-busy], [role], [aria-describedby]'
+    );
+    elements.forEach(el => {
       const attrs: Record<string, string> = {};
       ['aria-label', 'aria-busy', 'role', 'aria-describedby'].forEach(attr => {
         const value = el.getAttribute(attr);
         if (value) {
-attrs[attr] = value;
-}
+          attrs[attr] = value;
+        }
       });
 
       if (Object.keys(attrs).length > 0) {
         const key = el.tagName.toLowerCase();
         if (!attributes[key]) {
-attributes[key] = [];
-}
+          attributes[key] = [];
+        }
         attributes[key].push(JSON.stringify(attrs));
       }
     });
@@ -514,7 +541,9 @@ attributes[key] = [];
   /**
    * Helper: Extract prop types from component
    */
-  private extractPropTypes(component: React.ComponentType<any>): Record<string, string> {
+  private extractPropTypes(
+    component: React.ComponentType<any>
+  ): Record<string, string> {
     // This would use TypeScript compiler API to extract actual prop types
     // For now, returning mock data
     return {
@@ -611,7 +640,10 @@ attributes[key] = [];
   /**
    * Generate detailed report
    */
-  private generateReport(differences: DetailedDifference[], score: number): string {
+  private generateReport(
+    differences: DetailedDifference[],
+    score: number
+  ): string {
     const report: string[] = [
       '# Component Equivalency Report',
       '',
@@ -630,8 +662,8 @@ attributes[key] = [];
 
       for (const [severity, diffs] of Object.entries(grouped)) {
         if (diffs.length === 0) {
-continue;
-}
+          continue;
+        }
 
         report.push(`### ${severity.toUpperCase()} (${diffs.length})`);
         report.push('');
@@ -641,7 +673,9 @@ continue;
           if (diff.context) {
             report.push(`  - Context: ${diff.context}`);
           }
-          report.push(`  - Expected: ${JSON.stringify(diff.expected, null, 2)}`);
+          report.push(
+            `  - Expected: ${JSON.stringify(diff.expected, null, 2)}`
+          );
           report.push(`  - Actual: ${JSON.stringify(diff.actual, null, 2)}`);
           report.push('');
         }

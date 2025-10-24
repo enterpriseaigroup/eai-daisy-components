@@ -8,8 +8,7 @@
  * @version 1.0.0
  */
 
-import type {
-  ComponentDiscoveryEngine} from '@/engine/discovery';
+import type { ComponentDiscoveryEngine } from '@/engine/discovery';
 import {
   type DiscoveryOptions,
   type DiscoveryResult,
@@ -153,7 +152,7 @@ export class ComponentDiscoveryService {
           operation: 'discoverComponents',
           filePath: this.config.extractionConfig.sourcePath,
         },
-        error as Error,
+        error as Error
       );
     }
   }
@@ -165,12 +164,12 @@ export class ComponentDiscoveryService {
    * @returns Filtered component definitions
    */
   public async discoverComponentsBy(
-    criteria: DiscoveryFilter,
+    criteria: DiscoveryFilter
   ): Promise<ComponentDefinition[]> {
     const result = await this.discoverComponents();
 
     return result.components.filter(component =>
-      this.matchesCriteria(component, criteria),
+      this.matchesCriteria(component, criteria)
     );
   }
 
@@ -181,7 +180,7 @@ export class ComponentDiscoveryService {
    * @returns Component definition or null
    */
   public async discoverComponentByName(
-    componentName: string,
+    componentName: string
   ): Promise<ComponentDefinition | null> {
     const result = await this.discoverComponents();
 
@@ -195,12 +194,12 @@ export class ComponentDiscoveryService {
    * @returns Component definitions
    */
   public async discoverComponentsInDirectory(
-    directoryPath: string,
+    directoryPath: string
   ): Promise<ComponentDefinition[]> {
     const result = await this.discoverComponents();
 
     return result.components.filter(component =>
-      component.sourcePath.startsWith(directoryPath),
+      component.sourcePath.startsWith(directoryPath)
     );
   }
 
@@ -244,7 +243,7 @@ export class ComponentDiscoveryService {
       this.discoveryEngine = createDiscoveryEngine(
         this.config.extractionConfig,
         this.logger,
-        this.config.discoveryOptions,
+        this.config.discoveryOptions
       );
     }
     return this.discoveryEngine;
@@ -259,7 +258,7 @@ export class ComponentDiscoveryService {
     }
 
     const filteredComponents = result.components.filter(component =>
-      this.matchesCriteria(component, this.config.filters || {}),
+      this.matchesCriteria(component, this.config.filters || {})
     );
 
     return {
@@ -277,7 +276,7 @@ export class ComponentDiscoveryService {
    */
   private matchesCriteria(
     component: ComponentDefinition,
-    criteria: DiscoveryFilter,
+    criteria: DiscoveryFilter
   ): boolean {
     // Type filter
     if (criteria.types && !criteria.types.includes(component.type)) {
@@ -295,7 +294,7 @@ export class ComponentDiscoveryService {
     // Include pattern filter
     if (criteria.includePatterns) {
       const matches = criteria.includePatterns.some(pattern =>
-        this.matchesPattern(component.name, pattern),
+        this.matchesPattern(component.name, pattern)
       );
       if (!matches) {
         return false;
@@ -305,7 +304,7 @@ export class ComponentDiscoveryService {
     // Exclude pattern filter
     if (criteria.excludePatterns) {
       const matches = criteria.excludePatterns.some(pattern =>
-        this.matchesPattern(component.name, pattern),
+        this.matchesPattern(component.name, pattern)
       );
       if (matches) {
         return false;
@@ -401,7 +400,7 @@ export class ComponentDiscoveryService {
  */
 export function createDiscoveryService(
   extractionConfig: ExtractionConfig,
-  options?: Partial<DiscoveryServiceConfig>,
+  options?: Partial<DiscoveryServiceConfig>
 ): ComponentDiscoveryService {
   return new ComponentDiscoveryService({
     extractionConfig,

@@ -80,12 +80,15 @@ export class MigrationCertifier {
    */
   public certify(
     validations: ComponentValidation[],
-    certifiedBy: string,
+    certifiedBy: string
   ): CertificationResult {
     const results = this.analyzeResults(validations);
     const criticalIssues = this.identifyCriticalIssues(validations, results);
     const certified = this.evaluateCertification(results, criticalIssues);
-    const recommendations = this.generateRecommendations(results, criticalIssues);
+    const recommendations = this.generateRecommendations(
+      results,
+      criticalIssues
+    );
 
     const certificationResult: CertificationResult = {
       certified,
@@ -151,38 +154,43 @@ export class MigrationCertifier {
    */
   private identifyCriticalIssues(
     validations: ComponentValidation[],
-    results: ReturnType<typeof this.analyzeResults>,
+    results: ReturnType<typeof this.analyzeResults>
   ): string[] {
     const issues: string[] = [];
 
     // Check success rate
     if (results.successRate < this.criteria.minimumSuccessRate) {
       issues.push(
-        `Success rate (${results.successRate.toFixed(1)}%) below minimum (${this.criteria.minimumSuccessRate}%)`,
+        `Success rate (${results.successRate.toFixed(1)}%) below minimum (${this.criteria.minimumSuccessRate}%)`
       );
     }
 
     // Check equivalency score
-    if (results.averageEquivalencyScore < this.criteria.minimumEquivalencyScore) {
+    if (
+      results.averageEquivalencyScore < this.criteria.minimumEquivalencyScore
+    ) {
       issues.push(
-        `Average equivalency score (${(results.averageEquivalencyScore * 100).toFixed(1)}%) below minimum (${(this.criteria.minimumEquivalencyScore * 100).toFixed(1)}%)`,
+        `Average equivalency score (${(results.averageEquivalencyScore * 100).toFixed(1)}%) below minimum (${(this.criteria.minimumEquivalencyScore * 100).toFixed(1)}%)`
       );
     }
 
     // Check for failed components
-    if (this.criteria.requireNoFailures && results.failedComponents.length > 0) {
+    if (
+      this.criteria.requireNoFailures &&
+      results.failedComponents.length > 0
+    ) {
       issues.push(
-        `${results.failedComponents.length} components failed migration`,
+        `${results.failedComponents.length} components failed migration`
       );
     }
 
     // Check for business logic preservation
     const logicIssues = validations.filter(
-      v => v.migrated && !v.businessLogicPreserved,
+      v => v.migrated && !v.businessLogicPreserved
     );
     if (logicIssues.length > 0) {
       issues.push(
-        `${logicIssues.length} components have business logic preservation issues`,
+        `${logicIssues.length} components have business logic preservation issues`
       );
     }
 
@@ -200,7 +208,7 @@ export class MigrationCertifier {
    */
   private evaluateCertification(
     results: ReturnType<typeof this.analyzeResults>,
-    criticalIssues: string[],
+    criticalIssues: string[]
   ): boolean {
     // No critical issues
     if (criticalIssues.length > 0) {
@@ -213,7 +221,9 @@ export class MigrationCertifier {
     }
 
     // Meet minimum equivalency score
-    if (results.averageEquivalencyScore < this.criteria.minimumEquivalencyScore) {
+    if (
+      results.averageEquivalencyScore < this.criteria.minimumEquivalencyScore
+    ) {
       return false;
     }
 
@@ -233,7 +243,7 @@ export class MigrationCertifier {
    */
   private generateRecommendations(
     results: ReturnType<typeof this.analyzeResults>,
-    criticalIssues: string[],
+    criticalIssues: string[]
   ): string[] {
     const recommendations: string[] = [];
 
@@ -243,26 +253,26 @@ export class MigrationCertifier {
 
     if (results.failedComponents.length > 0) {
       recommendations.push(
-        `Review and remediate ${results.failedComponents.length} failed components`,
+        `Review and remediate ${results.failedComponents.length} failed components`
       );
     }
 
     if (results.averageEquivalencyScore < 1.0) {
       recommendations.push(
-        'Review components with lower equivalency scores for potential improvements',
+        'Review components with lower equivalency scores for potential improvements'
       );
     }
 
     if (results.successRate < 100) {
       recommendations.push(
-        'Consider implementing retry mechanism for failed migrations',
+        'Consider implementing retry mechanism for failed migrations'
       );
     }
 
-    recommendations.push('Implement monitoring for migrated components in production');
     recommendations.push(
-      'Schedule follow-up review 30 days after deployment',
+      'Implement monitoring for migrated components in production'
     );
+    recommendations.push('Schedule follow-up review 30 days after deployment');
     recommendations.push('Document any known limitations or workarounds');
 
     return recommendations;
@@ -273,7 +283,7 @@ export class MigrationCertifier {
    */
   public async generateCertificationDocument(
     result: CertificationResult,
-    outputPath: string,
+    outputPath: string
   ): Promise<string> {
     const document = `# Component Migration Certification
 
@@ -337,7 +347,7 @@ ${result.recommendations.map((rec, i) => `${i + 1}. ${rec}`).join('\n')}
    */
   public async generateJSONCertification(
     result: CertificationResult,
-    outputPath: string,
+    outputPath: string
   ): Promise<void> {
     await fs.writeFile(outputPath, JSON.stringify(result, null, 2));
   }
@@ -347,7 +357,7 @@ ${result.recommendations.map((rec, i) => `${i + 1}. ${rec}`).join('\n')}
  * Create certifier with default criteria
  */
 export function createCertifier(
-  criteria?: Partial<CertificationCriteria>,
+  criteria?: Partial<CertificationCriteria>
 ): MigrationCertifier {
   return new MigrationCertifier(criteria);
 }

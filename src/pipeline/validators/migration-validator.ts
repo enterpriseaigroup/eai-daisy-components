@@ -33,49 +33,49 @@ export class MigrationValidator {
   public validate(
     component: ComponentDefinition,
     transformation: TransformationResult,
-    generation: GenerationResult,
+    generation: GenerationResult
   ): Promise<MigrationValidationResult> {
     return Promise.resolve().then(() => {
-    this.logger.debug(`Validating migration: ${component.name}`);
+      this.logger.debug(`Validating migration: ${component.name}`);
 
-    const errors = [];
-    const warnings = [];
+      const errors = [];
+      const warnings = [];
 
-    if (!transformation.businessLogicPreserved) {
-      errors.push({
-        code: 'BUSINESS_LOGIC_NOT_PRESERVED',
-        message: 'Business logic preservation could not be verified',
-        path: component.name,
-        value: transformation.businessLogicPreserved,
-      });
-    }
+      if (!transformation.businessLogicPreserved) {
+        errors.push({
+          code: 'BUSINESS_LOGIC_NOT_PRESERVED',
+          message: 'Business logic preservation could not be verified',
+          path: component.name,
+          value: transformation.businessLogicPreserved,
+        });
+      }
 
-    if (transformation.requiresManualReview) {
-      warnings.push({
-        code: 'MANUAL_REVIEW_REQUIRED',
-        message: 'Component requires manual review',
-        path: component.name,
-      });
-    }
+      if (transformation.requiresManualReview) {
+        warnings.push({
+          code: 'MANUAL_REVIEW_REQUIRED',
+          message: 'Component requires manual review',
+          path: component.name,
+        });
+      }
 
-    const valid = errors.length === 0;
-    const score = this.calculateScore(
-      transformation,
-      generation,
-      errors,
-      warnings,
-    );
+      const valid = errors.length === 0;
+      const score = this.calculateScore(
+        transformation,
+        generation,
+        errors,
+        warnings
+      );
 
-    return {
-      componentName: component.name,
-      valid,
-      errors,
-      warnings,
-      score,
-      businessLogicPreserved: transformation.businessLogicPreserved,
-      typesSafe: true,
-      testsPass: true,
-    };
+      return {
+        componentName: component.name,
+        valid,
+        errors,
+        warnings,
+        score,
+        businessLogicPreserved: transformation.businessLogicPreserved,
+        typesSafe: true,
+        testsPass: true,
+      };
     });
   }
 
@@ -83,7 +83,7 @@ export class MigrationValidator {
     transformation: TransformationResult,
     _generation: GenerationResult,
     errors: ValidationResult['errors'],
-    warnings: ValidationResult['warnings'],
+    warnings: ValidationResult['warnings']
   ): number {
     let score = 100;
 
@@ -103,7 +103,7 @@ export class MigrationValidator {
 }
 
 export function createMigrationValidator(
-  config: ExtractionConfig,
+  config: ExtractionConfig
 ): MigrationValidator {
   return new MigrationValidator(config);
 }

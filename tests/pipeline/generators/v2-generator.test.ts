@@ -124,7 +124,7 @@ describe('V2ComponentGenerator', () => {
     it('should generate component files', async () => {
       const result = await generator.generate(
         mockTransformation,
-        'source code',
+        'source code'
       );
 
       expect(result.success).toBe(true);

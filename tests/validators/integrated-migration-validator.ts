@@ -66,9 +66,12 @@ export class IntegratedMigrationValidator {
    */
   public async validateMigration(
     migratedPath: string,
-    originalPath: string,
+    originalPath: string
   ): Promise<IntegratedValidationResult> {
-    const componentName = path.basename(migratedPath, path.extname(migratedPath));
+    const componentName = path.basename(
+      migratedPath,
+      path.extname(migratedPath)
+    );
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
 
@@ -99,8 +102,16 @@ export class IntegratedMigrationValidator {
 
     // Step 2: Parse both components
     const parseStartTime = Date.now();
-    const migratedParse = await this.parseComponent(migratedPath, componentName, errors);
-    const originalParse = await this.parseComponent(originalPath, componentName, errors);
+    const migratedParse = await this.parseComponent(
+      migratedPath,
+      componentName,
+      errors
+    );
+    const originalParse = await this.parseComponent(
+      originalPath,
+      componentName,
+      errors
+    );
     const parseTime = Date.now() - parseStartTime;
 
     const parseable = migratedParse !== null && originalParse !== null;
@@ -118,28 +129,28 @@ export class IntegratedMigrationValidator {
         const migratedComponent = this.createComponentDefinition(
           migratedPath,
           componentName,
-          migratedParse,
+          migratedParse
         );
         const originalComponent = this.createComponentDefinition(
           originalPath,
           componentName,
-          originalParse,
+          originalParse
         );
 
         const migratedAnalysis = this.businessLogicAnalyzer.analyzeComponent(
           migratedComponent,
-          migratedSource,
+          migratedSource
         );
         const originalAnalysis = this.businessLogicAnalyzer.analyzeComponent(
           originalComponent,
-          originalSource,
+          originalSource
         );
 
         // Check if business logic is preserved using the existing analyzer
         businessLogicPreserved = this.compareBusinessLogic(
           originalAnalysis,
           migratedAnalysis,
-          errors,
+          errors
         );
       } catch (error) {
         errors.push({
@@ -176,7 +187,10 @@ export class IntegratedMigrationValidator {
   /**
    * Check if file exists
    */
-  private async checkFileExists(filePath: string, errors: ValidationError[]): Promise<boolean> {
+  private async checkFileExists(
+    filePath: string,
+    errors: ValidationError[]
+  ): Promise<boolean> {
     try {
       await fs.access(filePath);
       return true;
@@ -196,7 +210,7 @@ export class IntegratedMigrationValidator {
   private async parseComponent(
     filePath: string,
     componentName: string,
-    errors: ValidationError[],
+    errors: ValidationError[]
   ): Promise<ParseResult | null> {
     try {
       // Create a minimal component definition for parsing
@@ -249,19 +263,20 @@ export class IntegratedMigrationValidator {
   private createComponentDefinition(
     filePath: string,
     componentName: string,
-    parseResult: ParseResult,
+    parseResult: ParseResult
   ): ComponentDefinition {
     return {
       id: componentName,
       name: componentName,
       type: parseResult.componentType === 'class' ? 'class' : 'functional',
       sourcePath: filePath,
-      props: parseResult.structure?.props.map(p => ({
-        name: p.name,
-        type: p.type,
-        required: p.required,
-        defaultValue: p.defaultValue,
-      })) || [],
+      props:
+        parseResult.structure?.props.map(p => ({
+          name: p.name,
+          type: p.type,
+          required: p.required,
+          defaultValue: p.defaultValue,
+        })) || [],
       businessLogic: [], // Will be filled by analyzer
       reactPatterns: this.extractReactPatterns(parseResult),
       dependencies: parseResult.structure?.imports.external || [],
@@ -284,41 +299,41 @@ export class IntegratedMigrationValidator {
     const patterns: string[] = [];
 
     if (!parseResult.structure) {
-return patterns;
-}
+      return patterns;
+    }
 
     const { hooks, composition } = parseResult.structure;
 
     // Check for hook usage
     if (hooks.some(h => h.type === 'state')) {
-patterns.push('hooks-useState');
-}
+      patterns.push('hooks-useState');
+    }
     if (hooks.some(h => h.type === 'effect')) {
-patterns.push('hooks-useEffect');
-}
+      patterns.push('hooks-useEffect');
+    }
     if (hooks.some(h => h.type === 'context')) {
-patterns.push('hooks-useContext');
-}
+      patterns.push('hooks-useContext');
+    }
     if (hooks.some(h => h.type === 'ref')) {
-patterns.push('hooks-useRef');
-}
+      patterns.push('hooks-useRef');
+    }
     if (hooks.some(h => h.type === 'memo')) {
-patterns.push('hooks-useMemo');
-}
+      patterns.push('hooks-useMemo');
+    }
     if (hooks.some(h => h.type === 'callback')) {
-patterns.push('hooks-useCallback');
-}
+      patterns.push('hooks-useCallback');
+    }
 
     // Check for composition patterns
     if (composition.forwardRef) {
-patterns.push('forwardRef');
-}
+      patterns.push('forwardRef');
+    }
     if (composition.memo) {
-patterns.push('memo');
-}
+      patterns.push('memo');
+    }
     if (composition.higherOrderComponents.length > 0) {
-patterns.push('hoc');
-}
+      patterns.push('hoc');
+    }
 
     return patterns;
   }
@@ -326,23 +341,25 @@ patterns.push('hoc');
   /**
    * Determine component complexity
    */
-  private determineComplexity(parseResult: ParseResult): 'simple' | 'moderate' | 'complex' | 'critical' {
+  private determineComplexity(
+    parseResult: ParseResult
+  ): 'simple' | 'moderate' | 'complex' | 'critical' {
     if (!parseResult.structure) {
-return 'simple';
-}
+      return 'simple';
+    }
 
     const { hooks, methods } = parseResult.structure;
     const totalElements = hooks.length + methods.length;
 
     if (totalElements > 20) {
-return 'critical';
-}
+      return 'critical';
+    }
     if (totalElements > 10) {
-return 'complex';
-}
+      return 'complex';
+    }
     if (totalElements > 5) {
-return 'moderate';
-}
+      return 'moderate';
+    }
     return 'simple';
   }
 
@@ -352,10 +369,12 @@ return 'moderate';
   private compareBusinessLogic(
     originalAnalysis: any,
     migratedAnalysis: any,
-    errors: ValidationError[],
+    errors: ValidationError[]
   ): boolean {
     // Compare function counts
-    if (originalAnalysis.functions.length !== migratedAnalysis.functions.length) {
+    if (
+      originalAnalysis.functions.length !== migratedAnalysis.functions.length
+    ) {
       errors.push({
         type: 'businessLogic',
         message: `Function count mismatch: original has ${originalAnalysis.functions.length}, migrated has ${migratedAnalysis.functions.length}`,
@@ -364,7 +383,10 @@ return 'moderate';
     }
 
     // Compare state management
-    if (originalAnalysis.stateManagement.length !== migratedAnalysis.stateManagement.length) {
+    if (
+      originalAnalysis.stateManagement.length !==
+      migratedAnalysis.stateManagement.length
+    ) {
       errors.push({
         type: 'businessLogic',
         message: `State management count mismatch: original has ${originalAnalysis.stateManagement.length}, migrated has ${migratedAnalysis.stateManagement.length}`,
@@ -373,7 +395,10 @@ return 'moderate';
     }
 
     // Compare side effects
-    if (originalAnalysis.sideEffects.length !== migratedAnalysis.sideEffects.length) {
+    if (
+      originalAnalysis.sideEffects.length !==
+      migratedAnalysis.sideEffects.length
+    ) {
       errors.push({
         type: 'businessLogic',
         message: `Side effects count mismatch: original has ${originalAnalysis.sideEffects.length}, migrated has ${migratedAnalysis.sideEffects.length}`,

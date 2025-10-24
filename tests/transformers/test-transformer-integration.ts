@@ -22,7 +22,7 @@ async function testTransformers() {
   // Read actual DAISY v1 Button component
   const buttonPath = path.resolve(
     __dirname,
-    '../../daisyv1/components/tier2/Button.tsx',
+    '../../daisyv1/components/tier2/Button.tsx'
   );
 
   console.log(`Reading component from: ${buttonPath}`);
@@ -65,21 +65,29 @@ async function testTransformers() {
   console.log('Sample conversions:');
   cssResult.convertedRules.slice(0, 5).forEach((conversion, i) => {
     console.log(`  ${i + 1}. .${conversion.selector}`);
-    console.log(`     CSS: ${conversion.cssRules.split('\n')[0].substring(0, 60)}...`);
-    console.log(`     Tailwind: ${conversion.tailwindClasses.substring(0, 80)}...`);
-    console.log(`     Confidence: ${(conversion.confidence * 100).toFixed(0)}%`);
+    console.log(
+      `     CSS: ${conversion.cssRules.split('\n')[0].substring(0, 60)}...`
+    );
+    console.log(
+      `     Tailwind: ${conversion.tailwindClasses.substring(0, 80)}...`
+    );
+    console.log(
+      `     Confidence: ${(conversion.confidence * 100).toFixed(0)}%`
+    );
   });
 
   console.log('');
   console.log('Code changes:');
   console.log(`  Before: ${originalCode.split('\n').length} lines`);
   console.log(`  After: ${cssResult.transformedCode.split('\n').length} lines`);
-  console.log(`  CSS imports removed: ${originalCode.includes("import './Button.css'") && !cssResult.transformedCode.includes("import './Button.css'") ? '✅' : '❌'}`);
+  console.log(
+    `  CSS imports removed: ${originalCode.includes("import './Button.css'") && !cssResult.transformedCode.includes("import './Button.css'") ? '✅' : '❌'}`
+  );
 
   // Save CSS-transformed code
   const cssTransformedPath = path.resolve(
     __dirname,
-    '../../tests/transformers/output/Button-css-transformed.tsx',
+    '../../tests/transformers/output/Button-css-transformed.tsx'
   );
   await fs.mkdir(path.dirname(cssTransformedPath), { recursive: true });
   await fs.writeFile(cssTransformedPath, cssResult.transformedCode);
@@ -106,14 +114,16 @@ async function testTransformers() {
   const v1DocResult = await pseudoCodeGen.generate(
     cssResult.transformedCode,
     'Button',
-    false,
+    false
   );
 
   console.log('');
   console.log('Pseudo-Code Generation Results (v1):');
   console.log('-'.repeat(80));
   console.log(`Success: ${v1DocResult.success ? '✅' : '❌'}`);
-  console.log(`Business logic blocks found: ${v1DocResult.blocksDocumented.length}`);
+  console.log(
+    `Business logic blocks found: ${v1DocResult.blocksDocumented.length}`
+  );
   console.log(`Warnings: ${v1DocResult.warnings.length}`);
 
   console.log('');
@@ -126,14 +136,20 @@ async function testTransformers() {
 
   console.log('');
   console.log('Code changes:');
-  console.log(`  Before: ${cssResult.transformedCode.split('\n').length} lines`);
-  console.log(`  After: ${v1DocResult.documentedCode.split('\n').length} lines`);
-  console.log(`  Lines added: ${v1DocResult.documentedCode.split('\n').length - cssResult.transformedCode.split('\n').length}`);
+  console.log(
+    `  Before: ${cssResult.transformedCode.split('\n').length} lines`
+  );
+  console.log(
+    `  After: ${v1DocResult.documentedCode.split('\n').length} lines`
+  );
+  console.log(
+    `  Lines added: ${v1DocResult.documentedCode.split('\n').length - cssResult.transformedCode.split('\n').length}`
+  );
 
   // Save v1 documented code
   const v1DocumentedPath = path.resolve(
     __dirname,
-    '../../tests/transformers/output/Button-v1-documented.tsx',
+    '../../tests/transformers/output/Button-v1-documented.tsx'
   );
   await fs.writeFile(v1DocumentedPath, v1DocResult.documentedCode);
   console.log(`  Saved to: ${v1DocumentedPath}`);
@@ -159,19 +175,21 @@ async function testTransformers() {
   const v2DocResult = await v2PseudoCodeGen.generate(
     v1DocResult.documentedCode,
     'Button',
-    true,
+    true
   );
 
   console.log('');
   console.log('Pseudo-Code Generation Results (v2):');
   console.log('-'.repeat(80));
   console.log(`Success: ${v2DocResult.success ? '✅' : '❌'}`);
-  console.log(`Business logic blocks found: ${v2DocResult.blocksDocumented.length}`);
+  console.log(
+    `Business logic blocks found: ${v2DocResult.blocksDocumented.length}`
+  );
 
   // Save v2 documented code
   const v2DocumentedPath = path.resolve(
     __dirname,
-    '../../tests/transformers/output/Button-v2-documented.tsx',
+    '../../tests/transformers/output/Button-v2-documented.tsx'
   );
   await fs.writeFile(v2DocumentedPath, v2DocResult.documentedCode);
   console.log(`  Saved to: ${v2DocumentedPath}`);
@@ -191,7 +209,9 @@ async function testTransformers() {
       parse(originalCode, { jsx: true });
       console.log('  Original code (with CSS import): ✅ Parseable');
     } catch (error) {
-      console.log('  Original code (with CSS import): ✅ Parseable (CSS import is syntax-valid)');
+      console.log(
+        '  Original code (with CSS import): ✅ Parseable (CSS import is syntax-valid)'
+      );
     }
 
     console.log('');
@@ -213,7 +233,9 @@ async function testTransformers() {
     console.log(`  AST nodes: ${JSON.stringify(v2Ast).length} characters`);
   } catch (error) {
     console.error('  Parsing failed: ❌');
-    console.error(`  Error: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `  Error: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 
   // Summary
@@ -223,18 +245,32 @@ async function testTransformers() {
   console.log('='.repeat(80));
   console.log('');
   console.log('Transformation Pipeline Results:');
-  console.log(`  1. CSS-to-Tailwind: ${cssResult.success ? '✅ SUCCESS' : '❌ FAILED'}`);
+  console.log(
+    `  1. CSS-to-Tailwind: ${cssResult.success ? '✅ SUCCESS' : '❌ FAILED'}`
+  );
   console.log(`     - ${cssResult.convertedRules.length} CSS rules converted`);
   console.log(`     - ${cssResult.processedFiles.length} CSS files processed`);
   console.log(`     - ${cssResult.warnings.length} warnings`);
   console.log('');
-  console.log(`  2. Pseudo-Code (v1): ${v1DocResult.success ? '✅ SUCCESS' : '❌ FAILED'}`);
-  console.log(`     - ${v1DocResult.blocksDocumented.length} business logic blocks documented`);
-  console.log(`     - ${v1DocResult.documentedCode.split('\n').length - cssResult.transformedCode.split('\n').length} documentation lines added`);
+  console.log(
+    `  2. Pseudo-Code (v1): ${v1DocResult.success ? '✅ SUCCESS' : '❌ FAILED'}`
+  );
+  console.log(
+    `     - ${v1DocResult.blocksDocumented.length} business logic blocks documented`
+  );
+  console.log(
+    `     - ${v1DocResult.documentedCode.split('\n').length - cssResult.transformedCode.split('\n').length} documentation lines added`
+  );
   console.log('');
-  console.log(`  3. Pseudo-Code (v2): ${v2DocResult.success ? '✅ SUCCESS' : '❌ FAILED'}`);
-  console.log(`     - ${v2DocResult.blocksDocumented.length} business logic blocks documented`);
-  console.log(`     - Migration notes added: ${v2DocResult.documentedCode.includes('MIGRATION NOTE') ? '✅' : '❌'}`);
+  console.log(
+    `  3. Pseudo-Code (v2): ${v2DocResult.success ? '✅ SUCCESS' : '❌ FAILED'}`
+  );
+  console.log(
+    `     - ${v2DocResult.blocksDocumented.length} business logic blocks documented`
+  );
+  console.log(
+    `     - Migration notes added: ${v2DocResult.documentedCode.includes('MIGRATION NOTE') ? '✅' : '❌'}`
+  );
   console.log('');
   console.log('Files Generated:');
   console.log(`  - ${cssTransformedPath}`);

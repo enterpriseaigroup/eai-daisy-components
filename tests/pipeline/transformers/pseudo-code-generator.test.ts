@@ -47,7 +47,9 @@ export const Component = () => {
 
       expect(result.success).toBe(true);
       expect(result.blocksDocumented.length).toBeGreaterThan(0);
-      expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(true);
+      expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(
+        true
+      );
     });
 
     it('should detect useCallback hooks', async () => {
@@ -66,7 +68,9 @@ export const Component = () => {
       const result = await generator.generate(code, 'Component', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.some(b => b.type === 'useCallback')).toBe(true);
+      expect(result.blocksDocumented.some(b => b.type === 'useCallback')).toBe(
+        true
+      );
     });
 
     it('should detect useMemo hooks', async () => {
@@ -85,7 +89,9 @@ export const Component = ({ items }: { items: number[] }) => {
       const result = await generator.generate(code, 'Component', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.some(b => b.type === 'useMemo')).toBe(true);
+      expect(result.blocksDocumented.some(b => b.type === 'useMemo')).toBe(
+        true
+      );
     });
 
     it('should detect function declarations', async () => {
@@ -102,7 +108,9 @@ export function formatCurrency(amount: number): string {
       const result = await generator.generate(code, 'Utils', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.filter(b => b.type === 'function').length).toBe(2);
+      expect(
+        result.blocksDocumented.filter(b => b.type === 'function').length
+      ).toBe(2);
     });
 
     it('should detect arrow function expressions', async () => {
@@ -160,7 +168,9 @@ export const Component = () => {
       const result = await generator.generate(code, 'Component', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(true);
+      expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(
+        true
+      );
     });
   });
 
@@ -376,7 +386,9 @@ export const Component = () => {
       const result = await generator.generate(code, 'Component', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(true);
+      expect(result.blocksDocumented.some(b => b.type === 'useEffect')).toBe(
+        true
+      );
       expect(result.documentedCode).toContain('cleanup');
     });
 
@@ -412,7 +424,9 @@ export async function fetchUserData(userId: string): Promise<any> {
       const result = await generator.generate(code, 'API', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.some(b => b.name === 'fetchUserData')).toBe(true);
+      expect(
+        result.blocksDocumented.some(b => b.name === 'fetchUserData')
+      ).toBe(true);
     });
 
     it('should handle error handling patterns', async () => {
@@ -450,7 +464,9 @@ export function calculateDiscount(price: number, isPremium: boolean): number {
       const result = await generator.generate(code, 'PricingService', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.some(b => b.name === 'calculateDiscount')).toBe(true);
+      expect(
+        result.blocksDocumented.some(b => b.name === 'calculateDiscount')
+      ).toBe(true);
     });
   });
 
@@ -470,7 +486,9 @@ export function getUserName(user: User): string {
       const result = await generator.generate(code, 'UserService', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.some(b => b.name === 'getUserName')).toBe(true);
+      expect(result.blocksDocumented.some(b => b.name === 'getUserName')).toBe(
+        true
+      );
     });
 
     it('should handle generics', async () => {
@@ -529,7 +547,9 @@ export const Component = () => {
       const result = await generator.generate(code, 'Component', false);
 
       expect(result.success).toBe(true);
-      const effectBlock = result.blocksDocumented.find(b => b.type === 'useEffect');
+      const effectBlock = result.blocksDocumented.find(
+        b => b.type === 'useEffect'
+      );
       expect(effectBlock?.confidence).toBeGreaterThan(0.7);
     });
 
@@ -599,7 +619,9 @@ export function longFunction() {
       const result = await generator.generate(code, 'Long', false);
 
       expect(result.success).toBe(true);
-      expect(result.blocksDocumented.some(b => b.name === 'longFunction')).toBe(true);
+      expect(result.blocksDocumented.some(b => b.name === 'longFunction')).toBe(
+        true
+      );
     });
 
     it('should handle anonymous functions', async () => {
@@ -639,7 +661,9 @@ export const Component = () => {
       const result = await generator.generate(code, 'Component', false);
 
       expect(result.success).toBe(true);
-      const effectBlock = result.blocksDocumented.find(b => b.type === 'useEffect');
+      const effectBlock = result.blocksDocumented.find(
+        b => b.type === 'useEffect'
+      );
       expect(effectBlock?.lineNumber).toBeGreaterThan(0);
       expect(effectBlock?.lineNumber).toBeLessThan(15);
     });

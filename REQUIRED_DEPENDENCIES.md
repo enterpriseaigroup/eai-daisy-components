@@ -21,6 +21,7 @@ npm install --save-dev \
 ## Dependency Breakdown
 
 ### Webpack & Bundling (Bundle Size Tests)
+
 - **webpack** - Module bundler for measuring actual bundle sizes
 - **webpack-cli** - Command line interface for webpack
 - **terser-webpack-plugin** - Minification plugin for production builds
@@ -29,19 +30,24 @@ npm install --save-dev \
 - **ts-loader** - TypeScript loader for webpack
 
 ### Playwright (Visual Regression & Equivalency Tests)
+
 - **@playwright/test** - End-to-end testing framework with browser automation
 
 ### Testing Library (Component Rendering Tests)
+
 - **@testing-library/react** - React component testing utilities
 - **@testing-library/jest-dom** - Custom Jest matchers for DOM
 - **jsdom** - JavaScript DOM implementation for Node.js
 
 ### Image Comparison (Visual Regression)
+
 - **pixelmatch** - Pixel-level image comparison
 - **pngjs** - PNG encoder/decoder for screenshot comparison
 
 ### Already Installed
+
 The following should already be in your project:
+
 - **typescript** - TypeScript compiler (for AST analysis)
 - **@types/node** - Node.js type definitions
 - **jest** - Test framework
@@ -83,14 +89,8 @@ module.exports = {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testMatch: [
-    '**/tests/**/*.test.ts',
-    '**/tests/**/*.test.tsx',
-  ],
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-  ],
+  testMatch: ['**/tests/**/*.test.ts', '**/tests/**/*.test.tsx'],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
 };
 ```
 
@@ -109,10 +109,7 @@ Add or update `tsconfig.test.json`:
     "types": ["jest", "@testing-library/jest-dom", "@playwright/test"],
     "jsx": "react"
   },
-  "include": [
-    "tests/**/*",
-    "src/**/*"
-  ]
+  "include": ["tests/**/*", "src/**/*"]
 }
 ```
 
@@ -164,6 +161,7 @@ npx playwright install chromium
 ### Issue: "Module parse failed" with CSS files
 
 Add to webpack config:
+
 ```javascript
 {
   test: /\.css$/,

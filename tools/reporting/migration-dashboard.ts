@@ -52,7 +52,8 @@ export interface DashboardUpdate {
  * Migration progress dashboard
  */
 export class MigrationDashboard extends EventEmitter {
-  private readonly components: Map<string, ComponentMigrationStatus> = new Map();
+  private readonly components: Map<string, ComponentMigrationStatus> =
+    new Map();
   private updateInterval: NodeJS.Timeout | undefined;
 
   /**
@@ -98,15 +99,18 @@ export class MigrationDashboard extends EventEmitter {
 
     const total = components.length;
     const completed = components.filter(c => c.status === 'completed').length;
-    const inProgress = components.filter(c => c.status === 'in-progress').length;
+    const inProgress = components.filter(
+      c => c.status === 'in-progress'
+    ).length;
     const failed = components.filter(c => c.status === 'failed').length;
     const pending = components.filter(c => c.status === 'pending').length;
 
-    const successRate = total > 0 ? (completed / (completed + failed)) * 100 : 0;
+    const successRate =
+      total > 0 ? (completed / (completed + failed)) * 100 : 0;
 
     // Calculate average migration time
     const completedComponents = components.filter(
-      c => c.status === 'completed' && c.duration,
+      c => c.status === 'completed' && c.duration
     );
     const averageTime =
       completedComponents.length > 0
@@ -304,7 +308,7 @@ export class MigrationDashboard extends EventEmitter {
               <td>${c.duration ? (c.duration / 1000).toFixed(2) + 's' : '-'}</td>
               <td>${c.equivalencyScore ? (c.equivalencyScore * 100).toFixed(1) + '%' : '-'}</td>
             </tr>
-          `,
+          `
             )
             .join('')}
         </tbody>
@@ -324,7 +328,7 @@ export class MigrationDashboard extends EventEmitter {
     const progressBar = this.createProgressBar(
       metrics.completed,
       metrics.total,
-      40,
+      40
     );
 
     return `
@@ -351,7 +355,11 @@ export class MigrationDashboard extends EventEmitter {
   /**
    * Create ASCII progress bar
    */
-  private createProgressBar(current: number, total: number, width: number): string {
+  private createProgressBar(
+    current: number,
+    total: number,
+    width: number
+  ): string {
     const percentage = total > 0 ? current / total : 0;
     const filled = Math.floor(percentage * width);
     const empty = width - filled;

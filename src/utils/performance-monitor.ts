@@ -29,7 +29,7 @@ export class PerformanceMonitor {
 
   public endMonitoring(
     componentName: string,
-    startTime: number,
+    startTime: number
   ): PerformanceMetrics {
     const endTime = Date.now();
     const duration = endTime - startTime;
@@ -61,8 +61,8 @@ export class PerformanceMonitor {
 
   public getAverageDuration(): number {
     if (this.metrics.length === 0) {
-return 0;
-}
+      return 0;
+    }
     const total = this.metrics.reduce((sum, m) => sum + m.duration, 0);
     return total / this.metrics.length;
   }

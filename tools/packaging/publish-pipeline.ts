@@ -106,7 +106,9 @@ export class PublishPipeline {
         this.logger.info('Dry run - skipping actual publish');
       }
 
-      this.logger.info(`Package published successfully: ${packageJson.name}@${packageJson.version}`);
+      this.logger.info(
+        `Package published successfully: ${packageJson.name}@${packageJson.version}`
+      );
 
       return {
         packageName: packageJson.name,
@@ -231,7 +233,7 @@ export class PublishPipeline {
    * Publish multiple packages
    */
   public async publishBatch(
-    packagesOptions: PublishOptions[],
+    packagesOptions: PublishOptions[]
   ): Promise<PublishResult[]> {
     const results: PublishResult[] = [];
 
@@ -271,7 +273,7 @@ export function createPublishPipeline(): PublishPipeline {
  * Publish package to NPM
  */
 export async function publishPackage(
-  options: PublishOptions,
+  options: PublishOptions
 ): Promise<PublishResult> {
   const pipeline = createPublishPipeline();
   return pipeline.publish(options);

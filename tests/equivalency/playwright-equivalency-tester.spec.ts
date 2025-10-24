@@ -4,7 +4,7 @@
  * Uses real browser rendering to validate component migration accuracy
  */
 
-import type { Page} from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { Locator, expect, test } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs/promises';
@@ -62,7 +62,7 @@ test.describe('Component Migration Equivalency Tests', () => {
       v2Page,
       'Button',
       '/fixtures/components/v1/Button',
-      '/fixtures/components/v2/Button',
+      '/fixtures/components/v2/Button'
     );
 
     // Assert overall equivalency
@@ -96,22 +96,32 @@ test.describe('Component Migration Equivalency Tests', () => {
       { props: { variant: 'primary', label: 'Click Me' } },
       { props: { variant: 'secondary', label: 'Submit', disabled: true } },
       { props: { variant: 'danger', label: 'Delete', loading: true } },
-      { props: { variant: 'primary', label: 'Long Button Label That Should Wrap', fullWidth: true } },
+      {
+        props: {
+          variant: 'primary',
+          label: 'Long Button Label That Should Wrap',
+          fullWidth: true,
+        },
+      },
     ];
 
     for (const state of states) {
       // Set props via test harness
-      await v1Page.evaluate((props) => {
+      await v1Page.evaluate(props => {
         (window as any).setComponentProps(props);
       }, state.props);
 
-      await v2Page.evaluate((props) => {
+      await v2Page.evaluate(props => {
         (window as any).setComponentProps(props);
       }, state.props);
 
       // Take screenshots
-      const v1Screenshot = await v1Page.locator('[data-testid="test-component"]').screenshot();
-      const v2Screenshot = await v2Page.locator('[data-testid="test-component"]').screenshot();
+      const v1Screenshot = await v1Page
+        .locator('[data-testid="test-component"]')
+        .screenshot();
+      const v2Screenshot = await v2Page
+        .locator('[data-testid="test-component"]')
+        .screenshot();
 
       // Compare screenshots (allowing minor differences)
       const visualMatch = await compareScreenshots(v1Screenshot, v2Screenshot);
@@ -176,11 +186,17 @@ test.describe('Component Migration Equivalency Tests', () => {
     const v2Metrics = await measureComponentPerformance(v2Page);
 
     // v2 should not be significantly slower
-    expect(v2Metrics.renderTime).toBeLessThanOrEqual(v1Metrics.renderTime * 1.2);
-    expect(v2Metrics.interactionResponseTime).toBeLessThanOrEqual(v1Metrics.interactionResponseTime * 1.2);
+    expect(v2Metrics.renderTime).toBeLessThanOrEqual(
+      v1Metrics.renderTime * 1.2
+    );
+    expect(v2Metrics.interactionResponseTime).toBeLessThanOrEqual(
+      v1Metrics.interactionResponseTime * 1.2
+    );
 
     // Memory usage should be comparable
-    expect(v2Metrics.memoryUsage).toBeLessThanOrEqual(v1Metrics.memoryUsage * 1.3);
+    expect(v2Metrics.memoryUsage).toBeLessThanOrEqual(
+      v1Metrics.memoryUsage * 1.3
+    );
   });
 
   /**
@@ -192,7 +208,9 @@ test.describe('Component Migration Equivalency Tests', () => {
 
     expect(v2Accessibility.ariaLabels).toEqual(v1Accessibility.ariaLabels);
     expect(v2Accessibility.roles).toEqual(v1Accessibility.roles);
-    expect(v2Accessibility.keyboardNavigable).toBe(v1Accessibility.keyboardNavigable);
+    expect(v2Accessibility.keyboardNavigable).toBe(
+      v1Accessibility.keyboardNavigable
+    );
   });
 });
 
@@ -204,7 +222,7 @@ async function testComponentEquivalency(
   v2Page: Page,
   componentName: string,
   v1Path: string,
-  v2Path: string,
+  v2Path: string
 ): Promise<ComponentTestResult> {
   const differences: Difference[] = [];
   let score = 100;
@@ -212,26 +230,38 @@ async function testComponentEquivalency(
   // Test visual rendering
   const visualMatch = await testVisualEquivalency(v1Page, v2Page, differences);
   if (!visualMatch) {
-score -= 20;
-}
+    score -= 20;
+  }
 
   // Test behavior
-  const behaviorMatch = await testBehaviorEquivalency(v1Page, v2Page, differences);
+  const behaviorMatch = await testBehaviorEquivalency(
+    v1Page,
+    v2Page,
+    differences
+  );
   if (!behaviorMatch) {
-score -= 30;
-}
+    score -= 30;
+  }
 
   // Test business logic
-  const businessLogicMatch = await testBusinessLogicEquivalency(v1Path, v2Path, differences);
+  const businessLogicMatch = await testBusinessLogicEquivalency(
+    v1Path,
+    v2Path,
+    differences
+  );
   if (!businessLogicMatch) {
-score -= 35;
-}
+    score -= 35;
+  }
 
   // Test performance
-  const performanceMatch = await testPerformanceEquivalency(v1Page, v2Page, differences);
+  const performanceMatch = await testPerformanceEquivalency(
+    v1Page,
+    v2Page,
+    differences
+  );
   if (!performanceMatch) {
-score -= 15;
-}
+    score -= 15;
+  }
 
   return {
     component: componentName,
@@ -252,7 +282,7 @@ score -= 15;
 async function testVisualEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[],
+  differences: Difference[]
 ): Promise<boolean> {
   // Implementation would compare screenshots
   return true;
@@ -264,7 +294,7 @@ async function testVisualEquivalency(
 async function testBehaviorEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[],
+  differences: Difference[]
 ): Promise<boolean> {
   // Implementation would test interactions
   return true;
@@ -276,7 +306,7 @@ async function testBehaviorEquivalency(
 async function testBusinessLogicEquivalency(
   v1Path: string,
   v2Path: string,
-  differences: Difference[],
+  differences: Difference[]
 ): Promise<boolean> {
   // Implementation would analyze source code
   return true;
@@ -288,7 +318,7 @@ async function testBusinessLogicEquivalency(
 async function testPerformanceEquivalency(
   v1Page: Page,
   v2Page: Page,
-  differences: Difference[],
+  differences: Difference[]
 ): Promise<boolean> {
   // Implementation would measure performance metrics
   return true;
@@ -299,7 +329,7 @@ async function testPerformanceEquivalency(
  */
 async function compareScreenshots(
   screenshot1: Buffer,
-  screenshot2: Buffer,
+  screenshot2: Buffer
 ): Promise<{ similarity: number; differences: any[] }> {
   // This would use image comparison library like pixelmatch
   // For now, returning mock data
@@ -346,7 +376,8 @@ async function testKeyboardInteraction(page: Page): Promise<any> {
 
   return {
     enterTriggersClick: parseInt(afterEnter || '0') > 0,
-    spaceTriggersClick: parseInt(afterSpace || '0') > parseInt(afterEnter || '0'),
+    spaceTriggersClick:
+      parseInt(afterSpace || '0') > parseInt(afterEnter || '0'),
   };
 }
 
@@ -356,7 +387,10 @@ async function testKeyboardInteraction(page: Page): Promise<any> {
 async function testDisabledBehavior(page: Page): Promise<any> {
   // Set button to disabled
   await page.evaluate(() => {
-    (window as any).setComponentProps({ disabled: true, label: 'Disabled Button' });
+    (window as any).setComponentProps({
+      disabled: true,
+      label: 'Disabled Button',
+    });
   });
 
   const button = page.locator('button');
@@ -393,7 +427,7 @@ async function testLoadingBehavior(page: Page): Promise<any> {
   return {
     hasSpinner: await spinner.isVisible(),
     isDisabled: await button.isDisabled(),
-    ariaBusy: await button.getAttribute('aria-busy') === 'true',
+    ariaBusy: (await button.getAttribute('aria-busy')) === 'true',
   };
 }
 
@@ -410,7 +444,7 @@ async function testValidationLogic(page: Page): Promise<any> {
   const results = [];
 
   for (const testCase of testCases) {
-    await page.evaluate((props) => {
+    await page.evaluate(props => {
       (window as any).setComponentProps(props);
     }, testCase);
 
@@ -446,7 +480,9 @@ async function testAnalyticsTracking(page: Page): Promise<any> {
 
   // Get tracked events
   const events = await page.evaluate(() => {
-    return JSON.parse(window.sessionStorage.getItem('analytics_events') || '[]');
+    return JSON.parse(
+      window.sessionStorage.getItem('analytics_events') || '[]'
+    );
   });
 
   return {
@@ -510,7 +546,7 @@ async function testAccessibility(page: Page): Promise<any> {
   return {
     ariaLabels: await button.getAttribute('aria-label'),
     roles: await button.getAttribute('role'),
-    keyboardNavigable: await button.evaluate((el) => {
+    keyboardNavigable: await button.evaluate(el => {
       return el.tabIndex >= 0;
     }),
   };

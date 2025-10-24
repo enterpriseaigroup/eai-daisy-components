@@ -57,7 +57,10 @@ export class RealPerformanceProfiler {
   private readonly marks: Map<string, number> = new Map();
   private readonly measures: Map<string, PhaseMetrics[]> = new Map();
   private readonly memorySnapshots: Map<string, any> = new Map();
-  private readonly gcStats: { count: number; time: number } = { count: 0, time: 0 };
+  private readonly gcStats: { count: number; time: number } = {
+    count: 0,
+    time: 0,
+  };
 
   constructor(targetComponentsPerHour: number = 10) {
     this.targetComponentsPerHour = targetComponentsPerHour;
@@ -68,9 +71,9 @@ export class RealPerformanceProfiler {
    * Setup performance observer for GC tracking
    */
   private setupPerformanceObserver(): void {
-    const obs = new PerformanceObserver((list) => {
+    const obs = new PerformanceObserver(list => {
       const entries = list.getEntries();
-      entries.forEach((entry) => {
+      entries.forEach(entry => {
         if (entry.entryType === 'gc') {
           this.gcStats.count++;
           this.gcStats.time += entry.duration;
@@ -91,7 +94,7 @@ export class RealPerformanceProfiler {
    */
   public async profileMigration(
     v1Path: string,
-    v2Path: string,
+    v2Path: string
   ): Promise<PerformanceProfile> {
     const componentName = this.extractComponentName(v1Path);
     const sessionId = `migration-${componentName}-${Date.now()}`;
@@ -141,11 +144,15 @@ export class RealPerformanceProfiler {
     // Calculate metrics
     const totalDuration = endTime - startTime;
     const memoryMetrics = this.calculateMemoryMetrics(sessionId);
-    const cpuMetrics = this.calculateCPUMetrics(startCPU, endCPU, totalDuration);
+    const cpuMetrics = this.calculateCPUMetrics(
+      startCPU,
+      endCPU,
+      totalDuration
+    );
     const bottlenecks = this.identifyBottlenecks(phases);
 
     // Calculate throughput
-    const componentsPerHour = (3600000 / totalDuration);
+    const componentsPerHour = 3600000 / totalDuration;
     const meetsTarget = componentsPerHour >= this.targetComponentsPerHour;
 
     return {
@@ -232,7 +239,7 @@ export class RealPerformanceProfiler {
       heapUsedEnd: endSnapshot.memoryUsage.heapUsed,
       heapUsedPeak: Math.max(
         startSnapshot.heapStatistics.used_heap_size,
-        endSnapshot.heapStatistics.used_heap_size,
+        endSnapshot.heapStatistics.used_heap_size
       ),
       external: endSnapshot.memoryUsage.external,
       gcTime: this.gcStats.time,
@@ -246,7 +253,7 @@ export class RealPerformanceProfiler {
   private calculateCPUMetrics(
     startCPU: NodeJS.CpuUsage,
     endCPU: NodeJS.CpuUsage,
-    duration: number,
+    duration: number
   ): CPUMetrics {
     const userTime = endCPU.user / 1000; // Convert to ms
     const systemTime = endCPU.system / 1000;
@@ -265,7 +272,10 @@ export class RealPerformanceProfiler {
    * Identify performance bottlenecks
    */
   private identifyBottlenecks(phases: PhaseMetrics[]): Bottleneck[] {
-    const totalDuration = phases.reduce((sum, phase) => sum + phase.duration, 0);
+    const totalDuration = phases.reduce(
+      (sum, phase) => sum + phase.duration,
+      0
+    );
     const bottlenecks: Bottleneck[] = [];
 
     // Update phase percentages
@@ -281,7 +291,10 @@ export class RealPerformanceProfiler {
         phase: phase.name,
         duration: phase.duration,
         percentage: phase.percentage,
-        recommendations: this.generateRecommendations(phase.name, phase.percentage),
+        recommendations: this.generateRecommendations(
+          phase.name,
+          phase.percentage
+        ),
       });
     }
 
@@ -294,7 +307,10 @@ export class RealPerformanceProfiler {
   /**
    * Generate optimization recommendations
    */
-  private generateRecommendations(phaseName: string, percentage: number): string[] {
+  private generateRecommendations(
+    phaseName: string,
+    percentage: number
+  ): string[] {
     const recommendations: string[] = [];
 
     switch (phaseName) {
@@ -330,7 +346,9 @@ export class RealPerformanceProfiler {
     }
 
     if (percentage > 50) {
-      recommendations.unshift(`Critical: ${phaseName} takes ${percentage.toFixed(1)}% of total time`);
+      recommendations.unshift(
+        `Critical: ${phaseName} takes ${percentage.toFixed(1)}% of total time`
+      );
     }
 
     return recommendations;
@@ -373,7 +391,7 @@ export class RealPerformanceProfiler {
 
     for (const phase of profile.phases) {
       lines.push(
-        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`,
+        `| ${phase.name} | ${phase.duration.toFixed(2)} | ${phase.percentage.toFixed(1)}% |`
       );
     }
 
@@ -381,7 +399,9 @@ export class RealPerformanceProfiler {
       lines.push('', '## Bottlenecks Identified', '');
 
       for (const bottleneck of profile.bottlenecks) {
-        lines.push(`### ${bottleneck.phase} (${bottleneck.percentage.toFixed(1)}%)`);
+        lines.push(
+          `### ${bottleneck.phase} (${bottleneck.percentage.toFixed(1)}%)`
+        );
         lines.push('', '**Recommendations:**');
 
         for (const rec of bottleneck.recommendations) {
@@ -393,16 +413,24 @@ export class RealPerformanceProfiler {
 
     lines.push('## Resource Usage', '');
     lines.push('**Memory:**');
-    lines.push(`- Heap Start: ${(profile.memoryUsage.heapUsedStart / 1024 / 1024).toFixed(2)} MB`);
-    lines.push(`- Heap End: ${(profile.memoryUsage.heapUsedEnd / 1024 / 1024).toFixed(2)} MB`);
-    lines.push(`- Heap Peak: ${(profile.memoryUsage.heapUsedPeak / 1024 / 1024).toFixed(2)} MB`);
+    lines.push(
+      `- Heap Start: ${(profile.memoryUsage.heapUsedStart / 1024 / 1024).toFixed(2)} MB`
+    );
+    lines.push(
+      `- Heap End: ${(profile.memoryUsage.heapUsedEnd / 1024 / 1024).toFixed(2)} MB`
+    );
+    lines.push(
+      `- Heap Peak: ${(profile.memoryUsage.heapUsedPeak / 1024 / 1024).toFixed(2)} MB`
+    );
     lines.push(`- GC Count: ${profile.memoryUsage.gcCount}`);
     lines.push(`- GC Time: ${profile.memoryUsage.gcTime.toFixed(2)}ms`);
     lines.push('');
     lines.push('**CPU:**');
     lines.push(`- User Time: ${profile.cpuUsage.userTime.toFixed(2)}ms`);
     lines.push(`- System Time: ${profile.cpuUsage.systemTime.toFixed(2)}ms`);
-    lines.push(`- Utilization: ${profile.cpuUsage.utilizationPercentage.toFixed(1)}%`);
+    lines.push(
+      `- Utilization: ${profile.cpuUsage.utilizationPercentage.toFixed(1)}%`
+    );
 
     return lines.join('\n');
   }
@@ -411,7 +439,7 @@ export class RealPerformanceProfiler {
    * Profile batch migration
    */
   public async profileBatchMigration(
-    components: Array<{ v1: string; v2: string }>,
+    components: Array<{ v1: string; v2: string }>
   ): Promise<{
     totalTime: number;
     averageTime: number;
@@ -430,7 +458,7 @@ export class RealPerformanceProfiler {
 
     const totalTime = performance.now() - startTime;
     const averageTime = totalTime / components.length;
-    const throughput = (3600000 / averageTime);
+    const throughput = 3600000 / averageTime;
     const meetsTarget = throughput >= this.targetComponentsPerHour;
 
     return {
@@ -447,7 +475,7 @@ export class RealPerformanceProfiler {
    */
   public async profileParallelMigration(
     components: Array<{ v1: string; v2: string }>,
-    maxConcurrency: number = os.cpus().length,
+    maxConcurrency: number = os.cpus().length
   ): Promise<{
     totalTime: number;
     averageTime: number;
@@ -460,8 +488,8 @@ export class RealPerformanceProfiler {
     // Process components in parallel with concurrency limit
     const results = await this.processInBatches(
       components,
-      async (component) => this.profileMigration(component.v1, component.v2),
-      maxConcurrency,
+      async component => this.profileMigration(component.v1, component.v2),
+      maxConcurrency
     );
 
     const totalTime = performance.now() - startTime;
@@ -486,7 +514,7 @@ export class RealPerformanceProfiler {
   private async processInBatches<T, R>(
     items: T[],
     processor: (item: T) => Promise<R>,
-    maxConcurrency: number,
+    maxConcurrency: number
   ): Promise<R[]> {
     const results: R[] = [];
     const executing: Promise<void>[] = [];
@@ -500,7 +528,10 @@ export class RealPerformanceProfiler {
 
       if (executing.length >= maxConcurrency) {
         await Promise.race(executing);
-        executing.splice(executing.findIndex(p => p), 1);
+        executing.splice(
+          executing.findIndex(p => p),
+          1
+        );
       }
     }
 

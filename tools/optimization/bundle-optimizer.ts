@@ -29,7 +29,11 @@ export interface BundleSizeAnalysis {
  * Optimization recommendation
  */
 export interface OptimizationRecommendation {
-  type: 'tree-shaking' | 'code-splitting' | 'lazy-loading' | 'dependency-reduction';
+  type:
+    | 'tree-shaking'
+    | 'code-splitting'
+    | 'lazy-loading'
+    | 'dependency-reduction';
   priority: 'high' | 'medium' | 'low';
   description: string;
   estimatedSavings: number;
@@ -64,20 +68,21 @@ export class BundleOptimizer {
   public async analyzeBundleSize(
     componentName: string,
     v1Path: string,
-    v2Path: string,
+    v2Path: string
   ): Promise<BundleSizeAnalysis> {
     const v1Size = await this.calculateDirectorySize(v1Path);
     const v2Size = await this.calculateDirectorySize(v2Path);
 
     const sizeIncrease = v2Size - v1Size;
     const sizeIncreasePercentage = v1Size > 0 ? (v2Size / v1Size) * 100 : 0;
-    const meetsConstraint = sizeIncreasePercentage <= this.maxIncreasePercentage;
+    const meetsConstraint =
+      sizeIncreasePercentage <= this.maxIncreasePercentage;
 
     const recommendations = this.generateRecommendations(
       componentName,
       v1Size,
       v2Size,
-      sizeIncreasePercentage,
+      sizeIncreasePercentage
     );
 
     return {
@@ -125,46 +130,42 @@ export class BundleOptimizer {
     _componentName: string,
     v1Size: number,
     v2Size: number,
-    increasePercentage: number,
+    increasePercentage: number
   ): string[] {
     const recommendations: string[] = [];
 
     if (increasePercentage > this.maxIncreasePercentage) {
       recommendations.push(
-        `⚠️ Bundle size exceeds ${this.maxIncreasePercentage}% constraint (current: ${increasePercentage.toFixed(1)}%)`,
+        `⚠️ Bundle size exceeds ${this.maxIncreasePercentage}% constraint (current: ${increasePercentage.toFixed(1)}%)`
       );
     }
 
     if (increasePercentage > 110) {
       recommendations.push(
-        '🔍 Review imported dependencies - consider tree-shaking opportunities',
+        '🔍 Review imported dependencies - consider tree-shaking opportunities'
       );
       recommendations.push(
-        '📦 Evaluate code-splitting for large component chunks',
+        '📦 Evaluate code-splitting for large component chunks'
       );
     }
 
     if (v2Size > 50000) {
       // 50KB threshold
       recommendations.push(
-        '💡 Consider lazy-loading non-critical functionality',
+        '💡 Consider lazy-loading non-critical functionality'
       );
     }
 
     const sizeIncrease = v2Size - v1Size;
     if (sizeIncrease > 10000) {
       // 10KB increase
-      recommendations.push(
-        '🎯 Analyze TypeScript type definitions overhead',
-      );
-      recommendations.push(
-        '⚡ Enable aggressive minification and compression',
-      );
+      recommendations.push('🎯 Analyze TypeScript type definitions overhead');
+      recommendations.push('⚡ Enable aggressive minification and compression');
     }
 
     if (recommendations.length === 0) {
       recommendations.push(
-        `✅ Bundle size is optimal (${increasePercentage.toFixed(1)}% of V1)`,
+        `✅ Bundle size is optimal (${increasePercentage.toFixed(1)}% of V1)`
       );
     }
 
@@ -175,7 +176,7 @@ export class BundleOptimizer {
    * Generate detailed optimization recommendations
    */
   public generateOptimizationPlan(
-    analysis: BundleSizeAnalysis,
+    analysis: BundleSizeAnalysis
   ): OptimizationRecommendation[] {
     const recommendations: OptimizationRecommendation[] = [];
 
@@ -228,7 +229,7 @@ export class BundleOptimizer {
    */
   public async optimizeBundle(
     component: ComponentDefinition,
-    options: BundleOptimizationOptions,
+    options: BundleOptimizationOptions
   ): Promise<{
     success: boolean;
     originalSize: number;
@@ -239,7 +240,7 @@ export class BundleOptimizer {
     const analysis = await this.analyzeBundleSize(
       component.name,
       join(options.v1BaselinePath, component.name),
-      join(options.v2OutputPath, component.name),
+      join(options.v2OutputPath, component.name)
     );
 
     // Simulate optimization (in real implementation, would run actual bundler optimizations)
@@ -249,7 +250,8 @@ export class BundleOptimizer {
     const savingsPercentage = (savings / analysis.v2Size) * 100;
 
     return {
-      success: optimizedSize <= (analysis.v1Size * this.maxIncreasePercentage) / 100,
+      success:
+        optimizedSize <= (analysis.v1Size * this.maxIncreasePercentage) / 100,
       originalSize: analysis.v2Size,
       optimizedSize,
       savings,
@@ -260,7 +262,9 @@ export class BundleOptimizer {
   /**
    * Calculate optimization factor based on enabled options
    */
-  private calculateOptimizationFactor(options: BundleOptimizationOptions): number {
+  private calculateOptimizationFactor(
+    options: BundleOptimizationOptions
+  ): number {
     let factor = 1.0;
 
     if (options.enableTreeShaking) {
@@ -281,7 +285,7 @@ export class BundleOptimizer {
    */
   public async generateReport(
     analyses: BundleSizeAnalysis[],
-    outputPath: string,
+    outputPath: string
   ): Promise<void> {
     const report = this.createReportMarkdown(analyses);
     await fs.writeFile(outputPath, report);
@@ -315,7 +319,7 @@ export class BundleOptimizer {
 ${analyses
   .map(
     a =>
-      `| ${a.componentName} | ${this.formatBytes(a.v1Size)} | ${this.formatBytes(a.v2Size)} | ${this.formatBytes(a.sizeIncrease)} | ${a.sizeIncreasePercentage.toFixed(1)}% | ${a.meetsConstraint ? '✅' : '❌'} |`,
+      `| ${a.componentName} | ${this.formatBytes(a.v1Size)} | ${this.formatBytes(a.v2Size)} | ${this.formatBytes(a.sizeIncrease)} | ${a.sizeIncreasePercentage.toFixed(1)}% | ${a.meetsConstraint ? '✅' : '❌'} |`
   )
   .join('\n')}
 
@@ -327,7 +331,7 @@ ${analyses
     a => `### ${a.componentName}
 
 ${a.recommendations.map(r => `- ${r}`).join('\n')}
-`,
+`
   )
   .join('\n')}
 
@@ -357,7 +361,7 @@ ${a.recommendations.map(r => `- ${r}`).join('\n')}
  * Create bundle optimizer with default settings
  */
 export function createBundleOptimizer(
-  maxIncreasePercentage: number = 120,
+  maxIncreasePercentage: number = 120
 ): BundleOptimizer {
   return new BundleOptimizer(maxIncreasePercentage);
 }

@@ -220,7 +220,7 @@ export class ComponentTransformer {
    */
   async transformComponent(
     component: ComponentDefinition,
-    config: ExtractionConfig,
+    config: ExtractionConfig
   ): Promise<ComponentTransformationResult> {
     const startTime = Date.now();
 
@@ -239,7 +239,7 @@ export class ComponentTransformer {
       // Parse component structure with enhanced analysis
       const componentStructure = await this.parseComponentStructure(
         sourceCode,
-        component,
+        component
       );
 
       // Extract business logic with advanced patterns
@@ -250,7 +250,7 @@ export class ComponentTransformer {
       // Transform props interface with Configurator v2 integration
       const propsInterface = await this.transformPropsInterface(
         component.props,
-        config,
+        config
       );
 
       // Generate comprehensive Configurator v2 props
@@ -264,14 +264,14 @@ export class ComponentTransformer {
         component,
         businessLogic,
         configuratorIntegration,
-        config,
+        config
       );
 
       // Generate enhanced type definitions
       const typeDefinitions = await this.generateTypeDefinitions(
         component,
         propsInterface,
-        configuratorIntegration,
+        configuratorIntegration
       );
 
       // Generate optimized imports and exports
@@ -294,7 +294,7 @@ export class ComponentTransformer {
       const migrationEffort = this.assessMigrationEffort(
         component,
         originalMetrics,
-        transformedMetrics,
+        transformedMetrics
       );
 
       const result: ComponentTransformationResult = {
@@ -323,13 +323,13 @@ export class ComponentTransformer {
             transformedCount: component.props.length,
             addedConfiguratorProps: configuratorIntegration
               ? this.extractConfiguratorPropNames(
-                  configuratorIntegration.propsCode,
+                  configuratorIntegration.propsCode
                 )
               : [],
           },
           dependenciesTransformation: {
             internal: component.dependencies.filter(
-              dep => dep.type === 'internal',
+              dep => dep.type === 'internal'
             ),
             external: component.dependencies
               .filter(dep => dep.type === 'external')
@@ -354,11 +354,11 @@ export class ComponentTransformer {
           memoryUsage: process.memoryUsage().heapUsed,
           qualityImprovement: this.calculateQualityImprovement(
             originalMetrics,
-            transformedMetrics,
+            transformedMetrics
           ),
           bundleSizeImpact: this.estimateBundleSizeImpact(
             originalMetrics,
-            transformedMetrics,
+            transformedMetrics
           ),
         },
       };
@@ -380,7 +380,7 @@ export class ComponentTransformer {
         {
           component: component.name,
           sourcePath: component.sourcePath,
-        },
+        }
       );
 
       return this.createErrorResult(component, startTime, error);
@@ -398,7 +398,7 @@ export class ComponentTransformer {
       maxConcurrency?: number;
       prioritizeByComplexity?: boolean;
       groupBySimilarity?: boolean;
-    } = {},
+    } = {}
   ): Promise<ComponentTransformationResult[]> {
     const {
       parallel = true,
@@ -450,7 +450,7 @@ export class ComponentTransformer {
     const results: ComponentTransformationResult[] = [];
     const batches = this.createOptimizedBatches(
       sortedComponents,
-      maxConcurrency,
+      maxConcurrency
     );
 
     for (let i = 0; i < batches.length; i++) {
@@ -467,7 +467,7 @@ export class ComponentTransformer {
       });
 
       const batchResults = await Promise.all(
-        batch.map(component => this.transformComponent(component, config)),
+        batch.map(component => this.transformComponent(component, config))
       );
 
       results.push(...batchResults);
@@ -508,23 +508,23 @@ export class ComponentTransformer {
 
     // Deduct points for complex patterns
     if (component.complexity === 'critical') {
-score -= 30;
-} else if (component.complexity === 'complex') {
-score -= 20;
-} else if (component.complexity === 'moderate') {
-score -= 10;
-}
+      score -= 30;
+    } else if (component.complexity === 'complex') {
+      score -= 20;
+    } else if (component.complexity === 'moderate') {
+      score -= 10;
+    }
 
     // Deduct points for problematic patterns
     const problematicPatterns = ['render-props', 'children-as-function'];
     const problematicCount = component.reactPatterns.filter(p =>
-      problematicPatterns.includes(p),
+      problematicPatterns.includes(p)
     ).length;
     score -= problematicCount * 15;
 
     // Deduct points for external dependencies
     const externalDeps = component.dependencies.filter(
-      dep => dep.type === 'external',
+      dep => dep.type === 'external'
     ).length;
     score -= externalDeps * 5;
 
@@ -536,7 +536,7 @@ score -= 10;
    */
   private parseComponentStructure(
     sourceCode: string,
-    component: ComponentDefinition,
+    component: ComponentDefinition
   ): Promise<EnhancedComponentStructure> {
     return Promise.resolve({
       name: component.name,
@@ -559,7 +559,7 @@ score -= 10;
    */
   private async extractBusinessLogic(
     structure: EnhancedComponentStructure,
-    component: ComponentDefinition,
+    component: ComponentDefinition
   ): Promise<EnhancedBusinessLogicExtraction | undefined> {
     if (
       !this.options.extractBusinessLogic ||
@@ -574,7 +574,7 @@ score -= 10;
     for (const businessLogic of component.businessLogic) {
       const hook = await this.createAdvancedCustomHook(
         businessLogic,
-        structure,
+        structure
       );
       if (hook) {
         hooks.push(hook);
@@ -604,39 +604,42 @@ score -= 10;
    */
   private generateConfiguratorIntegration(
     component: ComponentDefinition,
-    _config: ExtractionConfig,
+    _config: ExtractionConfig
   ): Promise<ConfiguratorIntegration> {
     return Promise.resolve().then(() => {
-    const configId = `${component.name.toLowerCase()}-config`;
+      const configId = `${component.name.toLowerCase()}-config`;
 
-    const integration: ConfiguratorV2Integration = {
-      configId,
-      variants: this.generateVariants(component),
-      themeSupport: true,
-      layoutSupport: this.supportsLayout(component),
-      stylingSupport: true,
-      behaviorSupport: this.supportsBehavior(component),
-      liveConfiguration: true,
-      persistConfiguration: true,
-    };
+      const integration: ConfiguratorV2Integration = {
+        configId,
+        variants: this.generateVariants(component),
+        themeSupport: true,
+        layoutSupport: this.supportsLayout(component),
+        stylingSupport: true,
+        behaviorSupport: this.supportsBehavior(component),
+        liveConfiguration: true,
+        persistConfiguration: true,
+      };
 
-    const propsCode = this.generateConfiguratorPropsCode(
-      component,
-      integration,
-    );
-    const hookCode = this.generateConfiguratorHookCode(component, integration);
-    const contextCode = this.generateConfiguratorContextCode(
-      component,
-      integration,
-    );
+      const propsCode = this.generateConfiguratorPropsCode(
+        component,
+        integration
+      );
+      const hookCode = this.generateConfiguratorHookCode(
+        component,
+        integration
+      );
+      const contextCode = this.generateConfiguratorContextCode(
+        component,
+        integration
+      );
 
-    return {
-      integration,
-      propsCode,
-      hookCode,
-      contextCode,
-      setupCode: this.generateConfiguratorSetupCode(component, integration),
-    };
+      return {
+        integration,
+        propsCode,
+        hookCode,
+        contextCode,
+        setupCode: this.generateConfiguratorSetupCode(component, integration),
+      };
     });
   }
 
@@ -648,34 +651,34 @@ score -= 10;
     component: ComponentDefinition,
     businessLogic: EnhancedBusinessLogicExtraction | undefined,
     configuratorIntegration: ConfiguratorIntegration | undefined,
-    _config: ExtractionConfig,
+    _config: ExtractionConfig
   ): Promise<string> {
     return Promise.resolve().then(() => {
-    let componentCode = '';
+      let componentCode = '';
 
-    // Add comprehensive JSDoc documentation
-    if (this.options.addDocumentation) {
-      componentCode += this.generateEnhancedJSDocComment(component);
-    }
+      // Add comprehensive JSDoc documentation
+      if (this.options.addDocumentation) {
+        componentCode += this.generateEnhancedJSDocComment(component);
+      }
 
-    // Generate component signature with full type safety
-    componentCode += this.generateComponentSignature(
-      component,
-      configuratorIntegration,
-    );
+      // Generate component signature with full type safety
+      componentCode += this.generateComponentSignature(
+        component,
+        configuratorIntegration
+      );
 
-    // Add component body
-    componentCode += this.generateComponentBody(
-      structure,
-      component,
-      businessLogic,
-      configuratorIntegration,
-    );
+      // Add component body
+      componentCode += this.generateComponentBody(
+        structure,
+        component,
+        businessLogic,
+        configuratorIntegration
+      );
 
-    // Add component metadata
-    componentCode += this.generateComponentMetadata(component);
+      // Add component metadata
+      componentCode += this.generateComponentMetadata(component);
 
-    return componentCode;
+      return componentCode;
     });
   }
 
@@ -684,23 +687,23 @@ score -= 10;
    */
   private calculateQualityImprovement(
     original: CodeMetrics,
-    transformed: CodeMetrics,
+    transformed: CodeMetrics
   ): number {
     const complexityImprovement = Math.max(
       0,
-      original.complexity - transformed.complexity,
+      original.complexity - transformed.complexity
     );
     const locImprovement =
       original.loc > 0 ? (original.loc - transformed.loc) / original.loc : 0;
 
     return Math.round(
-      (complexityImprovement * 0.7 + locImprovement * 0.3) * 100,
+      (complexityImprovement * 0.7 + locImprovement * 0.3) * 100
     );
   }
 
   private estimateBundleSizeImpact(
     original: CodeMetrics,
-    transformed: CodeMetrics,
+    transformed: CodeMetrics
   ): number {
     // Estimate bundle size change as percentage
     const locDiff = transformed.loc - original.loc;
@@ -710,7 +713,7 @@ score -= 10;
   private assessMigrationEffort(
     component: ComponentDefinition,
     originalMetrics: CodeMetrics,
-    _transformedMetrics: CodeMetrics,
+    _transformedMetrics: CodeMetrics
   ): 'low' | 'medium' | 'high' | 'critical' {
     const complexityFactor =
       component.complexity === 'critical'
@@ -740,21 +743,21 @@ score -= 10;
     const totalScore = complexityFactor + sizeFactor + patternFactor;
 
     if (totalScore >= 7) {
-return 'critical';
-}
+      return 'critical';
+    }
     if (totalScore >= 5) {
-return 'high';
-}
+      return 'high';
+    }
     if (totalScore >= 3) {
-return 'medium';
-}
+      return 'medium';
+    }
     return 'low';
   }
 
   private createErrorResult(
     component: ComponentDefinition,
     startTime: number,
-    error: unknown,
+    error: unknown
   ): ComponentTransformationResult {
     return {
       success: false,
@@ -820,7 +823,7 @@ return 'medium';
   }
   private createAdvancedCustomHook(
     _businessLogic: BusinessLogicDefinition,
-    _structure: EnhancedComponentStructure,
+    _structure: EnhancedComponentStructure
   ): Promise<ExtractedHook | undefined> {
     return Promise.resolve(undefined);
   }
@@ -844,36 +847,36 @@ return 'medium';
   }
   private generateConfiguratorPropsCode(
     _component: ComponentDefinition,
-    _integration: ConfiguratorV2Integration,
+    _integration: ConfiguratorV2Integration
   ): string {
     return '';
   }
   private generateConfiguratorHookCode(
     _component: ComponentDefinition,
-    _integration: ConfiguratorV2Integration,
+    _integration: ConfiguratorV2Integration
   ): string {
     return '';
   }
   private generateConfiguratorContextCode(
     _component: ComponentDefinition,
-    _integration: ConfiguratorV2Integration,
+    _integration: ConfiguratorV2Integration
   ): string {
     return '';
   }
   private generateConfiguratorSetupCode(
     _component: ComponentDefinition,
-    _integration: ConfiguratorV2Integration,
+    _integration: ConfiguratorV2Integration
   ): string {
     return '';
   }
   private generateEnhancedJSDocComment(
-    _component: ComponentDefinition,
+    _component: ComponentDefinition
   ): string {
     return '';
   }
   private generateComponentSignature(
     _component: ComponentDefinition,
-    _configuratorIntegration?: ConfiguratorIntegration,
+    _configuratorIntegration?: ConfiguratorIntegration
   ): string {
     return '';
   }
@@ -881,7 +884,7 @@ return 'medium';
     _structure: EnhancedComponentStructure,
     _component: ComponentDefinition,
     _businessLogic?: EnhancedBusinessLogicExtraction,
-    _configuratorIntegration?: ConfiguratorIntegration,
+    _configuratorIntegration?: ConfiguratorIntegration
   ): string {
     return '';
   }
@@ -890,23 +893,23 @@ return 'medium';
   }
   private generateTestCode(
     _component: ComponentDefinition,
-    _transformedCode: string,
+    _transformedCode: string
   ): Promise<string> {
     return Promise.resolve('');
   }
   private generateStoryCode(
     _component: ComponentDefinition,
-    _transformedCode: string,
+    _transformedCode: string
   ): Promise<string> {
     return Promise.resolve('');
   }
   private sortByComplexity(
-    components: ComponentDefinition[],
+    components: ComponentDefinition[]
   ): ComponentDefinition[] {
     return components;
   }
   private groupBySimilarity(
-    components: ComponentDefinition[],
+    components: ComponentDefinition[]
   ): ComponentDefinition[] {
     return components;
   }
@@ -918,7 +921,7 @@ return 'medium';
   private calculateCodeMetrics(code: string): CodeMetrics {
     const lines = code.split('\n');
     const loc = lines.filter(
-      line => line.trim() && !line.trim().startsWith('//'),
+      line => line.trim() && !line.trim().startsWith('//')
     ).length;
 
     const complexityPatterns = [
@@ -997,7 +1000,7 @@ return 'medium';
   }
 
   private calculateComplexityReduction(
-    businessLogic: BusinessLogicDefinition,
+    businessLogic: BusinessLogicDefinition
   ): number {
     return businessLogic.complexity === 'complex'
       ? 5
@@ -1008,29 +1011,29 @@ return 'medium';
 
   private transformPropsInterface(
     _props: PropDefinition[],
-    _config: ExtractionConfig,
+    _config: ExtractionConfig
   ): Promise<string> {
-    return Promise.resolve('export interface ComponentProps {\n  // Props interface\n}');
+    return Promise.resolve(
+      'export interface ComponentProps {\n  // Props interface\n}'
+    );
   }
 
   private generateTypeDefinitions(
     _component: ComponentDefinition,
     propsInterface: string,
-    _configuratorIntegration?: ConfiguratorIntegration,
+    _configuratorIntegration?: ConfiguratorIntegration
   ): Promise<string> {
     return Promise.resolve(propsInterface);
   }
 
   private generateImports(
     _component: ComponentDefinition,
-    _config: ExtractionConfig,
+    _config: ExtractionConfig
   ): Promise<string[]> {
     return Promise.resolve(["import React from 'react';"]);
   }
 
-  private generateExports(
-    component: ComponentDefinition,
-  ): Promise<string[]> {
+  private generateExports(component: ComponentDefinition): Promise<string[]> {
     return Promise.resolve([
       `export { ${component.name} };`,
       `export default ${component.name};`,
@@ -1045,7 +1048,7 @@ return 'medium';
     return imports.filter(
       imp =>
         imp.includes('@elevenlabs/configurator') ||
-        imp.includes('configurator-sdk'),
+        imp.includes('configurator-sdk')
     );
   }
 }

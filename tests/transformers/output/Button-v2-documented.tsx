@@ -78,7 +78,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'data-testid': testId,
       ...rest
     },
-    ref,
+    ref
   ) => {
     // Complex state management (to be transformed)
     const [isPressed, setIsPressed] = useState(false);
@@ -91,63 +91,63 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const pressTimer = useRef<NodeJS.Timeout>();
 
     // Complex business logic: Auto-focus management
-      /**
-       * BUSINESS LOGIC: Side Effect
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Monitors autoFocus, disabled for changes
-       * 2. Executes .focus functions
-       * 3. Runs side effect logic
-       *
-       * WHAT IT CALLS:
-       * - .focus() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - .focus: Required functionality
-       *
-       * DATA FLOW:
-       * Input: autoFocus, disabled state/props
-       * Processing: Calls .focus to process data
-       * Output: Side effects executed, cleanup registered
-       *
-       * DEPENDENCIES:
-       * - autoFocus: Triggers when autoFocus changes
-       * - disabled: Triggers when disabled changes
-       *
-       */
-      /**
-       * BUSINESS LOGIC: Side Effect
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Monitors autoFocus, disabled for changes
-       * 2. Executes .focus functions
-       * 3. Runs side effect logic
-       *
-       * WHAT IT CALLS:
-       * - .focus() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - .focus: Required functionality
-       *
-       * DATA FLOW:
-       * Input: autoFocus, disabled state/props
-       * Processing: Calls .focus to process data
-       * Output: Side effects executed, cleanup registered
-       *
-       * DEPENDENCIES:
-       * - autoFocus: Triggers when autoFocus changes
-       * - disabled: Triggers when disabled changes
-       *
-       * MIGRATION NOTE:
-       * - This logic is PRESERVED from v1 - no changes during migration
-       *
-       */
+    /**
+     * BUSINESS LOGIC: Side Effect
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Monitors autoFocus, disabled for changes
+     * 2. Executes .focus functions
+     * 3. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - .focus() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - .focus: Required functionality
+     *
+     * DATA FLOW:
+     * Input: autoFocus, disabled state/props
+     * Processing: Calls .focus to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * DEPENDENCIES:
+     * - autoFocus: Triggers when autoFocus changes
+     * - disabled: Triggers when disabled changes
+     *
+     */
+    /**
+     * BUSINESS LOGIC: Side Effect
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Monitors autoFocus, disabled for changes
+     * 2. Executes .focus functions
+     * 3. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - .focus() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - .focus: Required functionality
+     *
+     * DATA FLOW:
+     * Input: autoFocus, disabled state/props
+     * Processing: Calls .focus to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * DEPENDENCIES:
+     * - autoFocus: Triggers when autoFocus changes
+     * - disabled: Triggers when disabled changes
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
     useEffect(() => {
       if (autoFocus && buttonRef.current && !disabled) {
         buttonRef.current.focus();
@@ -155,184 +155,184 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }, [autoFocus, disabled]);
 
     // Complex business logic: Keyboard navigation
+    /**
+     * BUSINESS LOGIC: Cleanup Effect
+     *
+     * WHY THIS EXISTS:
+     * - Prevents memory leaks and cleans up resources
+     *
+     * WHAT IT DOES:
+     * 1. Executes setFocusVisible, setFocusVisible, document.addEventListener, document.addEventListener, document.removeEventListener, document.removeEventListener functions
+     * 2. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - setFocusVisible() - Function call
+     * - setFocusVisible() - Function call
+     * - document.addEventListener() - Function call
+     * - document.addEventListener() - Function call
+     * - document.removeEventListener() - Function call
+     * - document.removeEventListener() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setFocusVisible: State update
+     * - setFocusVisible: State update
+     * - document.addEventListener: Required functionality
+     * - document.addEventListener: Required functionality
+     * - document.removeEventListener: Required functionality
+     * - document.removeEventListener: Required functionality
+     *
+     * DATA FLOW:
+     * Input: Component state and props
+     * Processing: Calls setFocusVisible, setFocusVisible, document.addEventListener to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * SPECIAL BEHAVIOR:
+     * - Runs only on component mount
+     *
+     */
+    /**
+     * BUSINESS LOGIC: Cleanup Effect
+     *
+     * WHY THIS EXISTS:
+     * - Prevents memory leaks and cleans up resources
+     *
+     * WHAT IT DOES:
+     * 1. Executes setFocusVisible, setFocusVisible, document.addEventListener, document.addEventListener, document.removeEventListener, document.removeEventListener functions
+     * 2. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - setFocusVisible() - Function call
+     * - setFocusVisible() - Function call
+     * - document.addEventListener() - Function call
+     * - document.addEventListener() - Function call
+     * - document.removeEventListener() - Function call
+     * - document.removeEventListener() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setFocusVisible: State update
+     * - setFocusVisible: State update
+     * - document.addEventListener: Required functionality
+     * - document.addEventListener: Required functionality
+     * - document.removeEventListener: Required functionality
+     * - document.removeEventListener: Required functionality
+     *
+     * DATA FLOW:
+     * Input: Component state and props
+     * Processing: Calls setFocusVisible, setFocusVisible, document.addEventListener to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * SPECIAL BEHAVIOR:
+     * - Runs only on component mount
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
+    useEffect(() => {
       /**
-       * BUSINESS LOGIC: Cleanup Effect
+       * BUSINESS LOGIC: handleKeyDown
        *
        * WHY THIS EXISTS:
-       * - Prevents memory leaks and cleans up resources
+       * - Implements business logic requirement
        *
        * WHAT IT DOES:
-       * 1. Executes setFocusVisible, setFocusVisible, document.addEventListener, document.addEventListener, document.removeEventListener, document.removeEventListener functions
-       * 2. Runs side effect logic
+       * 1. Implements handleKeyDown logic
+       * 2. Calls helper functions: setFocusVisible
+       * 3. Returns computed result
        *
        * WHAT IT CALLS:
        * - setFocusVisible() - Function call
-       * - setFocusVisible() - Function call
-       * - document.addEventListener() - Function call
-       * - document.addEventListener() - Function call
-       * - document.removeEventListener() - Function call
-       * - document.removeEventListener() - Function call
        *
        * WHY IT CALLS THEM:
        * - setFocusVisible: State update
-       * - setFocusVisible: State update
-       * - document.addEventListener: Required functionality
-       * - document.addEventListener: Required functionality
-       * - document.removeEventListener: Required functionality
-       * - document.removeEventListener: Required functionality
        *
        * DATA FLOW:
        * Input: Component state and props
-       * Processing: Calls setFocusVisible, setFocusVisible, document.addEventListener to process data
-       * Output: Side effects executed, cleanup registered
-       *
-       * SPECIAL BEHAVIOR:
-       * - Runs only on component mount
+       * Processing: Calls setFocusVisible to process data
+       * Output: Computed value or side effect
        *
        */
       /**
-       * BUSINESS LOGIC: Cleanup Effect
+       * BUSINESS LOGIC: handleKeyDown
        *
        * WHY THIS EXISTS:
-       * - Prevents memory leaks and cleans up resources
+       * - Implements business logic requirement
        *
        * WHAT IT DOES:
-       * 1. Executes setFocusVisible, setFocusVisible, document.addEventListener, document.addEventListener, document.removeEventListener, document.removeEventListener functions
-       * 2. Runs side effect logic
+       * 1. Implements handleKeyDown logic
+       * 2. Calls helper functions: setFocusVisible
+       * 3. Returns computed result
        *
        * WHAT IT CALLS:
        * - setFocusVisible() - Function call
-       * - setFocusVisible() - Function call
-       * - document.addEventListener() - Function call
-       * - document.addEventListener() - Function call
-       * - document.removeEventListener() - Function call
-       * - document.removeEventListener() - Function call
        *
        * WHY IT CALLS THEM:
        * - setFocusVisible: State update
-       * - setFocusVisible: State update
-       * - document.addEventListener: Required functionality
-       * - document.addEventListener: Required functionality
-       * - document.removeEventListener: Required functionality
-       * - document.removeEventListener: Required functionality
        *
        * DATA FLOW:
        * Input: Component state and props
-       * Processing: Calls setFocusVisible, setFocusVisible, document.addEventListener to process data
-       * Output: Side effects executed, cleanup registered
-       *
-       * SPECIAL BEHAVIOR:
-       * - Runs only on component mount
+       * Processing: Calls setFocusVisible to process data
+       * Output: Computed value or side effect
        *
        * MIGRATION NOTE:
        * - This logic is PRESERVED from v1 - no changes during migration
        *
        */
-    useEffect(() => {
-        /**
-         * BUSINESS LOGIC: handleKeyDown
-         *
-         * WHY THIS EXISTS:
-         * - Implements business logic requirement
-         *
-         * WHAT IT DOES:
-         * 1. Implements handleKeyDown logic
-         * 2. Calls helper functions: setFocusVisible
-         * 3. Returns computed result
-         *
-         * WHAT IT CALLS:
-         * - setFocusVisible() - Function call
-         *
-         * WHY IT CALLS THEM:
-         * - setFocusVisible: State update
-         *
-         * DATA FLOW:
-         * Input: Component state and props
-         * Processing: Calls setFocusVisible to process data
-         * Output: Computed value or side effect
-         *
-         */
-        /**
-         * BUSINESS LOGIC: handleKeyDown
-         *
-         * WHY THIS EXISTS:
-         * - Implements business logic requirement
-         *
-         * WHAT IT DOES:
-         * 1. Implements handleKeyDown logic
-         * 2. Calls helper functions: setFocusVisible
-         * 3. Returns computed result
-         *
-         * WHAT IT CALLS:
-         * - setFocusVisible() - Function call
-         *
-         * WHY IT CALLS THEM:
-         * - setFocusVisible: State update
-         *
-         * DATA FLOW:
-         * Input: Component state and props
-         * Processing: Calls setFocusVisible to process data
-         * Output: Computed value or side effect
-         *
-         * MIGRATION NOTE:
-         * - This logic is PRESERVED from v1 - no changes during migration
-         *
-         */
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Tab') {
           setFocusVisible(true);
         }
       };
 
-        /**
-         * BUSINESS LOGIC: handleMouseDown
-         *
-         * WHY THIS EXISTS:
-         * - Implements business logic requirement
-         *
-         * WHAT IT DOES:
-         * 1. Implements handleMouseDown logic
-         * 2. Calls helper functions: setFocusVisible
-         * 3. Returns computed result
-         *
-         * WHAT IT CALLS:
-         * - setFocusVisible() - Function call
-         *
-         * WHY IT CALLS THEM:
-         * - setFocusVisible: State update
-         *
-         * DATA FLOW:
-         * Input: Component state and props
-         * Processing: Calls setFocusVisible to process data
-         * Output: Computed value or side effect
-         *
-         */
-        /**
-         * BUSINESS LOGIC: handleMouseDown
-         *
-         * WHY THIS EXISTS:
-         * - Implements business logic requirement
-         *
-         * WHAT IT DOES:
-         * 1. Implements handleMouseDown logic
-         * 2. Calls helper functions: setFocusVisible
-         * 3. Returns computed result
-         *
-         * WHAT IT CALLS:
-         * - setFocusVisible() - Function call
-         *
-         * WHY IT CALLS THEM:
-         * - setFocusVisible: State update
-         *
-         * DATA FLOW:
-         * Input: Component state and props
-         * Processing: Calls setFocusVisible to process data
-         * Output: Computed value or side effect
-         *
-         * MIGRATION NOTE:
-         * - This logic is PRESERVED from v1 - no changes during migration
-         *
-         */
+      /**
+       * BUSINESS LOGIC: handleMouseDown
+       *
+       * WHY THIS EXISTS:
+       * - Implements business logic requirement
+       *
+       * WHAT IT DOES:
+       * 1. Implements handleMouseDown logic
+       * 2. Calls helper functions: setFocusVisible
+       * 3. Returns computed result
+       *
+       * WHAT IT CALLS:
+       * - setFocusVisible() - Function call
+       *
+       * WHY IT CALLS THEM:
+       * - setFocusVisible: State update
+       *
+       * DATA FLOW:
+       * Input: Component state and props
+       * Processing: Calls setFocusVisible to process data
+       * Output: Computed value or side effect
+       *
+       */
+      /**
+       * BUSINESS LOGIC: handleMouseDown
+       *
+       * WHY THIS EXISTS:
+       * - Implements business logic requirement
+       *
+       * WHAT IT DOES:
+       * 1. Implements handleMouseDown logic
+       * 2. Calls helper functions: setFocusVisible
+       * 3. Returns computed result
+       *
+       * WHAT IT CALLS:
+       * - setFocusVisible() - Function call
+       *
+       * WHY IT CALLS THEM:
+       * - setFocusVisible: State update
+       *
+       * DATA FLOW:
+       * Input: Component state and props
+       * Processing: Calls setFocusVisible to process data
+       * Output: Computed value or side effect
+       *
+       * MIGRATION NOTE:
+       * - This logic is PRESERVED from v1 - no changes during migration
+       *
+       */
       const handleMouseDown = () => {
         setFocusVisible(false);
       };
@@ -347,75 +347,75 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }, []);
 
     // Complex business logic: Analytics tracking
-      /**
-       * BUSINESS LOGIC: trackEvent
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls .track, Date.now functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - .track() - Function call
-       * - Date.now() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - .track: Analytics tracking
-       * - Date.now: Required functionality
-       *
-       * DATA FLOW:
-       * Input: trackingId, variant, size state/props
-       * Processing: Calls .track, Date.now to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - trackingId: Triggers when trackingId changes
-       * - variant: Triggers when variant changes
-       * - size: Triggers when size changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       */
-      /**
-       * BUSINESS LOGIC: trackEvent
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls .track, Date.now functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - .track() - Function call
-       * - Date.now() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - .track: Analytics tracking
-       * - Date.now: Required functionality
-       *
-       * DATA FLOW:
-       * Input: trackingId, variant, size state/props
-       * Processing: Calls .track, Date.now to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - trackingId: Triggers when trackingId changes
-       * - variant: Triggers when variant changes
-       * - size: Triggers when size changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       * MIGRATION NOTE:
-       * - This logic is PRESERVED from v1 - no changes during migration
-       *
-       */
+    /**
+     * BUSINESS LOGIC: trackEvent
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls .track, Date.now functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - .track() - Function call
+     * - Date.now() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - .track: Analytics tracking
+     * - Date.now: Required functionality
+     *
+     * DATA FLOW:
+     * Input: trackingId, variant, size state/props
+     * Processing: Calls .track, Date.now to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - trackingId: Triggers when trackingId changes
+     * - variant: Triggers when variant changes
+     * - size: Triggers when size changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+    /**
+     * BUSINESS LOGIC: trackEvent
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls .track, Date.now functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - .track() - Function call
+     * - Date.now() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - .track: Analytics tracking
+     * - Date.now: Required functionality
+     *
+     * DATA FLOW:
+     * Input: trackingId, variant, size state/props
+     * Processing: Calls .track, Date.now to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - trackingId: Triggers when trackingId changes
+     * - variant: Triggers when variant changes
+     * - size: Triggers when size changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
     const trackEvent = useCallback(
       (eventType: string, metadata?: Record<string, any>) => {
         if (trackingId) {
@@ -430,107 +430,107 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           });
         }
       },
-      [trackingId, variant, size],
+      [trackingId, variant, size]
     );
 
     // Complex business logic: Enhanced click handling
-      /**
-       * BUSINESS LOGIC: handleClick
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls event.preventDefault, setIsPressed, trackEvent, Date.now, navigator.vibrate, onClick, setTimeout, setIsPressed functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - event.preventDefault() - Function call
-       * - setIsPressed() - Function call
-       * - trackEvent() - Function call
-       * - Date.now() - Function call
-       * - navigator.vibrate() - Function call
-       * - onClick() - Function call
-       * - setTimeout() - Function call
-       * - setIsPressed() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - event.preventDefault: Required functionality
-       * - setIsPressed: State update
-       * - trackEvent: Analytics tracking
-       * - Date.now: Required functionality
-       * - navigator.vibrate: Required functionality
-       * - onClick: Required functionality
-       * - setTimeout: State update
-       * - setIsPressed: State update
-       *
-       * DATA FLOW:
-       * Input: disabled, loading, onClick, children, trackEvent state/props
-       * Processing: Calls event.preventDefault, setIsPressed, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - disabled: Triggers when disabled changes
-       * - loading: Triggers when loading changes
-       * - onClick: Triggers when onClick changes
-       * - children: Triggers when children changes
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       */
-      /**
-       * BUSINESS LOGIC: handleClick
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls event.preventDefault, setIsPressed, trackEvent, Date.now, navigator.vibrate, onClick, setTimeout, setIsPressed functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - event.preventDefault() - Function call
-       * - setIsPressed() - Function call
-       * - trackEvent() - Function call
-       * - Date.now() - Function call
-       * - navigator.vibrate() - Function call
-       * - onClick() - Function call
-       * - setTimeout() - Function call
-       * - setIsPressed() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - event.preventDefault: Required functionality
-       * - setIsPressed: State update
-       * - trackEvent: Analytics tracking
-       * - Date.now: Required functionality
-       * - navigator.vibrate: Required functionality
-       * - onClick: Required functionality
-       * - setTimeout: State update
-       * - setIsPressed: State update
-       *
-       * DATA FLOW:
-       * Input: disabled, loading, onClick, children, trackEvent state/props
-       * Processing: Calls event.preventDefault, setIsPressed, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - disabled: Triggers when disabled changes
-       * - loading: Triggers when loading changes
-       * - onClick: Triggers when onClick changes
-       * - children: Triggers when children changes
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       * MIGRATION NOTE:
-       * - This logic is PRESERVED from v1 - no changes during migration
-       *
-       */
+    /**
+     * BUSINESS LOGIC: handleClick
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls event.preventDefault, setIsPressed, trackEvent, Date.now, navigator.vibrate, onClick, setTimeout, setIsPressed functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - event.preventDefault() - Function call
+     * - setIsPressed() - Function call
+     * - trackEvent() - Function call
+     * - Date.now() - Function call
+     * - navigator.vibrate() - Function call
+     * - onClick() - Function call
+     * - setTimeout() - Function call
+     * - setIsPressed() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - event.preventDefault: Required functionality
+     * - setIsPressed: State update
+     * - trackEvent: Analytics tracking
+     * - Date.now: Required functionality
+     * - navigator.vibrate: Required functionality
+     * - onClick: Required functionality
+     * - setTimeout: State update
+     * - setIsPressed: State update
+     *
+     * DATA FLOW:
+     * Input: disabled, loading, onClick, children, trackEvent state/props
+     * Processing: Calls event.preventDefault, setIsPressed, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - disabled: Triggers when disabled changes
+     * - loading: Triggers when loading changes
+     * - onClick: Triggers when onClick changes
+     * - children: Triggers when children changes
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+    /**
+     * BUSINESS LOGIC: handleClick
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls event.preventDefault, setIsPressed, trackEvent, Date.now, navigator.vibrate, onClick, setTimeout, setIsPressed functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - event.preventDefault() - Function call
+     * - setIsPressed() - Function call
+     * - trackEvent() - Function call
+     * - Date.now() - Function call
+     * - navigator.vibrate() - Function call
+     * - onClick() - Function call
+     * - setTimeout() - Function call
+     * - setIsPressed() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - event.preventDefault: Required functionality
+     * - setIsPressed: State update
+     * - trackEvent: Analytics tracking
+     * - Date.now: Required functionality
+     * - navigator.vibrate: Required functionality
+     * - onClick: Required functionality
+     * - setTimeout: State update
+     * - setIsPressed: State update
+     *
+     * DATA FLOW:
+     * Input: disabled, loading, onClick, children, trackEvent state/props
+     * Processing: Calls event.preventDefault, setIsPressed, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - disabled: Triggers when disabled changes
+     * - loading: Triggers when loading changes
+     * - onClick: Triggers when onClick changes
+     * - children: Triggers when children changes
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
     const handleClick = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {
         if (disabled || loading) {
@@ -561,79 +561,79 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           setIsPressed(false);
         }, 150);
       },
-      [disabled, loading, onClick, children, trackEvent],
+      [disabled, loading, onClick, children, trackEvent]
     );
 
     // Complex business logic: Tooltip management
-      /**
-       * BUSINESS LOGIC: handleMouseEnter
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls setTooltipVisible, trackEvent functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - setTooltipVisible() - Function call
-       * - trackEvent() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - setTooltipVisible: State update
-       * - trackEvent: Analytics tracking
-       *
-       * DATA FLOW:
-       * Input: tooltip, disabled, trackEvent state/props
-       * Processing: Calls setTooltipVisible, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - tooltip: Triggers when tooltip changes
-       * - disabled: Triggers when disabled changes
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       */
-      /**
-       * BUSINESS LOGIC: handleMouseEnter
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls setTooltipVisible, trackEvent functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - setTooltipVisible() - Function call
-       * - trackEvent() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - setTooltipVisible: State update
-       * - trackEvent: Analytics tracking
-       *
-       * DATA FLOW:
-       * Input: tooltip, disabled, trackEvent state/props
-       * Processing: Calls setTooltipVisible, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - tooltip: Triggers when tooltip changes
-       * - disabled: Triggers when disabled changes
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       * MIGRATION NOTE:
-       * - This logic is PRESERVED from v1 - no changes during migration
-       *
-       */
+    /**
+     * BUSINESS LOGIC: handleMouseEnter
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setTooltipVisible, trackEvent functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setTooltipVisible() - Function call
+     * - trackEvent() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setTooltipVisible: State update
+     * - trackEvent: Analytics tracking
+     *
+     * DATA FLOW:
+     * Input: tooltip, disabled, trackEvent state/props
+     * Processing: Calls setTooltipVisible, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - tooltip: Triggers when tooltip changes
+     * - disabled: Triggers when disabled changes
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+    /**
+     * BUSINESS LOGIC: handleMouseEnter
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setTooltipVisible, trackEvent functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setTooltipVisible() - Function call
+     * - trackEvent() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setTooltipVisible: State update
+     * - trackEvent: Analytics tracking
+     *
+     * DATA FLOW:
+     * Input: tooltip, disabled, trackEvent state/props
+     * Processing: Calls setTooltipVisible, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - tooltip: Triggers when tooltip changes
+     * - disabled: Triggers when disabled changes
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
     const handleMouseEnter = useCallback(() => {
       if (tooltip && !disabled) {
         setTooltipVisible(true);
@@ -641,73 +641,73 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       }
     }, [tooltip, disabled, trackEvent]);
 
-      /**
-       * BUSINESS LOGIC: handleMouseLeave
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls setTooltipVisible, trackEvent functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - setTooltipVisible() - Function call
-       * - trackEvent() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - setTooltipVisible: State update
-       * - trackEvent: Analytics tracking
-       *
-       * DATA FLOW:
-       * Input: tooltip, trackEvent state/props
-       * Processing: Calls setTooltipVisible, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - tooltip: Triggers when tooltip changes
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       */
-      /**
-       * BUSINESS LOGIC: handleMouseLeave
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls setTooltipVisible, trackEvent functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - setTooltipVisible() - Function call
-       * - trackEvent() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - setTooltipVisible: State update
-       * - trackEvent: Analytics tracking
-       *
-       * DATA FLOW:
-       * Input: tooltip, trackEvent state/props
-       * Processing: Calls setTooltipVisible, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - tooltip: Triggers when tooltip changes
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       * MIGRATION NOTE:
-       * - This logic is PRESERVED from v1 - no changes during migration
-       *
-       */
+    /**
+     * BUSINESS LOGIC: handleMouseLeave
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setTooltipVisible, trackEvent functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setTooltipVisible() - Function call
+     * - trackEvent() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setTooltipVisible: State update
+     * - trackEvent: Analytics tracking
+     *
+     * DATA FLOW:
+     * Input: tooltip, trackEvent state/props
+     * Processing: Calls setTooltipVisible, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - tooltip: Triggers when tooltip changes
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+    /**
+     * BUSINESS LOGIC: handleMouseLeave
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setTooltipVisible, trackEvent functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setTooltipVisible() - Function call
+     * - trackEvent() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setTooltipVisible: State update
+     * - trackEvent: Analytics tracking
+     *
+     * DATA FLOW:
+     * Input: tooltip, trackEvent state/props
+     * Processing: Calls setTooltipVisible, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - tooltip: Triggers when tooltip changes
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
     const handleMouseLeave = useCallback(() => {
       if (tooltip) {
         setTooltipVisible(false);
@@ -716,200 +716,200 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }, [tooltip, trackEvent]);
 
     // Complex business logic: Focus management
-      /**
-       * BUSINESS LOGIC: handleFocus
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls setFocusVisible, trackEvent functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - setFocusVisible() - Function call
-       * - trackEvent() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - setFocusVisible: State update
-       * - trackEvent: Analytics tracking
-       *
-       * DATA FLOW:
-       * Input: trackEvent state/props
-       * Processing: Calls setFocusVisible, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       */
-      /**
-       * BUSINESS LOGIC: handleFocus
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls setFocusVisible, trackEvent functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - setFocusVisible() - Function call
-       * - trackEvent() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - setFocusVisible: State update
-       * - trackEvent: Analytics tracking
-       *
-       * DATA FLOW:
-       * Input: trackEvent state/props
-       * Processing: Calls setFocusVisible, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       * MIGRATION NOTE:
-       * - This logic is PRESERVED from v1 - no changes during migration
-       *
-       */
+    /**
+     * BUSINESS LOGIC: handleFocus
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setFocusVisible, trackEvent functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setFocusVisible() - Function call
+     * - trackEvent() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setFocusVisible: State update
+     * - trackEvent: Analytics tracking
+     *
+     * DATA FLOW:
+     * Input: trackEvent state/props
+     * Processing: Calls setFocusVisible, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+    /**
+     * BUSINESS LOGIC: handleFocus
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setFocusVisible, trackEvent functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setFocusVisible() - Function call
+     * - trackEvent() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setFocusVisible: State update
+     * - trackEvent: Analytics tracking
+     *
+     * DATA FLOW:
+     * Input: trackEvent state/props
+     * Processing: Calls setFocusVisible, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
     const handleFocus = useCallback(() => {
       setFocusVisible(true);
       trackEvent('button_focus');
     }, [trackEvent]);
 
-      /**
-       * BUSINESS LOGIC: handleBlur
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls setFocusVisible, trackEvent functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - setFocusVisible() - Function call
-       * - trackEvent() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - setFocusVisible: State update
-       * - trackEvent: Analytics tracking
-       *
-       * DATA FLOW:
-       * Input: trackEvent state/props
-       * Processing: Calls setFocusVisible, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       */
-      /**
-       * BUSINESS LOGIC: handleBlur
-       *
-       * WHY THIS EXISTS:
-       * - Implements business logic requirement
-       *
-       * WHAT IT DOES:
-       * 1. Handles user interaction or event
-       * 2. Calls setFocusVisible, trackEvent functions
-       * 3. Updates state or triggers effects
-       *
-       * WHAT IT CALLS:
-       * - setFocusVisible() - Function call
-       * - trackEvent() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - setFocusVisible: State update
-       * - trackEvent: Analytics tracking
-       *
-       * DATA FLOW:
-       * Input: trackEvent state/props
-       * Processing: Calls setFocusVisible, trackEvent to process data
-       * Output: Event handled, state updated
-       *
-       * DEPENDENCIES:
-       * - trackEvent: Triggers when trackEvent changes
-       *
-       * SPECIAL BEHAVIOR:
-       * - Memoized for performance optimization
-       *
-       * MIGRATION NOTE:
-       * - This logic is PRESERVED from v1 - no changes during migration
-       *
-       */
+    /**
+     * BUSINESS LOGIC: handleBlur
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setFocusVisible, trackEvent functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setFocusVisible() - Function call
+     * - trackEvent() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setFocusVisible: State update
+     * - trackEvent: Analytics tracking
+     *
+     * DATA FLOW:
+     * Input: trackEvent state/props
+     * Processing: Calls setFocusVisible, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     */
+    /**
+     * BUSINESS LOGIC: handleBlur
+     *
+     * WHY THIS EXISTS:
+     * - Implements business logic requirement
+     *
+     * WHAT IT DOES:
+     * 1. Handles user interaction or event
+     * 2. Calls setFocusVisible, trackEvent functions
+     * 3. Updates state or triggers effects
+     *
+     * WHAT IT CALLS:
+     * - setFocusVisible() - Function call
+     * - trackEvent() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - setFocusVisible: State update
+     * - trackEvent: Analytics tracking
+     *
+     * DATA FLOW:
+     * Input: trackEvent state/props
+     * Processing: Calls setFocusVisible, trackEvent to process data
+     * Output: Event handled, state updated
+     *
+     * DEPENDENCIES:
+     * - trackEvent: Triggers when trackEvent changes
+     *
+     * SPECIAL BEHAVIOR:
+     * - Memoized for performance optimization
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
     const handleBlur = useCallback(() => {
       setFocusVisible(false);
       trackEvent('button_blur');
     }, [trackEvent]);
 
     // Cleanup timers
-      /**
-       * BUSINESS LOGIC: Cleanup Effect
-       *
-       * WHY THIS EXISTS:
-       * - Prevents memory leaks and cleans up resources
-       *
-       * WHAT IT DOES:
-       * 1. Executes clearTimeout functions
-       * 2. Runs side effect logic
-       *
-       * WHAT IT CALLS:
-       * - clearTimeout() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - clearTimeout: Required functionality
-       *
-       * DATA FLOW:
-       * Input: Component state and props
-       * Processing: Calls clearTimeout to process data
-       * Output: Side effects executed, cleanup registered
-       *
-       * SPECIAL BEHAVIOR:
-       * - Runs only on component mount
-       *
-       */
-      /**
-       * BUSINESS LOGIC: Cleanup Effect
-       *
-       * WHY THIS EXISTS:
-       * - Prevents memory leaks and cleans up resources
-       *
-       * WHAT IT DOES:
-       * 1. Executes clearTimeout functions
-       * 2. Runs side effect logic
-       *
-       * WHAT IT CALLS:
-       * - clearTimeout() - Function call
-       *
-       * WHY IT CALLS THEM:
-       * - clearTimeout: Required functionality
-       *
-       * DATA FLOW:
-       * Input: Component state and props
-       * Processing: Calls clearTimeout to process data
-       * Output: Side effects executed, cleanup registered
-       *
-       * SPECIAL BEHAVIOR:
-       * - Runs only on component mount
-       *
-       * MIGRATION NOTE:
-       * - This logic is PRESERVED from v1 - no changes during migration
-       *
-       */
+    /**
+     * BUSINESS LOGIC: Cleanup Effect
+     *
+     * WHY THIS EXISTS:
+     * - Prevents memory leaks and cleans up resources
+     *
+     * WHAT IT DOES:
+     * 1. Executes clearTimeout functions
+     * 2. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - clearTimeout() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - clearTimeout: Required functionality
+     *
+     * DATA FLOW:
+     * Input: Component state and props
+     * Processing: Calls clearTimeout to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * SPECIAL BEHAVIOR:
+     * - Runs only on component mount
+     *
+     */
+    /**
+     * BUSINESS LOGIC: Cleanup Effect
+     *
+     * WHY THIS EXISTS:
+     * - Prevents memory leaks and cleans up resources
+     *
+     * WHAT IT DOES:
+     * 1. Executes clearTimeout functions
+     * 2. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - clearTimeout() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - clearTimeout: Required functionality
+     *
+     * DATA FLOW:
+     * Input: Component state and props
+     * Processing: Calls clearTimeout to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * SPECIAL BEHAVIOR:
+     * - Runs only on component mount
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
     useEffect(() => {
       return () => {
         if (pressTimer.current) {
@@ -942,7 +942,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     return (
-      <div className="relative inline-block">
+      <div className='relative inline-block'>
         <button
           ref={buttonRef}
           type={type}
@@ -964,8 +964,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         >
           {/* DAISY v1 pattern: Complex loading state */}
           {loading && (
-            <span className="inline-flex items-center justify-center w-[16px] h-[16px]" aria-hidden='true'>
-              <svg viewBox='0 0 24 24' className="transition">
+            <span
+              className='inline-flex items-center justify-center w-[16px] h-[16px]'
+              aria-hidden='true'
+            >
+              <svg viewBox='0 0 24 24' className='transition'>
                 <circle
                   cx='12'
                   cy='12'
@@ -1000,278 +1003,278 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <div
               ref={tooltipRef}
               id={`${testId || 'button'}-tooltip`}
-              className=""
+              className=''
               role='tooltip'
               aria-hidden={!tooltipVisible}
             >
               {tooltip}
-              <div className="" />
+              <div className='' />
             </div>
           )}
         </button>
       </div>
     );
-  },
+  }
 );
 
 // DAISY v1 pattern: Higher-order component for theme integration
-  /**
-   * BUSINESS LOGIC: withDaisyTheme
-   *
-   * WHY THIS EXISTS:
-   * - Implements business logic requirement
-   *
-   * WHAT IT DOES:
-   * 1. Implements withDaisyTheme logic
-   * 2. Calls helper functions: React.forwardRef, useState, useEffect, localStorage.getItem, window.matchMedia, setTheme, detectTheme, window.matchMedia, setTheme, detectTheme, mediaQuery.addEventListener, window.addEventListener, mediaQuery.removeEventListener, window.removeEventListener
-   * 3. Returns computed result
-   *
-   * WHAT IT CALLS:
-   * - React.forwardRef() - Function call
-   * - useState() - Function call
-   * - useEffect() - Function call
-   * - localStorage.getItem() - Function call
-   * - window.matchMedia() - Function call
-   * - setTheme() - Function call
-   * - detectTheme() - Function call
-   * - window.matchMedia() - Function call
-   * - setTheme() - Function call
-   * - detectTheme() - Function call
-   * - mediaQuery.addEventListener() - Function call
-   * - window.addEventListener() - Function call
-   * - mediaQuery.removeEventListener() - Function call
-   * - window.removeEventListener() - Function call
-   *
-   * WHY IT CALLS THEM:
-   * - React.forwardRef: Required functionality
-   * - useState: Required functionality
-   * - useEffect: Required functionality
-   * - localStorage.getItem: Required functionality
-   * - window.matchMedia: Required functionality
-   * - setTheme: State update
-   * - detectTheme: Required functionality
-   * - window.matchMedia: Required functionality
-   * - setTheme: State update
-   * - detectTheme: Required functionality
-   * - mediaQuery.addEventListener: Required functionality
-   * - window.addEventListener: Required functionality
-   * - mediaQuery.removeEventListener: Required functionality
-   * - window.removeEventListener: Required functionality
-   *
-   * DATA FLOW:
-   * Input: Component state and props
-   * Processing: Calls React.forwardRef, useState, useEffect to process data
-   * Output: Computed value or side effect
-   *
-   */
-  /**
-   * BUSINESS LOGIC: withDaisyTheme
-   *
-   * WHY THIS EXISTS:
-   * - Implements business logic requirement
-   *
-   * WHAT IT DOES:
-   * 1. Implements withDaisyTheme logic
-   * 2. Calls helper functions: React.forwardRef, useState, useEffect, localStorage.getItem, window.matchMedia, setTheme, detectTheme, window.matchMedia, setTheme, detectTheme, mediaQuery.addEventListener, window.addEventListener, mediaQuery.removeEventListener, window.removeEventListener
-   * 3. Returns computed result
-   *
-   * WHAT IT CALLS:
-   * - React.forwardRef() - Function call
-   * - useState() - Function call
-   * - useEffect() - Function call
-   * - localStorage.getItem() - Function call
-   * - window.matchMedia() - Function call
-   * - setTheme() - Function call
-   * - detectTheme() - Function call
-   * - window.matchMedia() - Function call
-   * - setTheme() - Function call
-   * - detectTheme() - Function call
-   * - mediaQuery.addEventListener() - Function call
-   * - window.addEventListener() - Function call
-   * - mediaQuery.removeEventListener() - Function call
-   * - window.removeEventListener() - Function call
-   *
-   * WHY IT CALLS THEM:
-   * - React.forwardRef: Required functionality
-   * - useState: Required functionality
-   * - useEffect: Required functionality
-   * - localStorage.getItem: Required functionality
-   * - window.matchMedia: Required functionality
-   * - setTheme: State update
-   * - detectTheme: Required functionality
-   * - window.matchMedia: Required functionality
-   * - setTheme: State update
-   * - detectTheme: Required functionality
-   * - mediaQuery.addEventListener: Required functionality
-   * - window.addEventListener: Required functionality
-   * - mediaQuery.removeEventListener: Required functionality
-   * - window.removeEventListener: Required functionality
-   *
-   * DATA FLOW:
-   * Input: Component state and props
-   * Processing: Calls React.forwardRef, useState, useEffect to process data
-   * Output: Computed value or side effect
-   *
-   * MIGRATION NOTE:
-   * - This logic is PRESERVED from v1 - no changes during migration
-   *
-   */
+/**
+ * BUSINESS LOGIC: withDaisyTheme
+ *
+ * WHY THIS EXISTS:
+ * - Implements business logic requirement
+ *
+ * WHAT IT DOES:
+ * 1. Implements withDaisyTheme logic
+ * 2. Calls helper functions: React.forwardRef, useState, useEffect, localStorage.getItem, window.matchMedia, setTheme, detectTheme, window.matchMedia, setTheme, detectTheme, mediaQuery.addEventListener, window.addEventListener, mediaQuery.removeEventListener, window.removeEventListener
+ * 3. Returns computed result
+ *
+ * WHAT IT CALLS:
+ * - React.forwardRef() - Function call
+ * - useState() - Function call
+ * - useEffect() - Function call
+ * - localStorage.getItem() - Function call
+ * - window.matchMedia() - Function call
+ * - setTheme() - Function call
+ * - detectTheme() - Function call
+ * - window.matchMedia() - Function call
+ * - setTheme() - Function call
+ * - detectTheme() - Function call
+ * - mediaQuery.addEventListener() - Function call
+ * - window.addEventListener() - Function call
+ * - mediaQuery.removeEventListener() - Function call
+ * - window.removeEventListener() - Function call
+ *
+ * WHY IT CALLS THEM:
+ * - React.forwardRef: Required functionality
+ * - useState: Required functionality
+ * - useEffect: Required functionality
+ * - localStorage.getItem: Required functionality
+ * - window.matchMedia: Required functionality
+ * - setTheme: State update
+ * - detectTheme: Required functionality
+ * - window.matchMedia: Required functionality
+ * - setTheme: State update
+ * - detectTheme: Required functionality
+ * - mediaQuery.addEventListener: Required functionality
+ * - window.addEventListener: Required functionality
+ * - mediaQuery.removeEventListener: Required functionality
+ * - window.removeEventListener: Required functionality
+ *
+ * DATA FLOW:
+ * Input: Component state and props
+ * Processing: Calls React.forwardRef, useState, useEffect to process data
+ * Output: Computed value or side effect
+ *
+ */
+/**
+ * BUSINESS LOGIC: withDaisyTheme
+ *
+ * WHY THIS EXISTS:
+ * - Implements business logic requirement
+ *
+ * WHAT IT DOES:
+ * 1. Implements withDaisyTheme logic
+ * 2. Calls helper functions: React.forwardRef, useState, useEffect, localStorage.getItem, window.matchMedia, setTheme, detectTheme, window.matchMedia, setTheme, detectTheme, mediaQuery.addEventListener, window.addEventListener, mediaQuery.removeEventListener, window.removeEventListener
+ * 3. Returns computed result
+ *
+ * WHAT IT CALLS:
+ * - React.forwardRef() - Function call
+ * - useState() - Function call
+ * - useEffect() - Function call
+ * - localStorage.getItem() - Function call
+ * - window.matchMedia() - Function call
+ * - setTheme() - Function call
+ * - detectTheme() - Function call
+ * - window.matchMedia() - Function call
+ * - setTheme() - Function call
+ * - detectTheme() - Function call
+ * - mediaQuery.addEventListener() - Function call
+ * - window.addEventListener() - Function call
+ * - mediaQuery.removeEventListener() - Function call
+ * - window.removeEventListener() - Function call
+ *
+ * WHY IT CALLS THEM:
+ * - React.forwardRef: Required functionality
+ * - useState: Required functionality
+ * - useEffect: Required functionality
+ * - localStorage.getItem: Required functionality
+ * - window.matchMedia: Required functionality
+ * - setTheme: State update
+ * - detectTheme: Required functionality
+ * - window.matchMedia: Required functionality
+ * - setTheme: State update
+ * - detectTheme: Required functionality
+ * - mediaQuery.addEventListener: Required functionality
+ * - window.addEventListener: Required functionality
+ * - mediaQuery.removeEventListener: Required functionality
+ * - window.removeEventListener: Required functionality
+ *
+ * DATA FLOW:
+ * Input: Component state and props
+ * Processing: Calls React.forwardRef, useState, useEffect to process data
+ * Output: Computed value or side effect
+ *
+ * MIGRATION NOTE:
+ * - This logic is PRESERVED from v1 - no changes during migration
+ *
+ */
 export const withDaisyTheme = (
   WrappedButton: React.ForwardRefExoticComponent<
     ButtonProps & React.RefAttributes<HTMLButtonElement>
-  >,
+  >
 ) => {
   return React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const [theme, setTheme] = useState('light');
 
+    /**
+     * BUSINESS LOGIC: Cleanup Effect
+     *
+     * WHY THIS EXISTS:
+     * - Prevents memory leaks and cleans up resources
+     *
+     * WHAT IT DOES:
+     * 1. Executes localStorage.getItem, window.matchMedia, setTheme, detectTheme, window.matchMedia, setTheme, detectTheme, mediaQuery.addEventListener, window.addEventListener, mediaQuery.removeEventListener, window.removeEventListener functions
+     * 2. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - localStorage.getItem() - Function call
+     * - window.matchMedia() - Function call
+     * - setTheme() - Function call
+     * - detectTheme() - Function call
+     * - window.matchMedia() - Function call
+     * - setTheme() - Function call
+     * - detectTheme() - Function call
+     * - mediaQuery.addEventListener() - Function call
+     * - window.addEventListener() - Function call
+     * - mediaQuery.removeEventListener() - Function call
+     * - window.removeEventListener() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - localStorage.getItem: Required functionality
+     * - window.matchMedia: Required functionality
+     * - setTheme: State update
+     * - detectTheme: Required functionality
+     * - window.matchMedia: Required functionality
+     * - setTheme: State update
+     * - detectTheme: Required functionality
+     * - mediaQuery.addEventListener: Required functionality
+     * - window.addEventListener: Required functionality
+     * - mediaQuery.removeEventListener: Required functionality
+     * - window.removeEventListener: Required functionality
+     *
+     * DATA FLOW:
+     * Input: Component state and props
+     * Processing: Calls localStorage.getItem, window.matchMedia, setTheme to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * SPECIAL BEHAVIOR:
+     * - Runs only on component mount
+     *
+     */
+    /**
+     * BUSINESS LOGIC: Cleanup Effect
+     *
+     * WHY THIS EXISTS:
+     * - Prevents memory leaks and cleans up resources
+     *
+     * WHAT IT DOES:
+     * 1. Executes localStorage.getItem, window.matchMedia, setTheme, detectTheme, window.matchMedia, setTheme, detectTheme, mediaQuery.addEventListener, window.addEventListener, mediaQuery.removeEventListener, window.removeEventListener functions
+     * 2. Runs side effect logic
+     *
+     * WHAT IT CALLS:
+     * - localStorage.getItem() - Function call
+     * - window.matchMedia() - Function call
+     * - setTheme() - Function call
+     * - detectTheme() - Function call
+     * - window.matchMedia() - Function call
+     * - setTheme() - Function call
+     * - detectTheme() - Function call
+     * - mediaQuery.addEventListener() - Function call
+     * - window.addEventListener() - Function call
+     * - mediaQuery.removeEventListener() - Function call
+     * - window.removeEventListener() - Function call
+     *
+     * WHY IT CALLS THEM:
+     * - localStorage.getItem: Required functionality
+     * - window.matchMedia: Required functionality
+     * - setTheme: State update
+     * - detectTheme: Required functionality
+     * - window.matchMedia: Required functionality
+     * - setTheme: State update
+     * - detectTheme: Required functionality
+     * - mediaQuery.addEventListener: Required functionality
+     * - window.addEventListener: Required functionality
+     * - mediaQuery.removeEventListener: Required functionality
+     * - window.removeEventListener: Required functionality
+     *
+     * DATA FLOW:
+     * Input: Component state and props
+     * Processing: Calls localStorage.getItem, window.matchMedia, setTheme to process data
+     * Output: Side effects executed, cleanup registered
+     *
+     * SPECIAL BEHAVIOR:
+     * - Runs only on component mount
+     *
+     * MIGRATION NOTE:
+     * - This logic is PRESERVED from v1 - no changes during migration
+     *
+     */
+    useEffect(() => {
+      // DAISY v1 theme detection pattern
       /**
-       * BUSINESS LOGIC: Cleanup Effect
+       * BUSINESS LOGIC: detectTheme
        *
        * WHY THIS EXISTS:
-       * - Prevents memory leaks and cleans up resources
+       * - Implements business logic requirement
        *
        * WHAT IT DOES:
-       * 1. Executes localStorage.getItem, window.matchMedia, setTheme, detectTheme, window.matchMedia, setTheme, detectTheme, mediaQuery.addEventListener, window.addEventListener, mediaQuery.removeEventListener, window.removeEventListener functions
-       * 2. Runs side effect logic
+       * 1. Implements detectTheme logic
+       * 2. Calls helper functions: localStorage.getItem, window.matchMedia
+       * 3. Returns computed result
        *
        * WHAT IT CALLS:
        * - localStorage.getItem() - Function call
        * - window.matchMedia() - Function call
-       * - setTheme() - Function call
-       * - detectTheme() - Function call
-       * - window.matchMedia() - Function call
-       * - setTheme() - Function call
-       * - detectTheme() - Function call
-       * - mediaQuery.addEventListener() - Function call
-       * - window.addEventListener() - Function call
-       * - mediaQuery.removeEventListener() - Function call
-       * - window.removeEventListener() - Function call
        *
        * WHY IT CALLS THEM:
        * - localStorage.getItem: Required functionality
        * - window.matchMedia: Required functionality
-       * - setTheme: State update
-       * - detectTheme: Required functionality
-       * - window.matchMedia: Required functionality
-       * - setTheme: State update
-       * - detectTheme: Required functionality
-       * - mediaQuery.addEventListener: Required functionality
-       * - window.addEventListener: Required functionality
-       * - mediaQuery.removeEventListener: Required functionality
-       * - window.removeEventListener: Required functionality
        *
        * DATA FLOW:
        * Input: Component state and props
-       * Processing: Calls localStorage.getItem, window.matchMedia, setTheme to process data
-       * Output: Side effects executed, cleanup registered
-       *
-       * SPECIAL BEHAVIOR:
-       * - Runs only on component mount
+       * Processing: Calls localStorage.getItem, window.matchMedia to process data
+       * Output: Computed value or side effect
        *
        */
       /**
-       * BUSINESS LOGIC: Cleanup Effect
+       * BUSINESS LOGIC: detectTheme
        *
        * WHY THIS EXISTS:
-       * - Prevents memory leaks and cleans up resources
+       * - Implements business logic requirement
        *
        * WHAT IT DOES:
-       * 1. Executes localStorage.getItem, window.matchMedia, setTheme, detectTheme, window.matchMedia, setTheme, detectTheme, mediaQuery.addEventListener, window.addEventListener, mediaQuery.removeEventListener, window.removeEventListener functions
-       * 2. Runs side effect logic
+       * 1. Implements detectTheme logic
+       * 2. Calls helper functions: localStorage.getItem, window.matchMedia
+       * 3. Returns computed result
        *
        * WHAT IT CALLS:
        * - localStorage.getItem() - Function call
        * - window.matchMedia() - Function call
-       * - setTheme() - Function call
-       * - detectTheme() - Function call
-       * - window.matchMedia() - Function call
-       * - setTheme() - Function call
-       * - detectTheme() - Function call
-       * - mediaQuery.addEventListener() - Function call
-       * - window.addEventListener() - Function call
-       * - mediaQuery.removeEventListener() - Function call
-       * - window.removeEventListener() - Function call
        *
        * WHY IT CALLS THEM:
        * - localStorage.getItem: Required functionality
        * - window.matchMedia: Required functionality
-       * - setTheme: State update
-       * - detectTheme: Required functionality
-       * - window.matchMedia: Required functionality
-       * - setTheme: State update
-       * - detectTheme: Required functionality
-       * - mediaQuery.addEventListener: Required functionality
-       * - window.addEventListener: Required functionality
-       * - mediaQuery.removeEventListener: Required functionality
-       * - window.removeEventListener: Required functionality
        *
        * DATA FLOW:
        * Input: Component state and props
-       * Processing: Calls localStorage.getItem, window.matchMedia, setTheme to process data
-       * Output: Side effects executed, cleanup registered
-       *
-       * SPECIAL BEHAVIOR:
-       * - Runs only on component mount
+       * Processing: Calls localStorage.getItem, window.matchMedia to process data
+       * Output: Computed value or side effect
        *
        * MIGRATION NOTE:
        * - This logic is PRESERVED from v1 - no changes during migration
        *
        */
-    useEffect(() => {
-      // DAISY v1 theme detection pattern
-        /**
-         * BUSINESS LOGIC: detectTheme
-         *
-         * WHY THIS EXISTS:
-         * - Implements business logic requirement
-         *
-         * WHAT IT DOES:
-         * 1. Implements detectTheme logic
-         * 2. Calls helper functions: localStorage.getItem, window.matchMedia
-         * 3. Returns computed result
-         *
-         * WHAT IT CALLS:
-         * - localStorage.getItem() - Function call
-         * - window.matchMedia() - Function call
-         *
-         * WHY IT CALLS THEM:
-         * - localStorage.getItem: Required functionality
-         * - window.matchMedia: Required functionality
-         *
-         * DATA FLOW:
-         * Input: Component state and props
-         * Processing: Calls localStorage.getItem, window.matchMedia to process data
-         * Output: Computed value or side effect
-         *
-         */
-        /**
-         * BUSINESS LOGIC: detectTheme
-         *
-         * WHY THIS EXISTS:
-         * - Implements business logic requirement
-         *
-         * WHAT IT DOES:
-         * 1. Implements detectTheme logic
-         * 2. Calls helper functions: localStorage.getItem, window.matchMedia
-         * 3. Returns computed result
-         *
-         * WHAT IT CALLS:
-         * - localStorage.getItem() - Function call
-         * - window.matchMedia() - Function call
-         *
-         * WHY IT CALLS THEM:
-         * - localStorage.getItem: Required functionality
-         * - window.matchMedia: Required functionality
-         *
-         * DATA FLOW:
-         * Input: Component state and props
-         * Processing: Calls localStorage.getItem, window.matchMedia to process data
-         * Output: Computed value or side effect
-         *
-         * MIGRATION NOTE:
-         * - This logic is PRESERVED from v1 - no changes during migration
-         *
-         */
       const detectTheme = () => {
         const savedTheme = localStorage.getItem('daisy-theme');
         const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
@@ -1284,59 +1287,59 @@ export const withDaisyTheme = (
       setTheme(detectTheme());
 
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        /**
-         * BUSINESS LOGIC: handleThemeChange
-         *
-         * WHY THIS EXISTS:
-         * - Implements business logic requirement
-         *
-         * WHAT IT DOES:
-         * 1. Implements handleThemeChange logic
-         * 2. Calls helper functions: setTheme, detectTheme
-         * 3. Returns computed result
-         *
-         * WHAT IT CALLS:
-         * - setTheme() - Function call
-         * - detectTheme() - Function call
-         *
-         * WHY IT CALLS THEM:
-         * - setTheme: State update
-         * - detectTheme: Required functionality
-         *
-         * DATA FLOW:
-         * Input: Component state and props
-         * Processing: Calls setTheme, detectTheme to process data
-         * Output: Computed value or side effect
-         *
-         */
-        /**
-         * BUSINESS LOGIC: handleThemeChange
-         *
-         * WHY THIS EXISTS:
-         * - Implements business logic requirement
-         *
-         * WHAT IT DOES:
-         * 1. Implements handleThemeChange logic
-         * 2. Calls helper functions: setTheme, detectTheme
-         * 3. Returns computed result
-         *
-         * WHAT IT CALLS:
-         * - setTheme() - Function call
-         * - detectTheme() - Function call
-         *
-         * WHY IT CALLS THEM:
-         * - setTheme: State update
-         * - detectTheme: Required functionality
-         *
-         * DATA FLOW:
-         * Input: Component state and props
-         * Processing: Calls setTheme, detectTheme to process data
-         * Output: Computed value or side effect
-         *
-         * MIGRATION NOTE:
-         * - This logic is PRESERVED from v1 - no changes during migration
-         *
-         */
+      /**
+       * BUSINESS LOGIC: handleThemeChange
+       *
+       * WHY THIS EXISTS:
+       * - Implements business logic requirement
+       *
+       * WHAT IT DOES:
+       * 1. Implements handleThemeChange logic
+       * 2. Calls helper functions: setTheme, detectTheme
+       * 3. Returns computed result
+       *
+       * WHAT IT CALLS:
+       * - setTheme() - Function call
+       * - detectTheme() - Function call
+       *
+       * WHY IT CALLS THEM:
+       * - setTheme: State update
+       * - detectTheme: Required functionality
+       *
+       * DATA FLOW:
+       * Input: Component state and props
+       * Processing: Calls setTheme, detectTheme to process data
+       * Output: Computed value or side effect
+       *
+       */
+      /**
+       * BUSINESS LOGIC: handleThemeChange
+       *
+       * WHY THIS EXISTS:
+       * - Implements business logic requirement
+       *
+       * WHAT IT DOES:
+       * 1. Implements handleThemeChange logic
+       * 2. Calls helper functions: setTheme, detectTheme
+       * 3. Returns computed result
+       *
+       * WHAT IT CALLS:
+       * - setTheme() - Function call
+       * - detectTheme() - Function call
+       *
+       * WHY IT CALLS THEM:
+       * - setTheme: State update
+       * - detectTheme: Required functionality
+       *
+       * DATA FLOW:
+       * Input: Component state and props
+       * Processing: Calls setTheme, detectTheme to process data
+       * Output: Computed value or side effect
+       *
+       * MIGRATION NOTE:
+       * - This logic is PRESERVED from v1 - no changes during migration
+       *
+       */
       const handleThemeChange = () => setTheme(detectTheme());
 
       mediaQuery.addEventListener('change', handleThemeChange);

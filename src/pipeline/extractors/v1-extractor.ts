@@ -168,7 +168,7 @@ export class V1ComponentExtractor {
    */
   public async extractComponent(
     component: ComponentDefinition,
-    options: ExtractionOptions = {},
+    options: ExtractionOptions = {}
   ): Promise<ExtractionResult> {
     const startTime = Date.now();
 
@@ -193,14 +193,14 @@ export class V1ComponentExtractor {
       // Create baseline directory structure
       const baselinePath = await this.createBaselineDirectory(
         component,
-        tierConfig,
+        tierConfig
       );
 
       // Extract main component file
       const componentFile = await this.extractComponentFile(
         component,
         baselinePath,
-        options,
+        options
       );
       extractedFiles.push(componentFile);
 
@@ -208,7 +208,7 @@ export class V1ComponentExtractor {
       const typeFiles = await this.extractTypeFiles(
         component,
         baselinePath,
-        options,
+        options
       );
       extractedFiles.push(...typeFiles);
 
@@ -218,12 +218,12 @@ export class V1ComponentExtractor {
           const depFiles = await this.extractDependencyFiles(
             component,
             baselinePath,
-            options,
+            options
           );
           extractedFiles.push(...depFiles);
         } catch (error) {
           warnings.push(
-            `Failed to extract some dependencies: ${(error as Error).message}`,
+            `Failed to extract some dependencies: ${(error as Error).message}`
           );
         }
       }
@@ -234,12 +234,12 @@ export class V1ComponentExtractor {
           const testFiles = await this.extractTestFiles(
             component,
             baselinePath,
-            options,
+            options
           );
           extractedFiles.push(...testFiles);
         } catch (error) {
           warnings.push(
-            `Failed to extract test files: ${(error as Error).message}`,
+            `Failed to extract test files: ${(error as Error).message}`
           );
         }
       }
@@ -250,12 +250,12 @@ export class V1ComponentExtractor {
           const styleFiles = await this.extractStyleFiles(
             component,
             baselinePath,
-            options,
+            options
           );
           extractedFiles.push(...styleFiles);
         } catch (error) {
           warnings.push(
-            `Failed to extract style files: ${(error as Error).message}`,
+            `Failed to extract style files: ${(error as Error).message}`
           );
         }
       }
@@ -285,7 +285,7 @@ export class V1ComponentExtractor {
     } catch (error) {
       this.logger.error(
         `Component extraction failed: ${component.name}`,
-        error as Error,
+        error as Error
       );
 
       return {
@@ -310,7 +310,7 @@ export class V1ComponentExtractor {
    */
   public async extractComponents(
     components: ComponentDefinition[],
-    options: ExtractionOptions = {},
+    options: ExtractionOptions = {}
   ): Promise<ExtractionResult[]> {
     this.logger.info(`Extracting ${components.length} components`);
 
@@ -323,7 +323,7 @@ export class V1ComponentExtractor {
 
     const successCount = results.filter(r => r.success).length;
     this.logger.info(
-      `Extraction completed: ${successCount}/${components.length} successful`,
+      `Extraction completed: ${successCount}/${components.length} successful`
     );
 
     return results;
@@ -346,13 +346,13 @@ export class V1ComponentExtractor {
    */
   private async createBaselineDirectory(
     component: ComponentDefinition,
-    tierConfig: TierConfig,
+    tierConfig: TierConfig
   ): Promise<string> {
     const baselinePath = join(
       this.config.outputPath,
       'daisyv1',
       tierConfig.directory,
-      component.name,
+      component.name
     );
 
     await this.fileManager.createDirectory(baselinePath);
@@ -366,7 +366,7 @@ export class V1ComponentExtractor {
   private async extractComponentFile(
     component: ComponentDefinition,
     baselinePath: string,
-    options: ExtractionOptions,
+    options: ExtractionOptions
   ): Promise<ExtractedFile> {
     const sourcePath = join(this.config.sourcePath, component.sourcePath);
     const fileName = basename(sourcePath);
@@ -398,7 +398,7 @@ export class V1ComponentExtractor {
   private async extractTypeFiles(
     component: ComponentDefinition,
     baselinePath: string,
-    options: ExtractionOptions,
+    options: ExtractionOptions
   ): Promise<ExtractedFile[]> {
     const extractedFiles: ExtractedFile[] = [];
     const sourcePath = join(this.config.sourcePath, component.sourcePath);
@@ -446,13 +446,13 @@ export class V1ComponentExtractor {
   private async extractDependencyFiles(
     component: ComponentDefinition,
     baselinePath: string,
-    options: ExtractionOptions,
+    options: ExtractionOptions
   ): Promise<ExtractedFile[]> {
     const extractedFiles: ExtractedFile[] = [];
 
     // Extract internal dependencies only
     const internalDeps = component.dependencies.filter(
-      dep => dep.type === 'internal' || dep.type === 'component',
+      dep => dep.type === 'internal' || dep.type === 'component'
     );
 
     for (const dep of internalDeps) {
@@ -496,7 +496,7 @@ export class V1ComponentExtractor {
   private async extractTestFiles(
     component: ComponentDefinition,
     baselinePath: string,
-    options: ExtractionOptions,
+    options: ExtractionOptions
   ): Promise<ExtractedFile[]> {
     const extractedFiles: ExtractedFile[] = [];
     const sourcePath = join(this.config.sourcePath, component.sourcePath);
@@ -548,7 +548,7 @@ export class V1ComponentExtractor {
   private async extractStyleFiles(
     component: ComponentDefinition,
     baselinePath: string,
-    options: ExtractionOptions,
+    options: ExtractionOptions
   ): Promise<ExtractedFile[]> {
     const extractedFiles: ExtractedFile[] = [];
     const sourcePath = join(this.config.sourcePath, component.sourcePath);
@@ -603,7 +603,7 @@ export class V1ComponentExtractor {
       tier: number;
       tierConfig: TierConfig;
       extractedFiles: ExtractedFile[];
-    },
+    }
   ): Promise<void> {
     const readmePath = join(baselinePath, 'README.md');
 
@@ -665,7 +665,7 @@ must be maintained in the migrated Configurator v2 version.
  * @returns Extractor instance
  */
 export function createV1Extractor(
-  config: ExtractionConfig,
+  config: ExtractionConfig
 ): V1ComponentExtractor {
   return new V1ComponentExtractor(config);
 }
@@ -681,7 +681,7 @@ export function createV1Extractor(
 export async function extractComponentToBaseline(
   component: ComponentDefinition,
   config: ExtractionConfig,
-  options?: ExtractionOptions,
+  options?: ExtractionOptions
 ): Promise<ExtractionResult> {
   const extractor = createV1Extractor(config);
   return extractor.extractComponent(component, options);

@@ -58,10 +58,11 @@ describe('BusinessLogicAnalyzer', () => {
     });
 
     it('should detect useReducer patterns', () => {
-      const code = 'const [state, dispatch] = useReducer(reducer, initialState);';
+      const code =
+        'const [state, dispatch] = useReducer(reducer, initialState);';
       const result = analyzer.analyzeComponent(mockComponent, code);
       expect(result.stateManagement.some(s => s.type === 'useReducer')).toBe(
-        true,
+        true
       );
     });
 
@@ -72,7 +73,7 @@ describe('BusinessLogicAnalyzer', () => {
     });
 
     it('should detect event handlers', () => {
-      const code = 'const handleClick = () => { console.log(\'clicked\'); };';
+      const code = "const handleClick = () => { console.log('clicked'); };";
       const result = analyzer.analyzeComponent(mockComponent, code);
       expect(result.eventHandlers.length).toBeGreaterThan(0);
     });

@@ -140,7 +140,7 @@ export class ComponentDiscoveryEngine {
   constructor(
     config: ExtractionConfig,
     logger: Logger,
-    options: DiscoveryOptions = {},
+    options: DiscoveryOptions = {}
   ) {
     this.config = config;
     this.logger = logger;
@@ -198,7 +198,7 @@ export class ComponentDiscoveryEngine {
       // Aggregate results
       const result = this.aggregateResults(
         analysisResults,
-        Date.now() - startTime,
+        Date.now() - startTime
       );
 
       this.logger.info('Component discovery completed', {
@@ -216,7 +216,7 @@ export class ComponentDiscoveryEngine {
           : new FileSystemError(
               'Component discovery failed',
               { operation: 'discover-components' },
-              error as Error,
+              error as Error
             );
 
       this.logger.error('Component discovery failed', pipelineError);
@@ -243,7 +243,7 @@ export class ComponentDiscoveryEngine {
           exclude: this.discoveryOptions.excludePatterns,
           recursive: true,
           maxDepth: 10,
-        },
+        }
       );
 
       const candidateFiles = result.files
@@ -261,7 +261,7 @@ export class ComponentDiscoveryEngine {
    * Analyze files for component content
    */
   private async analyzeFiles(
-    filePaths: string[],
+    filePaths: string[]
   ): Promise<FileAnalysisResult[]> {
     if (this.discoveryOptions.parallel) {
       return this.analyzeFilesParallel(filePaths);
@@ -274,7 +274,7 @@ export class ComponentDiscoveryEngine {
    * Analyze files sequentially
    */
   private async analyzeFilesSequential(
-    filePaths: string[],
+    filePaths: string[]
   ): Promise<FileAnalysisResult[]> {
     const results: FileAnalysisResult[] = [];
 
@@ -299,7 +299,7 @@ export class ComponentDiscoveryEngine {
    * Analyze files in parallel (simplified for now)
    */
   private async analyzeFilesParallel(
-    filePaths: string[],
+    filePaths: string[]
   ): Promise<FileAnalysisResult[]> {
     // For now, use Promise.all with limited concurrency
     const BATCH_SIZE = this.discoveryOptions.workers;
@@ -308,7 +308,7 @@ export class ComponentDiscoveryEngine {
     for (let i = 0; i < filePaths.length; i += BATCH_SIZE) {
       const batch = filePaths.slice(i, i + BATCH_SIZE);
       const batchResults = await Promise.all(
-        batch.map(filePath => this.analyzeFile(filePath)),
+        batch.map(filePath => this.analyzeFile(filePath))
       );
 
       results.push(...batchResults);
@@ -348,7 +348,7 @@ export class ComponentDiscoveryEngine {
       // Extract components from file
       const components = await this.extractComponentsFromFile(
         filePath,
-        content,
+        content
       );
 
       return {
@@ -362,7 +362,7 @@ export class ComponentDiscoveryEngine {
       const pipelineError = new FileSystemError(
         `Failed to analyze file: ${filePath}`,
         { filePath },
-        error as Error,
+        error as Error
       );
 
       if (this.discoveryOptions.skipErrors) {
@@ -406,7 +406,7 @@ export class ComponentDiscoveryEngine {
    */
   private async extractComponentsFromFile(
     filePath: string,
-    content: string,
+    content: string
   ): Promise<ComponentDefinition[]> {
     const components: ComponentDefinition[] = [];
 
@@ -418,7 +418,7 @@ export class ComponentDiscoveryEngine {
         const component = await this.createComponentDefinition(
           filePath,
           content,
-          match,
+          match
         );
 
         if (component) {
@@ -454,7 +454,7 @@ export class ComponentDiscoveryEngine {
 
     // Function components
     const functionMatches = content.matchAll(
-      /(?:export\s+(?:default\s+)?)?function\s+([A-Z][a-zA-Z0-9]*)/g,
+      /(?:export\s+(?:default\s+)?)?function\s+([A-Z][a-zA-Z0-9]*)/g
     );
     for (const match of functionMatches) {
       const name = match[1];
@@ -470,7 +470,7 @@ export class ComponentDiscoveryEngine {
 
     // Arrow function components
     const arrowMatches = content.matchAll(
-      /(?:export\s+(?:default\s+)?)?const\s+([A-Z][a-zA-Z0-9]*)\s*=\s*\(/g,
+      /(?:export\s+(?:default\s+)?)?const\s+([A-Z][a-zA-Z0-9]*)\s*=\s*\(/g
     );
     for (const match of arrowMatches) {
       const name = match[1];
@@ -486,7 +486,7 @@ export class ComponentDiscoveryEngine {
 
     // ForwardRef components
     const forwardRefMatches = content.matchAll(
-      /(?:export\s+(?:default\s+)?)?const\s+([A-Z][a-zA-Z0-9]*)\s*=\s*React\.forwardRef/g,
+      /(?:export\s+(?:default\s+)?)?const\s+([A-Z][a-zA-Z0-9]*)\s*=\s*React\.forwardRef/g
     );
     for (const match of forwardRefMatches) {
       const name = match[1];
@@ -502,7 +502,7 @@ export class ComponentDiscoveryEngine {
 
     // Class components
     const classMatches = content.matchAll(
-      /(?:export\s+(?:default\s+)?)?class\s+([A-Z][a-zA-Z0-9]*)\s+extends\s+.*Component/g,
+      /(?:export\s+(?:default\s+)?)?class\s+([A-Z][a-zA-Z0-9]*)\s+extends\s+.*Component/g
     );
     for (const match of classMatches) {
       const name = match[1];
@@ -518,7 +518,7 @@ export class ComponentDiscoveryEngine {
 
     // Custom hooks
     const hookMatches = content.matchAll(
-      /(?:export\s+(?:default\s+)?)?(?:function\s+|const\s+)(use[A-Z][a-zA-Z0-9]*)/g,
+      /(?:export\s+(?:default\s+)?)?(?:function\s+|const\s+)(use[A-Z][a-zA-Z0-9]*)/g
     );
     for (const match of hookMatches) {
       const name = match[1];
@@ -546,7 +546,7 @@ export class ComponentDiscoveryEngine {
       type: ComponentType;
       startIndex: number;
       endIndex: number;
-    },
+    }
   ): Promise<ComponentDefinition | null> {
     const componentId = `${relative(this.config.sourcePath, filePath)}:${match.name}`;
 
@@ -559,7 +559,7 @@ export class ComponentDiscoveryEngine {
       content,
       props,
       businessLogic,
-      reactPatterns,
+      reactPatterns
     );
 
     // Create metadata
@@ -589,14 +589,14 @@ export class ComponentDiscoveryEngine {
    */
   private extractProps(
     content: string,
-    match: { name: string; type: ComponentType },
+    match: { name: string; type: ComponentType }
   ): PropDefinition[] {
     const props: PropDefinition[] = [];
 
     // Look for TypeScript interface definitions
     const interfacePattern = new RegExp(
       `interface\\s+${match.name}Props\\s*\\{([^}]+)\\}`,
-      's',
+      's'
     );
     const interfaceMatch = content.match(interfacePattern);
 
@@ -625,7 +625,7 @@ export class ComponentDiscoveryEngine {
    */
   private extractBusinessLogic(
     content: string,
-    match: { name: string; type: ComponentType },
+    match: { name: string; type: ComponentType }
   ): BusinessLogicDefinition[] {
     const businessLogic: BusinessLogicDefinition[] = [];
 
@@ -748,7 +748,7 @@ export class ComponentDiscoveryEngine {
     content: string,
     props: PropDefinition[],
     businessLogic: BusinessLogicDefinition[],
-    reactPatterns: ReactPattern[],
+    reactPatterns: ReactPattern[]
   ): ComplexityLevel {
     let score = 0;
 
@@ -784,7 +784,7 @@ export class ComponentDiscoveryEngine {
   private async createComponentMetadata(
     filePath: string,
     content: string,
-    match: { name: string; type: ComponentType },
+    match: { name: string; type: ComponentType }
   ): Promise<ComponentMetadata> {
     const stats = await fs.stat(filePath);
 
@@ -856,7 +856,7 @@ export class ComponentDiscoveryEngine {
    */
   private aggregateResults(
     analysisResults: FileAnalysisResult[],
-    duration: number,
+    duration: number
   ): DiscoveryResult {
     const components: ComponentDefinition[] = [];
     const errors: PipelineError[] = [];
@@ -889,7 +889,7 @@ export class ComponentDiscoveryEngine {
    */
   private calculateStatistics(
     analysisResults: FileAnalysisResult[],
-    components: ComponentDefinition[],
+    components: ComponentDefinition[]
   ): DiscoveryStatistics {
     const componentsByType: Record<ComponentType, number> = {
       functional: 0,
@@ -939,7 +939,7 @@ export class ComponentDiscoveryEngine {
 
     const totalComplexity = components.reduce(
       (sum, comp) => sum + complexityScores[comp.complexity],
-      0,
+      0
     );
     const averageComplexity =
       components.length > 0 ? totalComplexity / components.length : 0;
@@ -1003,7 +1003,7 @@ export class ComponentDiscoveryEngine {
 export function createDiscoveryEngine(
   config: ExtractionConfig,
   logger: Logger,
-  options?: DiscoveryOptions,
+  options?: DiscoveryOptions
 ): ComponentDiscoveryEngine {
   return new ComponentDiscoveryEngine(config, logger, options);
 }
@@ -1014,7 +1014,7 @@ export function createDiscoveryEngine(
 export async function discoverComponentsInFiles(
   filePaths: string[],
   config: ExtractionConfig,
-  logger: Logger,
+  logger: Logger
 ): Promise<ComponentDefinition[]> {
   const engine = new ComponentDiscoveryEngine(config, logger, {
     includePatterns: filePaths,
@@ -1055,7 +1055,7 @@ export function formatDiscoveryResults(result: DiscoveryResult): string {
       if (count > 0) {
         lines.push(`${type}: ${count}`);
       }
-    },
+    }
   );
   lines.push('');
 
@@ -1066,10 +1066,10 @@ export function formatDiscoveryResults(result: DiscoveryResult): string {
       if (count > 0) {
         lines.push(`${complexity}: ${count}`);
       }
-    },
+    }
   );
   lines.push(
-    `Average Complexity: ${result.statistics.averageComplexity.toFixed(2)}`,
+    `Average Complexity: ${result.statistics.averageComplexity.toFixed(2)}`
   );
   lines.push('');
 
@@ -1080,7 +1080,7 @@ export function formatDiscoveryResults(result: DiscoveryResult): string {
       if (count > 0) {
         lines.push(`${pattern}: ${count}`);
       }
-    },
+    }
   );
   lines.push('');
 

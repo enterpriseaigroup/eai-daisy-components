@@ -64,7 +64,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   public async analyze(
     originalPath: string,
-    migratedPath: string,
+    migratedPath: string
   ): Promise<BusinessLogicAnalysisResult> {
     // Parse both components
     const originalAST = await this.parseComponent(originalPath);
@@ -75,21 +75,38 @@ export class EnhancedBusinessLogicAnalyzer {
     const migratedFunctions = this.extractFunctions(migratedAST);
 
     // Compare functions
-    const comparison = this.compareFunctions(originalFunctions, migratedFunctions);
+    const comparison = this.compareFunctions(
+      originalFunctions,
+      migratedFunctions
+    );
 
     // Analyze specific logic types
-    const eventHandlersPreserved = this.compareEventHandlers(originalAST, migratedAST);
-    const validationLogicPreserved = this.compareValidationLogic(originalAST, migratedAST);
-    const stateManagementPreserved = this.compareStateManagement(originalAST, migratedAST);
+    const eventHandlersPreserved = this.compareEventHandlers(
+      originalAST,
+      migratedAST
+    );
+    const validationLogicPreserved = this.compareValidationLogic(
+      originalAST,
+      migratedAST
+    );
+    const stateManagementPreserved = this.compareStateManagement(
+      originalAST,
+      migratedAST
+    );
 
     // Perform semantic analysis
-    const astDifferences = await this.performSemanticAnalysis(originalAST, migratedAST);
-    const semanticEquivalence = astDifferences.filter(d => d.severity === 'critical').length === 0;
+    const astDifferences = await this.performSemanticAnalysis(
+      originalAST,
+      migratedAST
+    );
+    const semanticEquivalence =
+      astDifferences.filter(d => d.severity === 'critical').length === 0;
 
     // Determine overall preservation
     const preserved =
       comparison.missingFunctions.length === 0 &&
-      comparison.changedFunctions.filter(c => c.impact === 'critical').length === 0 &&
+      comparison.changedFunctions.filter(c => c.impact === 'critical')
+        .length === 0 &&
       eventHandlersPreserved &&
       validationLogicPreserved &&
       stateManagementPreserved &&
@@ -124,7 +141,7 @@ export class EnhancedBusinessLogicAnalyzer {
    */
   public async analyzeWithAST(
     originalPath: string,
-    migratedPath: string,
+    migratedPath: string
   ): Promise<BusinessLogicAnalysisResult> {
     return this.analyze(originalPath, migratedPath);
   }
@@ -160,7 +177,9 @@ export class EnhancedBusinessLogicAnalyzer {
   /**
    * Extract all functions from AST
    */
-  private extractFunctions(sourceFile: ts.SourceFile): Map<string, FunctionInfo> {
+  private extractFunctions(
+    sourceFile: ts.SourceFile
+  ): Map<string, FunctionInfo> {
     const functions = new Map<string, FunctionInfo>();
 
     const visit = (node: ts.Node): void => {
@@ -176,10 +195,15 @@ export class EnhancedBusinessLogicAnalyzer {
       if (ts.isVariableStatement(node)) {
         const declaration = node.declarationList.declarations[0];
         if (declaration && declaration.initializer) {
-          if (ts.isArrowFunction(declaration.initializer) ||
-              ts.isFunctionExpression(declaration.initializer)) {
+          if (
+            ts.isArrowFunction(declaration.initializer) ||
+            ts.isFunctionExpression(declaration.initializer)
+          ) {
             const name = declaration.name.getText();
-            const funcInfo = this.extractFunctionInfo(declaration.initializer, name);
+            const funcInfo = this.extractFunctionInfo(
+              declaration.initializer,
+              name
+            );
             if (funcInfo) {
               functions.set(funcInfo.name, funcInfo);
             }
@@ -200,7 +224,10 @@ export class EnhancedBusinessLogicAnalyzer {
         const expression = node.expression.getText();
         if (expression === 'useCallback' || expression === 'useMemo') {
           const arg = node.arguments[0];
-          if (arg && (ts.isArrowFunction(arg) || ts.isFunctionExpression(arg))) {
+          if (
+            arg &&
+            (ts.isArrowFunction(arg) || ts.isFunctionExpression(arg))
+          ) {
             const hookName = `hook_${expression}_${node.pos}`;
             const funcInfo = this.extractFunctionInfo(arg, hookName);
             if (funcInfo) {
@@ -221,21 +248,26 @@ export class EnhancedBusinessLogicAnalyzer {
    * Extract detailed function information
    */
   private extractFunctionInfo(
-    node: ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression | ts.MethodDeclaration,
-    name?: string,
+    node:
+      | ts.FunctionDeclaration
+      | ts.ArrowFunction
+      | ts.FunctionExpression
+      | ts.MethodDeclaration,
+    name?: string
   ): FunctionInfo | null {
     if (!this.checker) {
-return null;
-}
+      return null;
+    }
 
-    const funcName = name ||
+    const funcName =
+      name ||
       (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)
         ? node.name?.getText()
         : 'anonymous');
 
     if (!funcName) {
-return null;
-}
+      return null;
+    }
 
     // Extract parameters
     const parameters = node.parameters.map(param => {
@@ -327,7 +359,11 @@ return null;
 
       if (ts.isPropertyAccessExpression(n)) {
         const expression = n.expression.getText();
-        if (expression !== 'this' && expression !== 'props' && expression !== 'state') {
+        if (
+          expression !== 'this' &&
+          expression !== 'props' &&
+          expression !== 'state'
+        ) {
           dependencies.add(expression);
         }
       }
@@ -347,8 +383,8 @@ return null;
 
     const visit = (n: ts.Node): void => {
       if (hasSideEffect) {
-return;
-}
+        return;
+      }
 
       // Check for state mutations
       if (ts.isCallExpression(n)) {
@@ -364,10 +400,16 @@ return;
       }
 
       // Check for assignments to external variables
-      if (ts.isBinaryExpression(n) &&
-          n.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+      if (
+        ts.isBinaryExpression(n) &&
+        n.operatorToken.kind === ts.SyntaxKind.EqualsToken
+      ) {
         const left = n.left.getText();
-        if (!left.includes('const') && !left.includes('let') && !left.includes('var')) {
+        if (
+          !left.includes('const') &&
+          !left.includes('let') &&
+          !left.includes('var')
+        ) {
           hasSideEffect = true;
         }
       }
@@ -396,7 +438,11 @@ return;
    */
   private generateFunctionHash(node: ts.Node): string {
     const body = node.getText();
-    return crypto.createHash('sha256').update(body).digest('hex').substring(0, 16);
+    return crypto
+      .createHash('sha256')
+      .update(body)
+      .digest('hex')
+      .substring(0, 16);
   }
 
   /**
@@ -404,7 +450,7 @@ return;
    */
   private compareFunctions(
     original: Map<string, FunctionInfo>,
-    migrated: Map<string, FunctionInfo>,
+    migrated: Map<string, FunctionInfo>
   ): {
     missingFunctions: string[];
     changedFunctions: FunctionChange[];
@@ -439,7 +485,7 @@ return;
           // Deeper analysis needed to determine if change is semantic
           const semanticallyEquivalent = this.checkSemanticEquivalence(
             originalFunc,
-            migratedFunc,
+            migratedFunc
           );
 
           if (!semanticallyEquivalent) {
@@ -475,7 +521,7 @@ return;
    */
   private checkSemanticEquivalence(
     func1: FunctionInfo,
-    func2: FunctionInfo,
+    func2: FunctionInfo
   ): boolean {
     // Check if functions have same parameters
     if (func1.parameters.length !== func2.parameters.length) {
@@ -485,10 +531,12 @@ return;
     // Check if return types are compatible
     if (func1.returnType !== func2.returnType) {
       // Allow void <-> undefined equivalence
-      if (!(
-        (func1.returnType === 'void' && func2.returnType === 'undefined') ||
-        (func1.returnType === 'undefined' && func2.returnType === 'void')
-      )) {
+      if (
+        !(
+          (func1.returnType === 'void' && func2.returnType === 'undefined') ||
+          (func1.returnType === 'undefined' && func2.returnType === 'void')
+        )
+      ) {
         return false;
       }
     }
@@ -510,7 +558,9 @@ return;
   /**
    * Assess impact of function change
    */
-  private assessImpact(func: FunctionInfo): 'critical' | 'high' | 'medium' | 'low' {
+  private assessImpact(
+    func: FunctionInfo
+  ): 'critical' | 'high' | 'medium' | 'low' {
     // Critical: Functions with side effects or complex logic
     if (func.sideEffects || func.complexity > 10) {
       return 'critical';
@@ -535,7 +585,7 @@ return;
    */
   private compareEventHandlers(
     originalAST: ts.SourceFile,
-    migratedAST: ts.SourceFile,
+    migratedAST: ts.SourceFile
   ): boolean {
     const originalHandlers = this.extractEventHandlers(originalAST);
     const migratedHandlers = this.extractEventHandlers(migratedAST);
@@ -588,7 +638,7 @@ return;
    */
   private compareValidationLogic(
     originalAST: ts.SourceFile,
-    migratedAST: ts.SourceFile,
+    migratedAST: ts.SourceFile
   ): boolean {
     const originalValidations = this.extractValidationLogic(originalAST);
     const migratedValidations = this.extractValidationLogic(migratedAST);
@@ -633,7 +683,7 @@ return;
    */
   private compareStateManagement(
     originalAST: ts.SourceFile,
-    migratedAST: ts.SourceFile,
+    migratedAST: ts.SourceFile
   ): boolean {
     const originalState = this.extractStateManagement(originalAST);
     const migratedState = this.extractStateManagement(migratedAST);
@@ -651,7 +701,9 @@ return;
   /**
    * Extract state management patterns
    */
-  private extractStateManagement(sourceFile: ts.SourceFile): Map<string, string> {
+  private extractStateManagement(
+    sourceFile: ts.SourceFile
+  ): Map<string, string> {
     const stateMap = new Map<string, string>();
 
     const visit = (node: ts.Node): void => {
@@ -688,7 +740,7 @@ return;
    */
   private async performSemanticAnalysis(
     originalAST: ts.SourceFile,
-    migratedAST: ts.SourceFile,
+    migratedAST: ts.SourceFile
   ): Promise<ASTDifference[]> {
     const differences: ASTDifference[] = [];
 
