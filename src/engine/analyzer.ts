@@ -658,6 +658,9 @@ export class DependencyAnalyzer {
       throw new Error('Invalid package name');
     }
     const cleanName = parts[0];
+    if (!cleanName) {
+      return;
+    }
 
     if (!this.externalPackages.has(cleanName)) {
       this.externalPackages.set(cleanName, {

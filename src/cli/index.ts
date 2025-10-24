@@ -149,7 +149,7 @@ class SimpleSpinner {
   stop(): void {
     if (this.interval) {
       clearInterval(this.interval);
-      this.interval = undefined;
+      this.interval = undefined as unknown as NodeJS.Timeout;
       process.stdout.write('\r');
     }
   }
