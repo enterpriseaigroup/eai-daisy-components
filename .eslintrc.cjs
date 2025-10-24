@@ -19,11 +19,14 @@ module.exports = {
     'coverage',
     '.eslintrc.cjs',
     'vite.config.ts',
+    'playwright.config.ts',
     '*.js',
     '*.cjs',
     '.specify',
     'daisyv1/**/*',
     'scripts/**/*',
+    'tests/fixtures/**/*',
+    'tests/transformers/output/**/*',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -130,7 +133,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx'],
+      files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx', 'tests/**/*.ts', 'tests/**/*.tsx'],
       env: {
         jest: true,
       },
@@ -138,7 +141,18 @@ module.exports = {
       rules: {
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/no-explicit-any': 'off', // Allow any in tests for mocking
+        '@typescript-eslint/require-await': 'off', // Allow async functions without await in tests
+        '@typescript-eslint/no-non-null-assertion': 'off', // Allow non-null assertions in tests
+        '@typescript-eslint/no-unnecessary-condition': 'off', // Allow unnecessary conditions in tests
+        '@typescript-eslint/no-misused-promises': 'off', // Allow promise handling in tests
+        '@typescript-eslint/no-floating-promises': 'off', // Allow floating promises in tests
+        '@typescript-eslint/prefer-promise-reject-errors': 'off', // Allow non-Error rejections in tests
         'no-console': 'off',
+        'jest/no-conditional-expect': 'off', // Allow conditional expects in tests
+        'jest/no-export': 'off', // Allow exports from test files
+        'react/display-name': 'off', // Allow anonymous components in tests
+        'react-refresh/only-export-components': 'off', // Not relevant for test files
+        'react-hooks/exhaustive-deps': 'off', // Less strict in tests
       },
     },
   ],

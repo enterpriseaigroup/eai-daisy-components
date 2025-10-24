@@ -457,9 +457,10 @@ export class ComponentDiscoveryEngine {
       /(?:export\s+(?:default\s+)?)?function\s+([A-Z][a-zA-Z0-9]*)/g,
     );
     for (const match of functionMatches) {
-      if (match.index !== undefined && match[1]) {
+      const name = match[1];
+      if (match.index !== undefined && name) {
         declarations.push({
-          name: match[1],
+          name,
           type: 'functional',
           startIndex: match.index,
           endIndex: match.index + match[0].length,
@@ -472,9 +473,10 @@ export class ComponentDiscoveryEngine {
       /(?:export\s+(?:default\s+)?)?const\s+([A-Z][a-zA-Z0-9]*)\s*=\s*\(/g,
     );
     for (const match of arrowMatches) {
-      if (match.index !== undefined && match[1]) {
+      const name = match[1];
+      if (match.index !== undefined && name) {
         declarations.push({
-          name: match[1],
+          name,
           type: 'functional',
           startIndex: match.index,
           endIndex: match.index + match[0].length,
@@ -487,9 +489,10 @@ export class ComponentDiscoveryEngine {
       /(?:export\s+(?:default\s+)?)?const\s+([A-Z][a-zA-Z0-9]*)\s*=\s*React\.forwardRef/g,
     );
     for (const match of forwardRefMatches) {
-      if (match.index !== undefined && match[1]) {
+      const name = match[1];
+      if (match.index !== undefined && name) {
         declarations.push({
-          name: match[1],
+          name,
           type: 'functional',
           startIndex: match.index,
           endIndex: match.index + match[0].length,
@@ -502,9 +505,10 @@ export class ComponentDiscoveryEngine {
       /(?:export\s+(?:default\s+)?)?class\s+([A-Z][a-zA-Z0-9]*)\s+extends\s+.*Component/g,
     );
     for (const match of classMatches) {
-      if (match.index !== undefined && match[1]) {
+      const name = match[1];
+      if (match.index !== undefined && name) {
         declarations.push({
-          name: match[1],
+          name,
           type: 'class',
           startIndex: match.index,
           endIndex: match.index + match[0].length,
@@ -517,9 +521,10 @@ export class ComponentDiscoveryEngine {
       /(?:export\s+(?:default\s+)?)?(?:function\s+|const\s+)(use[A-Z][a-zA-Z0-9]*)/g,
     );
     for (const match of hookMatches) {
-      if (match.index !== undefined && match[1]) {
+      const name = match[1];
+      if (match.index !== undefined && name) {
         declarations.push({
-          name: match[1],
+          name,
           type: 'hook',
           startIndex: match.index,
           endIndex: match.index + match[0].length,
@@ -659,38 +664,38 @@ export class ComponentDiscoveryEngine {
 
     // Check for hooks
     if (/useState\s*\(/.test(content)) {
-patterns.push('useState');
-}
+      patterns.push('useState');
+    }
     if (/useEffect\s*\(/.test(content)) {
-patterns.push('useEffect');
-}
+      patterns.push('useEffect');
+    }
     if (/useContext\s*\(/.test(content)) {
-patterns.push('useContext');
-}
+      patterns.push('useContext');
+    }
     if (/useReducer\s*\(/.test(content)) {
-patterns.push('useReducer');
-}
+      patterns.push('useReducer');
+    }
     if (/useMemo\s*\(/.test(content)) {
-patterns.push('useMemo');
-}
+      patterns.push('useMemo');
+    }
     if (/useCallback\s*\(/.test(content)) {
-patterns.push('useCallback');
-}
+      patterns.push('useCallback');
+    }
 
     // Check for custom hooks
     if (/use[A-Z]\w*\s*\(/.test(content)) {
-patterns.push('custom-hook');
-}
+      patterns.push('custom-hook');
+    }
 
     // Check for render props
     if (/\{.*\(.*\)\s*=>/.test(content)) {
-patterns.push('render-props');
-}
+      patterns.push('render-props');
+    }
 
     // Check for children as function
     if (/children\s*\(/.test(content)) {
-patterns.push('children-as-function');
-}
+      patterns.push('children-as-function');
+    }
 
     return patterns;
   }
@@ -710,8 +715,8 @@ patterns.push('children-as-function');
       const importPath = importMatch[1];
 
       if (!importPath) {
-continue;
-}
+        continue;
+      }
 
       // Determine dependency type
       let type: ComponentDependency['type'];
@@ -762,14 +767,14 @@ continue;
 
     // Classify complexity
     if (score <= 10) {
-return 'simple';
-}
+      return 'simple';
+    }
     if (score <= 25) {
-return 'moderate';
-}
+      return 'moderate';
+    }
     if (score <= 50) {
-return 'complex';
-}
+      return 'complex';
+    }
     return 'critical';
   }
 

@@ -269,6 +269,27 @@ export class PipelineOrchestrator {
   // Execution state
   private context?: PipelineContext;
   private progress?: PipelineProgress;
+
+  /**
+   * Get progress with safety check
+   */
+  private getProgress(): PipelineProgress {
+    if (!this.progress) {
+      throw new Error('Progress not initialized');
+    }
+    return this.progress;
+  }
+
+  /**
+   * Get context with safety check
+   */
+  private getContext(): PipelineContext {
+    if (!this.context) {
+      throw new Error('Context not initialized');
+    }
+    return this.context;
+  }
+
   private isRunning = false;
   private shouldCancel = false;
 
@@ -376,7 +397,7 @@ export class PipelineOrchestrator {
     options: Partial<PipelineOptions>,
   ): Promise<PipelineContext> {
     // Basic configuration validation
-    if (!config || typeof config !== 'object') {
+    if (typeof config !== 'object') {
       throw new Error('Invalid configuration: Configuration must be an object');
     }
 
@@ -520,7 +541,7 @@ export class PipelineOrchestrator {
       return {
         success: true,
         context,
-        progress: this.progress!,
+        progress: this.getProgress(),
         discovery,
         parsing,
         dependencies,
@@ -546,7 +567,7 @@ export class PipelineOrchestrator {
       return {
         success: false,
         context,
-        progress: this.progress!,
+        progress: this.getProgress(),
         discovery,
         parsing,
         dependencies,
@@ -586,11 +607,12 @@ export class PipelineOrchestrator {
 
     const result = await this.discoveryEngine.discoverComponents();
 
+    const progress = this.getProgress();
     this.updateProgress({
       phaseProgress: 100,
       currentOperation: `Discovered ${result.components.length} components`,
       stats: {
-        ...this.progress!.stats,
+        ...progress.stats,
         componentsDiscovered: result.components.length,
       },
     });
@@ -638,10 +660,11 @@ break;
         );
         results.set(component.sourcePath, parseResult);
 
+        const progress = this.getProgress();
         if (parseResult.success) {
-          this.progress!.stats.componentsParsed++;
+          progress.stats.componentsParsed++;
         } else {
-          this.progress!.stats.errorsEncountered++;
+          progress.stats.errorsEncountered++;
 
           if (!context.options.skipErrors) {
             this.emitWarning(`Failed to parse component: ${component.name}`);
@@ -650,7 +673,8 @@ break;
 
         this.emitComponentProcessed(component.sourcePath, parseResult);
       } catch (error) {
-        this.progress!.stats.errorsEncountered++;
+        const progress = this.getProgress();
+        progress.stats.errorsEncountered++;
 
         if (!context.options.skipErrors) {
           throw error;
@@ -665,7 +689,7 @@ break;
 
     this.updateProgress({
       phaseProgress: 100,
-      currentOperation: `Parsed ${this.progress!.stats.componentsParsed} components`,
+      currentOperation: `Parsed ${this.getProgress().stats.componentsParsed} components`,
     });
 
     this.emitPhaseComplete('parsing');
@@ -703,7 +727,7 @@ break;
       phaseProgress: 100,
       currentOperation: `Analyzed ${result.dependencies.length} dependencies`,
       stats: {
-        ...this.progress!.stats,
+        ...this.getProgress().stats,
         componentsAnalyzed: components.length,
       },
     });
@@ -924,9 +948,9 @@ return false;
 
     return {
       success: false,
-      context: this.context!,
-      progress: this.progress!,
-      metrics: this.calculateMetrics(this.context!, Date.now()),
+      context: this.getContext(),
+      progress: this.getProgress(),
+      metrics: this.calculateMetrics(this.getContext(), Date.now()),
       errors: [pipelineError],
       warnings: [],
       outputPaths: [],

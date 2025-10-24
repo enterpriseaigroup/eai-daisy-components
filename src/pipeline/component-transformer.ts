@@ -534,11 +534,11 @@ score -= 10;
   /**
    * Parse component structure with enhanced analysis
    */
-  private async parseComponentStructure(
+  private parseComponentStructure(
     sourceCode: string,
     component: ComponentDefinition,
   ): Promise<EnhancedComponentStructure> {
-    return {
+    return Promise.resolve({
       name: component.name,
       type: component.type,
       props: component.props,
@@ -551,7 +551,7 @@ score -= 10;
       eventHandlers: this.extractEventHandlers(sourceCode),
       stateManagement: this.analyzeStateManagement(sourceCode),
       lifecycle: this.analyzeLifecycleMethods(sourceCode),
-    };
+    });
   }
 
   /**
@@ -602,10 +602,11 @@ score -= 10;
   /**
    * Generate comprehensive Configurator v2 integration
    */
-  private async generateConfiguratorIntegration(
+  private generateConfiguratorIntegration(
     component: ComponentDefinition,
     _config: ExtractionConfig,
   ): Promise<ConfiguratorIntegration> {
+    return Promise.resolve().then(() => {
     const configId = `${component.name.toLowerCase()}-config`;
 
     const integration: ConfiguratorV2Integration = {
@@ -636,18 +637,20 @@ score -= 10;
       contextCode,
       setupCode: this.generateConfiguratorSetupCode(component, integration),
     };
+    });
   }
 
   /**
    * Transform component code with advanced patterns
    */
-  private async transformComponentCode(
+  private transformComponentCode(
     structure: EnhancedComponentStructure,
     component: ComponentDefinition,
     businessLogic: EnhancedBusinessLogicExtraction | undefined,
     configuratorIntegration: ConfiguratorIntegration | undefined,
     _config: ExtractionConfig,
   ): Promise<string> {
+    return Promise.resolve().then(() => {
     let componentCode = '';
 
     // Add comprehensive JSDoc documentation
@@ -673,6 +676,7 @@ score -= 10;
     componentCode += this.generateComponentMetadata(component);
 
     return componentCode;
+    });
   }
 
   /**
@@ -1002,35 +1006,35 @@ return 'medium';
         : 1;
   }
 
-  private async transformPropsInterface(
+  private transformPropsInterface(
     _props: PropDefinition[],
     _config: ExtractionConfig,
   ): Promise<string> {
-    return 'export interface ComponentProps {\n  // Props interface\n}';
+    return Promise.resolve('export interface ComponentProps {\n  // Props interface\n}');
   }
 
-  private async generateTypeDefinitions(
+  private generateTypeDefinitions(
     _component: ComponentDefinition,
     propsInterface: string,
     _configuratorIntegration?: ConfiguratorIntegration,
   ): Promise<string> {
-    return propsInterface;
+    return Promise.resolve(propsInterface);
   }
 
-  private async generateImports(
+  private generateImports(
     _component: ComponentDefinition,
     _config: ExtractionConfig,
   ): Promise<string[]> {
-    return ["import React from 'react';"];
+    return Promise.resolve(["import React from 'react';"]);
   }
 
-  private async generateExports(
+  private generateExports(
     component: ComponentDefinition,
   ): Promise<string[]> {
-    return [
+    return Promise.resolve([
       `export { ${component.name} };`,
       `export default ${component.name};`,
-    ];
+    ]);
   }
 
   private extractConfiguratorPropNames(_configuratorProps: string): string[] {

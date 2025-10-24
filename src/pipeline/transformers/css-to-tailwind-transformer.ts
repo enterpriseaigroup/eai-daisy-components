@@ -289,6 +289,7 @@ export class CSSToTailwindTransformer {
         const map: Record<string, string> = {
           'flex': 'flex',
           'inline-flex': 'inline-flex',
+          'inline': 'inline',
           'block': 'block',
           'inline-block': 'inline-block',
           'grid': 'grid',
@@ -507,16 +508,19 @@ export class CSSToTailwindTransformer {
     let result = code;
 
     for (const [className, tailwindClasses] of Object.entries(mappings)) {
+      const escapedClass = this.escapeRegex(className);
+      const escapedCamelCase = this.escapeRegex(className.replace(/-/g, '_'));
+      
       // Replace className="class-name" with Tailwind classes
       const patterns = [
         // className="class-name"
         {
-          pattern: new RegExp(`className=["']${this.escapeRegex(className)}["']`, 'g'),
+          pattern: new RegExp(`className=["']${escapedClass}["']`, 'g'),
           replacement: `className="${tailwindClasses}"`,
         },
         // className="class-name other-class"
         {
-          pattern: new RegExp(`className=["']([^"']*\\s)?${this.escapeRegex(className)}(\\s[^"']*)?["']`, 'g'),
+          pattern: new RegExp(`className=["']([^"']*\\s)?${escapedClass}(\\s[^"']*)?["']`, 'g'),
           replacement: (_match: string, before: string = '', after: string = '') => {
             const before_trimmed = before.trim();
             const after_trimmed = after.trim();
@@ -524,24 +528,49 @@ export class CSSToTailwindTransformer {
             return `className="${parts.join(' ')}"`;
           },
         },
+        // className={`class-name`} - plain string in template literal
+        {
+          pattern: new RegExp('className=\\{`' + escapedClass + '`\\}', 'g'),
+          replacement: `className="${tailwindClasses}"`,
+        },
+        // className={`class-name ${expr}`} - class at start of template literal
+        {
+          pattern: new RegExp('className=\\{`' + escapedClass + '([\\s\\$][^`]*)?`\\}', 'g'),
+          replacement: (_match: string, after: string = '') => {
+            if (after && after.trim()) {
+              return `className={\`${tailwindClasses}${after}\`}`;
+            }
+            return `className="${tailwindClasses}"`;
+          },
+        },
+        // 'class-name' within template literal strings (not expressions)
+        {
+          pattern: new RegExp("'" + escapedClass + "'", 'g'),
+          replacement: `'${tailwindClasses}'`,
+        },
+        // "class-name" within template literal strings (not expressions)
+        {
+          pattern: new RegExp('"' + escapedClass + '"', 'g'),
+          replacement: `"${tailwindClasses}"`,
+        },
         // className={styles['class-name']}
         {
-          pattern: new RegExp(`className=\\{styles\\['${this.escapeRegex(className)}'\\]\\}`, 'g'),
+          pattern: new RegExp(`className=\\{styles\\['${escapedClass}'\\]\\}`, 'g'),
           replacement: `className="${tailwindClasses}"`,
         },
         // className={styles.className}
         {
-          pattern: new RegExp(`className=\\{styles\\.${this.escapeRegex(className.replace(/-/g, '_'))}\\}`, 'g'),
+          pattern: new RegExp(`className=\\{styles\\.${escapedCamelCase}\\}`, 'g'),
           replacement: `className="${tailwindClasses}"`,
         },
         // className={`${styles.className}`}
         {
-          pattern: new RegExp(`className=\\{\`\\$\\{styles\\.${this.escapeRegex(className.replace(/-/g, '_'))}\\}\`\\}`, 'g'),
+          pattern: new RegExp('className=\\{`\\$\\{styles\\.' + escapedCamelCase + '\\}`\\}', 'g'),
           replacement: `className="${tailwindClasses}"`,
         },
         // className={`some-class ${styles.className}`}
         {
-          pattern: new RegExp('className=\\{`([^`]*\\s)?\\$\\{styles\\.' + this.escapeRegex(className.replace(/-/g, '_')) + '\\}(\\s[^`]*)?`\\}', 'g'),
+          pattern: new RegExp('className=\\{`([^`]*\\s)?\\$\\{styles\\.' + escapedCamelCase + '\\}(\\s[^`]*)?`\\}', 'g'),
           replacement: (_match: string, before: string = '', after: string = '') => {
             const before_trimmed = before.trim();
             const after_trimmed = after.trim();

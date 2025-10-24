@@ -401,7 +401,7 @@ export class ComponentParser {
 
     // Analyze specific imports for React patterns
     if (source === 'react') {
-      node.specifiers?.forEach(spec => {
+      node.specifiers.forEach(spec => {
         if (spec.type === 'ImportSpecifier') {
           const importName =
             spec.imported.type === 'Identifier'
@@ -438,14 +438,12 @@ export class ComponentParser {
     }
 
     // Handle re-exports
-    node.specifiers?.forEach(spec => {
-      if (spec.type === 'ExportSpecifier') {
-        structure.exports.named.push(
-          spec.exported.type === 'Identifier'
-            ? spec.exported.name
-            : spec.exported.value,
-        );
-      }
+    node.specifiers.forEach(spec => {
+      structure.exports.named.push(
+        spec.exported.type === 'Identifier'
+          ? spec.exported.name
+          : spec.exported.value,
+      );
     });
   }
 
@@ -463,8 +461,8 @@ export class ComponentParser {
     // Extract function name
     const name = this.getFunctionName(node);
     if (!name) {
-return;
-}
+      return;
+    }
 
     // Check if this is a React component (starts with uppercase)
     if (this.isReactComponent(name)) {
@@ -502,14 +500,14 @@ return;
     structure: ComponentStructure,
   ): void {
     if (!node.id) {
-return;
-}
+      return;
+    }
 
     // Check if this extends React.Component
     const isReactComponent = this.extendsReactComponent(node);
     if (!isReactComponent) {
-return;
-}
+      return;
+    }
 
     // Analyze class body
     node.body.body.forEach(member => {
@@ -563,13 +561,14 @@ return;
     }
 
     // Check for render props pattern
-    node.openingElement.attributes?.forEach(attr => {
+    node.openingElement.attributes.forEach(attr => {
       if (attr.type === 'JSXAttribute' && attr.name.name === 'render') {
         structure.composition.renderProps.push('render');
       } else if (
         attr.type === 'JSXAttribute' &&
         attr.name.type === 'JSXIdentifier' &&
-        attr.value?.type === 'JSXExpressionContainer' &&
+        attr.value &&
+        attr.value.type === 'JSXExpressionContainer' &&
         attr.value.expression.type === 'ArrowFunctionExpression'
       ) {
         structure.composition.renderProps.push(attr.name.name);
@@ -606,8 +605,8 @@ return;
   ): void {
     const firstParam = node.params[0];
     if (!firstParam) {
-return;
-}
+      return;
+    }
 
     if (firstParam.type === 'Identifier' && firstParam.typeAnnotation) {
       // Extract props from type annotation
@@ -652,9 +651,9 @@ return;
       | TSESTree.FunctionExpression,
     structure: ComponentStructure,
   ): void {
-    if (node.body?.type !== 'BlockStatement') {
-return;
-}
+    if (!node.body || node.body.type !== 'BlockStatement') {
+      return;
+    }
 
     this.traverseAST(node.body, childNode => {
       if (
@@ -839,8 +838,8 @@ return;
 
   private extendsReactComponent(node: TSESTree.ClassDeclaration): boolean {
     if (!node.superClass) {
-return false;
-}
+      return false;
+    }
 
     if (node.superClass.type === 'Identifier') {
       return (
@@ -877,18 +876,18 @@ return false;
 
     // Determine hook type
     if (name === 'useState') {
-type = 'state';
-} else if (name === 'useEffect' || name === 'useLayoutEffect') {
-type = 'effect';
-} else if (name === 'useContext') {
-type = 'context';
-} else if (name === 'useRef') {
-type = 'ref';
-} else if (name === 'useMemo') {
-type = 'memo';
-} else if (name === 'useCallback') {
-type = 'callback';
-}
+      type = 'state';
+    } else if (name === 'useEffect' || name === 'useLayoutEffect') {
+      type = 'effect';
+    } else if (name === 'useContext') {
+      type = 'context';
+    } else if (name === 'useRef') {
+      type = 'ref';
+    } else if (name === 'useMemo') {
+      type = 'memo';
+    } else if (name === 'useCallback') {
+      type = 'callback';
+    }
 
     // Extract dependencies for useEffect, useMemo, useCallback
     let dependencies: string[] | undefined;
@@ -977,8 +976,8 @@ type = 'callback';
     name: string,
   ): 'public' | 'private' | 'protected' {
     if (name.startsWith('_')) {
-return 'private';
-}
+      return 'private';
+    }
     return 'public';
   }
 
@@ -986,8 +985,8 @@ return 'private';
     typeAnnotation?: TSESTree.TSTypeAnnotation,
   ): string {
     if (!typeAnnotation?.typeAnnotation) {
-return 'unknown';
-}
+      return 'unknown';
+    }
 
     const type = typeAnnotation.typeAnnotation;
 

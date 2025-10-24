@@ -105,7 +105,7 @@ export class DependencyResolver {
   private resolveComponentId(dependency: ComponentDependency): string {
     // Extract component name from import path
     const match = dependency.importPath.match(/\/([^/]+)$/);
-    return (match && match[1]) ? match[1] : dependency.name;
+    return match && match[1] ? match[1] : dependency.name;
   }
 
   /**

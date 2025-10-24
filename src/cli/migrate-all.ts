@@ -155,7 +155,10 @@ export class BatchMigrationOrchestrator {
 
       // Discover components
       logger.info('Discovering components...');
-      const discoveryResult = await this.discovery!.discoverComponents();
+      if (!this.discovery) {
+        throw new Error('Discovery engine not initialized');
+      }
+      const discoveryResult = await this.discovery.discoverComponents();
 
       if (discoveryResult.errors.length > 0) {
         throw new Error(`Discovery failed: ${discoveryResult.errors.map(e => e.message).join(', ')}`);
@@ -260,8 +263,8 @@ export class BatchMigrationOrchestrator {
         const batchResult = batchResults[j];
 
         if (!component || !batchResult) {
-continue;
-}
+          continue;
+        }
 
         if (batchResult.status === 'fulfilled' && batchResult.value.success) {
           result.successful++;
@@ -382,9 +385,12 @@ continue;
       // Record completion
       this.tracker.updateStatus(component.id, result.success ? 'completed' : 'failed');
 
-      if (!result.success && result.errors && result.errors.length > 0 && result.errors[0]) {
-        const error = new Error(result.errors[0].message);
-        this.tracker.recordError(component.id, error);
+      if (!result.success && result.errors && result.errors.length > 0) {
+        const firstError = result.errors[0];
+        if (firstError) {
+          const error = new Error(firstError.message);
+          this.tracker.recordError(component.id, error);
+        }
       }
 
       return { success: result.success };

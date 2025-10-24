@@ -469,8 +469,9 @@ export class CLIApplication {
   /**
    * Handle info command
    */
-  private async handleInfoCommand(): Promise<void> {
+  private handleInfoCommand(): Promise<void> {
     this.formatter.info('DAISY Component Extraction Pipeline');
+    return Promise.resolve().then(() => {
 
     const info = [
       ['Version', '1.0.0'],
@@ -481,6 +482,7 @@ export class CLIApplication {
     ];
 
     this.formatter.table(['Property', 'Value'], info);
+    });
   }
 
   /**
@@ -638,7 +640,7 @@ export class CLIApplication {
     options: Partial<CLIOptions>,
   ): PipelineOptions {
     return {
-      mode: (options.mode as ExecutionMode) || 'full-pipeline',
+      mode: (options.mode as ExecutionMode | undefined) || 'full-pipeline',
       parallel: options.parallel ?? true,
       maxWorkers: options.maxWorkers || 4,
       skipErrors: options.skipErrors || false,

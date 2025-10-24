@@ -281,12 +281,13 @@ export class ComponentInventoryGenerator {
   /**
    * Generate complete component inventory
    */
-  async generateInventory(
+  generateInventory(
     discovery: DiscoveryResult,
     parsing: Map<string, ParseResult>,
     dependencies: DependencyAnalysisResult,
     extractionConfig: ExtractionConfig,
   ): Promise<ComponentInventory> {
+    return Promise.resolve().then(() => {
     try {
       this.logger.info('Generating component inventory...');
 
@@ -344,6 +345,7 @@ export class ComponentInventoryGenerator {
       );
       throw error;
     }
+    });
   }
 
   /**
@@ -508,14 +510,14 @@ export class ComponentInventoryGenerator {
     score: number,
   ): ComponentReadiness['readinessLevel'] {
     if (score >= this.config.readinessThreshold) {
-return 'ready';
-}
+      return 'ready';
+    }
     if (score >= 60) {
-return 'needs-work';
-}
+      return 'needs-work';
+    }
     if (score >= 40) {
-return 'complex';
-}
+      return 'complex';
+    }
     return 'high-risk';
   }
 
@@ -527,27 +529,27 @@ return 'complex';
 
     // Functional components are easier to migrate
     if (component.type === 'functional') {
-score += 10;
-}
+      score += 10;
+    }
     if (component.type === 'class') {
-score -= 10;
-}
+      score -= 10;
+    }
 
     // Modern React patterns are good
     if (component.reactPatterns.includes('useState')) {
-score += 5;
-}
+      score += 5;
+    }
     if (component.reactPatterns.includes('useEffect')) {
-score += 5;
-}
+      score += 5;
+    }
 
     // High complexity is problematic
     if (component.complexity === 'complex') {
-score -= 15;
-}
+      score -= 15;
+    }
     if (component.complexity === 'critical') {
-score -= 25;
-}
+      score -= 25;
+    }
 
     return Math.max(0, Math.min(100, score));
   }
@@ -636,25 +638,25 @@ score -= 25;
 
     // Base effort by component type
     if (component.type === 'functional') {
-effort += 1;
-}
+      effort += 1;
+    }
     if (component.type === 'class') {
-effort += 2;
-}
+      effort += 2;
+    }
     if (component.type === 'higher-order') {
-effort += 3;
-}
+      effort += 3;
+    }
 
     // Complexity impact
     if (component.complexity === 'moderate') {
-effort += 1;
-}
+      effort += 1;
+    }
     if (component.complexity === 'complex') {
-effort += 2;
-}
+      effort += 2;
+    }
     if (component.complexity === 'critical') {
-effort += 3;
-}
+      effort += 3;
+    }
 
     // Dependencies impact
     effort += Math.min(2, Math.floor(component.dependencies.length / 3));
@@ -672,14 +674,14 @@ effort += 3;
 
     // Convert to effort level
     if (effort <= 2) {
-return 'low';
-}
+      return 'low';
+    }
     if (effort <= 4) {
-return 'medium';
-}
+      return 'medium';
+    }
     if (effort <= 6) {
-return 'high';
-}
+      return 'high';
+    }
     return 'very-high';
   }
 
@@ -695,29 +697,29 @@ return 'high';
 
     // Critical complexity is high risk
     if (component.complexity === 'critical') {
-risk += 3;
-}
+      risk += 3;
+    }
     if (component.complexity === 'complex') {
-risk += 2;
-}
+      risk += 2;
+    }
 
     // Many dependencies increase risk
     if (dependencies.length > 5) {
-risk += 2;
-}
+      risk += 2;
+    }
     if (dependencies.length > 10) {
-risk += 3;
-}
+      risk += 3;
+    }
 
     // Parse failures are risky
     if (parseResult && !parseResult.success) {
-risk += 2;
-}
+      risk += 2;
+    }
 
     // High cyclomatic complexity
     if (parseResult && parseResult.complexity.cyclomaticComplexity > 20) {
-risk += 3;
-}
+      risk += 3;
+    }
 
     // Missing tests increase risk
     if (
@@ -729,14 +731,14 @@ risk += 3;
 
     // Convert to risk level
     if (risk <= 2) {
-return 'low';
-}
+      return 'low';
+    }
     if (risk <= 4) {
-return 'medium';
-}
+      return 'medium';
+    }
     if (risk <= 6) {
-return 'high';
-}
+      return 'high';
+    }
     return 'critical';
   }
 
@@ -790,7 +792,9 @@ return 'high';
     return array.reduce(
       (groups, item) => {
         const key = keyFn(item);
-        groups[key] = groups[key] || [];
+        if (!groups[key]) {
+          groups[key] = [];
+        }
         groups[key].push(item);
         return groups;
       },
@@ -948,11 +952,11 @@ return 'high';
    */
   private getPhaseName(phase: number): string {
     if (phase === 1) {
-return 'Foundation';
-}
+      return 'Foundation';
+    }
     if (phase === 2) {
-return 'Core Components';
-}
+      return 'Core Components';
+    }
     return 'Advanced Components';
   }
 
@@ -961,11 +965,11 @@ return 'Core Components';
    */
   private getPhaseDescription(phase: number): string {
     if (phase === 1) {
-return 'Extract ready components to establish migration foundation';
-}
+      return 'Extract ready components to establish migration foundation';
+    }
     if (phase === 2) {
-return 'Migrate core functionality components';
-}
+      return 'Migrate core functionality components';
+    }
     return 'Handle complex and high-risk components';
   }
 
@@ -977,11 +981,11 @@ return 'Migrate core functionality components';
     const totalWeeks = Math.ceil(componentCount * weeksPerComponent);
 
     if (totalWeeks <= 1) {
-return '1 week';
-}
+      return '1 week';
+    }
     if (totalWeeks <= 4) {
-return `${totalWeeks} weeks`;
-}
+      return `${totalWeeks} weeks`;
+    }
     return `${Math.ceil(totalWeeks / 4)} months`;
   }
 
@@ -995,8 +999,8 @@ return `${totalWeeks} weeks`;
     const totalWeeks = Math.ceil(totalPhases * averagePhaseWeeks * 0.8); // 20% overlap
 
     if (totalWeeks <= 4) {
-return `${totalWeeks} weeks`;
-}
+      return `${totalWeeks} weeks`;
+    }
     return `${Math.ceil(totalWeeks / 4)} months`;
   }
 
@@ -1293,9 +1297,10 @@ return `${totalWeeks} weeks`;
    * Export inventory to HTML format
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async exportToHtml(_inventory: ComponentInventory): Promise<void> {
+  private exportToHtml(_inventory: ComponentInventory): Promise<void> {
     // HTML export implementation would go here
     this.logger.info('HTML export not yet implemented');
+    return Promise.resolve();
   }
 }
 

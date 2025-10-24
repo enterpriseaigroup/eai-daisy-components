@@ -466,8 +466,8 @@ export class DependencyAnalyzer {
         // Parse AST
         const ast = this.parseComponentAST(content, component.sourcePath);
         if (!ast) {
-continue;
-}
+          continue;
+        }
 
         // Extract dependencies from AST
         const dependencies = this.extractDependenciesFromAST(ast, component);
@@ -601,8 +601,8 @@ continue;
     // Add usage context for import
     const context: DependencyUsageContext = {
       location: {
-        line: node.loc?.start.line || 0,
-        column: node.loc?.start.column || 0,
+        line: node.loc ? node.loc.start.line : 0,
+        column: node.loc ? node.loc.start.column : 0,
       },
       usage: 'import',
       context: `import ${imports.join(', ')} from '${importPath}'`,
@@ -611,7 +611,10 @@ continue;
     if (!usageContexts.has(resolvedPath)) {
       usageContexts.set(resolvedPath, []);
     }
-    usageContexts.get(resolvedPath)!.push(context);
+    const contexts = usageContexts.get(resolvedPath);
+    if (contexts) {
+      contexts.push(context);
+    }
   }
 
   /**
@@ -620,7 +623,7 @@ continue;
   private extractImportNames(node: TSESTree.ImportDeclaration): string[] {
     const names: string[] = [];
 
-    node.specifiers?.forEach(spec => {
+    node.specifiers.forEach(spec => {
       switch (spec.type) {
         case 'ImportDefaultSpecifier':
           names.push(spec.local.name);
@@ -650,7 +653,11 @@ continue;
     usedBy: string,
   ): void {
     // Clean package name (remove subpaths)
-    const cleanName = packageName.split('/')[0] || packageName;
+    const parts = packageName.split('/');
+    if (parts.length === 0) {
+      throw new Error('Invalid package name');
+    }
+    const cleanName = parts[0];
 
     if (!this.externalPackages.has(cleanName)) {
       this.externalPackages.set(cleanName, {
@@ -664,12 +671,14 @@ continue;
       });
     }
 
-    const pkg = this.externalPackages.get(cleanName)!;
-    pkg.imports.push(...imports);
-    if (!pkg.usedBy.includes(usedBy)) {
-      pkg.usedBy.push(usedBy);
+    const pkg = this.externalPackages.get(cleanName);
+    if (pkg) {
+      pkg.imports.push(...imports);
+      if (!pkg.usedBy.includes(usedBy)) {
+        pkg.usedBy.push(usedBy);
+      }
+      pkg.usageCount++;
     }
-    pkg.usageCount++;
   }
 
   /**
@@ -728,14 +737,14 @@ continue;
     packageName: string,
   ): ExternalDependency['migrationStrategy'] {
     if (packageName === 'react') {
-return 'keep';
-}
+      return 'keep';
+    }
     if (packageName.includes('test')) {
-return 'evaluate';
-}
+      return 'evaluate';
+    }
     if (packageName.includes('build')) {
-return 'replace';
-}
+      return 'replace';
+    }
     return 'evaluate';
   }
 
@@ -748,14 +757,14 @@ return 'replace';
   ): DependencyDetail['extractionRisk'] {
     // High risk for deeply nested imports or many specific imports
     if (imports.length > 5) {
-return 'high';
-}
+      return 'high';
+    }
     if (importPath.includes('..')) {
-return 'medium';
-}
+      return 'medium';
+    }
     if (imports.some(imp => imp.toLowerCase().includes('context'))) {
-return 'high';
-}
+      return 'high';
+    }
     return 'low';
   }
 
@@ -822,21 +831,21 @@ return 'high';
    * Analyze transitive dependencies
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async analyzeTransitiveDependencies(
+  private analyzeTransitiveDependencies(
     _directDeps: DependencyDetail[],
   ): Promise<DependencyDetail[]> {
     // Implementation for transitive dependency analysis
-    return [];
+    return Promise.resolve([]);
   }
 
   /**
    * Analyze external dependencies across all components
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async analyzeExternalDependencies(
+  private analyzeExternalDependencies(
     _components: ComponentDefinition[],
   ): Promise<ExternalDependency[]> {
-    return Array.from(this.externalPackages.values());
+    return Promise.resolve(Array.from(this.externalPackages.values()));
   }
 
   /**
@@ -897,11 +906,11 @@ return 'high';
       const sourceNode = nodeMap.get(dep.source);
       const targetNode = nodeMap.get(dep.target);
       if (sourceNode) {
-sourceNode.outDegree++;
-}
+        sourceNode.outDegree++;
+      }
       if (targetNode) {
-targetNode.inDegree++;
-}
+        targetNode.inDegree++;
+      }
     });
 
     // Calculate centrality scores (simplified PageRank-like)

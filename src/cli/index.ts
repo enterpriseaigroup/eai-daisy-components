@@ -12,8 +12,7 @@ import { Command } from 'commander';
 import type { ExtractionConfig, LogLevel } from '@/types';
 import { ConfigurationManager } from '@/utils/config';
 import { FileSystemManager } from '@/utils/filesystem';
-import type { Logger} from '@/utils/logging';
-import { createSimpleLogger } from '@/utils/logging';
+import { type Logger, createSimpleLogger } from '@/utils/logging';
 import { PipelineError, getGlobalErrorHandler } from '@/utils/errors';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -123,7 +122,7 @@ const styles = {
  * Simple progress indicator
  */
 class SimpleSpinner {
-  private interval?: NodeJS.Timeout | undefined;
+  private interval?: NodeJS.Timeout;
   private readonly frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   private frameIndex = 0;
 
@@ -271,10 +270,12 @@ const scanCommand: CLICommand = {
     'daisy-extract scan --source ./src/components',
     'daisy-extract scan --source ./src --format json',
   ],
-  handler: async (context: CommandContext): Promise<void> => {
+  handler: (context: CommandContext): Promise<void> => {
     const { options, config } = context;
 
     const sourceDir = options.source || config.sourcePath;
+
+    return Promise.resolve().then(async () => {
 
     if (!sourceDir) {
       throw new PipelineError(
@@ -324,6 +325,7 @@ const scanCommand: CLICommand = {
       spinner.fail('Component scan failed');
       throw error;
     }
+    });
   },
 };
 
@@ -497,7 +499,7 @@ export class CLIBuilder {
       ? await configManager.loadFromFile(options.config)
       : configManager.createMinimal(process.cwd(), './output');
 
-    const logLevel = (options.logLevel as LogLevel) || config.logging.level;
+    const logLevel = (options.logLevel as LogLevel | undefined) || config.logging.level;
     const logger = createSimpleLogger('cli', logLevel);
 
     const fileManager = new FileSystemManager();
