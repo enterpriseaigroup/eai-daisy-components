@@ -71,7 +71,7 @@ export class EnhancedEquivalencyTester {
   public async testEquivalency(
     v1ComponentPath: string,
     v2ComponentPath: string,
-    testCases: ComponentTestCase[]
+    testCases: ComponentTestCase[],
   ): Promise<EnhancedEquivalencyResult> {
     const differences: DetailedDifference[] = [];
 
@@ -84,14 +84,14 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences
+      differences,
     );
 
     // Step 3: Test props compatibility
     const propsMatch = await this.testPropsCompatibility(
       v1Component,
       v2Component,
-      differences
+      differences,
     );
 
     // Step 4: Test behavior equivalency
@@ -99,7 +99,7 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences
+      differences,
     );
 
     // Step 5: Test state management
@@ -107,7 +107,7 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences
+      differences,
     );
 
     // Step 6: Test performance
@@ -115,14 +115,14 @@ export class EnhancedEquivalencyTester {
       v1Component,
       v2Component,
       testCases,
-      differences
+      differences,
     );
 
     // Step 7: Test business logic preservation
     const businessLogicMatch = await this.testBusinessLogicPreservation(
       v1ComponentPath,
       v2ComponentPath,
-      differences
+      differences,
     );
 
     // Calculate overall score
@@ -150,7 +150,7 @@ export class EnhancedEquivalencyTester {
    * Compile TypeScript/JSX component to runnable code
    */
   private async compileComponent(
-    componentPath: string
+    componentPath: string,
   ): Promise<React.ComponentType<any>> {
     // This would actually read and compile the component
     // For now, returning a placeholder
@@ -165,7 +165,7 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     let allMatch = true;
 
@@ -196,10 +196,10 @@ export class EnhancedEquivalencyTester {
 
       // Compare accessibility attributes
       const v1Accessibility = this.extractAccessibilityAttributes(
-        v1Result.container
+        v1Result.container,
       );
       const v2Accessibility = this.extractAccessibilityAttributes(
-        v2Result.container
+        v2Result.container,
       );
 
       if (JSON.stringify(v1Accessibility) !== JSON.stringify(v2Accessibility)) {
@@ -227,7 +227,7 @@ export class EnhancedEquivalencyTester {
   private async testPropsCompatibility(
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     // Extract prop types from components
     const v1Props = this.extractPropTypes(v1Component);
@@ -289,7 +289,7 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     let allMatch = true;
 
@@ -383,7 +383,7 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     // Test useState hooks
     // Test useEffect hooks
@@ -399,7 +399,7 @@ export class EnhancedEquivalencyTester {
     v1Component: React.ComponentType<any>,
     v2Component: React.ComponentType<any>,
     testCases: ComponentTestCase[],
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     let allMatch = true;
 
@@ -439,7 +439,7 @@ export class EnhancedEquivalencyTester {
   private async testBusinessLogicPreservation(
     v1Path: string,
     v2Path: string,
-    differences: DetailedDifference[]
+    differences: DetailedDifference[],
   ): Promise<boolean> {
     // Parse both components using TypeScript compiler API
     const v1AST = await this.parseComponent(v1Path);
@@ -510,12 +510,12 @@ export class EnhancedEquivalencyTester {
    * Helper: Extract accessibility attributes
    */
   private extractAccessibilityAttributes(
-    container: HTMLElement
+    container: HTMLElement,
   ): Record<string, string[]> {
     const attributes: Record<string, string[]> = {};
 
     const elements = container.querySelectorAll(
-      '[aria-label], [aria-busy], [role], [aria-describedby]'
+      '[aria-label], [aria-busy], [role], [aria-describedby]',
     );
     elements.forEach(el => {
       const attrs: Record<string, string> = {};
@@ -542,7 +542,7 @@ export class EnhancedEquivalencyTester {
    * Helper: Extract prop types from component
    */
   private extractPropTypes(
-    component: React.ComponentType<any>
+    component: React.ComponentType<any>,
   ): Record<string, string> {
     // This would use TypeScript compiler API to extract actual prop types
     // For now, returning mock data
@@ -642,7 +642,7 @@ export class EnhancedEquivalencyTester {
    */
   private generateReport(
     differences: DetailedDifference[],
-    score: number
+    score: number,
   ): string {
     const report: string[] = [
       '# Component Equivalency Report',
@@ -674,7 +674,7 @@ export class EnhancedEquivalencyTester {
             report.push(`  - Context: ${diff.context}`);
           }
           report.push(
-            `  - Expected: ${JSON.stringify(diff.expected, null, 2)}`
+            `  - Expected: ${JSON.stringify(diff.expected, null, 2)}`,
           );
           report.push(`  - Actual: ${JSON.stringify(diff.actual, null, 2)}`);
           report.push('');

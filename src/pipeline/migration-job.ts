@@ -89,13 +89,13 @@ export class MigrationJob {
   }
 
   private async migrateComponent(
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): Promise<MigrationResult> {
     const perfStart = this.performanceMonitor.startMonitoring(component.name);
 
     try {
       const sourceCode = await this.fileManager.readFile(
-        `${this.config.sourcePath}/${component.sourcePath}`
+        `${this.config.sourcePath}/${component.sourcePath}`,
       );
 
       const extractor = new V1ComponentExtractor(this.config);
@@ -110,12 +110,12 @@ export class MigrationJob {
       });
       const cssTransformResult = await cssTransformer.transform(
         sourceCode,
-        `${this.config.sourcePath}/${component.sourcePath}`
+        `${this.config.sourcePath}/${component.sourcePath}`,
       );
 
       // Step 2: Generate pseudo-code documentation (for v1 baseline)
       this.logger.debug(
-        `Generating pseudo-code documentation for ${component.name}`
+        `Generating pseudo-code documentation for ${component.name}`,
       );
       const pseudoCodeGen = new PseudoCodeGenerator({
         includeWhySection: true,
@@ -129,7 +129,7 @@ export class MigrationJob {
       const v1Documentation = await pseudoCodeGen.generate(
         cssTransformResult.transformedCode,
         component.name,
-        false // isV2Component = false
+        false, // isV2Component = false
       );
 
       // Use documented v1 code for transformation
@@ -141,19 +141,19 @@ export class MigrationJob {
       const transformer = new ConfiguratorTransformer();
       const transformation = await transformer.transform(
         component,
-        documentedSourceCode
+        documentedSourceCode,
       );
 
       // Step 4: Generate V2 component
       const generator = new V2ComponentGenerator(this.config);
       const generation = await generator.generate(
         transformation,
-        documentedSourceCode
+        documentedSourceCode,
       );
 
       // Step 5: Add pseudo-code documentation to v2 component (with migration notes)
       this.logger.debug(
-        `Adding migration documentation to v2 ${component.name}`
+        `Adding migration documentation to v2 ${component.name}`,
       );
       const v2PseudoCodeGen = new PseudoCodeGenerator({
         includeWhySection: true,
@@ -170,7 +170,7 @@ export class MigrationJob {
       const v2Documentation = await v2PseudoCodeGen.generate(
         v2Component.content,
         component.name,
-        true // isV2Component = true
+        true, // isV2Component = true
       );
       if (v2Documentation.success) {
         // Note: GeneratedFile.content is readonly, update would need to recreate the object
@@ -181,12 +181,12 @@ export class MigrationJob {
       const validation = await validator.validate(
         component,
         transformation,
-        generation
+        generation,
       );
 
       const performance = this.performanceMonitor.endMonitoring(
         component.name,
-        perfStart
+        perfStart,
       );
 
       return {

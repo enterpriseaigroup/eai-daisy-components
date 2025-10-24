@@ -21,7 +21,7 @@ export class BehaviorAssertions {
 
   public assertBusinessLogicPreserved(
     v1Component: ComponentDefinition,
-    v2Component: ComponentDefinition
+    v2Component: ComponentDefinition,
   ): void {
     this.assertions.push({
       description: 'Business logic functions are preserved',
@@ -32,7 +32,7 @@ export class BehaviorAssertions {
 
   public assertPropsCompatible(
     v1Component: ComponentDefinition,
-    v2Component: ComponentDefinition
+    v2Component: ComponentDefinition,
   ): void {
     this.assertions.push({
       description: 'Component props are compatible',
@@ -43,7 +43,7 @@ export class BehaviorAssertions {
 
   public assertStateManagementPreserved(
     v1Component: ComponentDefinition,
-    v2Component: ComponentDefinition
+    v2Component: ComponentDefinition,
   ): void {
     this.assertions.push({
       description: 'State management patterns are preserved',
@@ -79,7 +79,7 @@ export class BehaviorAssertions {
 
   private compareBusinessLogic(
     v1Component: ComponentDefinition,
-    v2Component: ComponentDefinition
+    v2Component: ComponentDefinition,
   ): boolean {
     return (
       v1Component.businessLogic.length === v2Component.businessLogic.length
@@ -88,7 +88,7 @@ export class BehaviorAssertions {
 
   private compareProps(
     v1Component: ComponentDefinition,
-    v2Component: ComponentDefinition
+    v2Component: ComponentDefinition,
   ): boolean {
     const v1PropNames = v1Component.props.map(p => p.name).sort();
     const v2PropNames = v2Component.props.map(p => p.name).sort();
@@ -110,7 +110,7 @@ export function createBehaviorAssertions(): BehaviorAssertions {
 
 export function assertBusinessLogicPreserved(
   v1Component: ComponentDefinition,
-  v2Component: ComponentDefinition
+  v2Component: ComponentDefinition,
 ): void {
   const v1Logic = v1Component.businessLogic.map(bl => bl.name).sort();
   const v2Logic = v2Component.businessLogic.map(bl => bl.name).sort();
@@ -120,7 +120,7 @@ export function assertBusinessLogicPreserved(
 
 export function assertPropsPreserved(
   v1Component: ComponentDefinition,
-  v2Component: ComponentDefinition
+  v2Component: ComponentDefinition,
 ): void {
   const v1Props = v1Component.props.map(p => p.name).sort();
   const v2Props = v2Component.props.map(p => p.name).sort();
@@ -133,7 +133,7 @@ export function assertPropsPreserved(
  */
 export function assertReactPatternsPreserved(
   v1Component: ComponentDefinition,
-  v2Component: ComponentDefinition
+  v2Component: ComponentDefinition,
 ): void {
   const v1Patterns = v1Component.reactPatterns.sort();
   const v2Patterns = v2Component.reactPatterns.sort();
@@ -146,10 +146,10 @@ export function assertReactPatternsPreserved(
  */
 export function assertDependenciesPreserved(
   v1Component: ComponentDefinition,
-  v2Component: ComponentDefinition
+  v2Component: ComponentDefinition,
 ): void {
   expect(v2Component.dependencies.length).toBeGreaterThanOrEqual(
-    v1Component.dependencies.length
+    v1Component.dependencies.length,
   );
 }
 
@@ -158,7 +158,7 @@ export function assertDependenciesPreserved(
  */
 export function assertEventHandlersPreserved(
   v1Logic: BusinessLogicDefinition[],
-  v2Logic: BusinessLogicDefinition[]
+  v2Logic: BusinessLogicDefinition[],
 ): void {
   const v1Handlers = v1Logic.filter(bl => bl.type === 'event-handler');
   const v2Handlers = v2Logic.filter(bl => bl.type === 'event-handler');
@@ -171,17 +171,17 @@ export function assertEventHandlersPreserved(
  */
 export function assertDataTransformationsPreserved(
   v1Logic: BusinessLogicDefinition[],
-  v2Logic: BusinessLogicDefinition[]
+  v2Logic: BusinessLogicDefinition[],
 ): void {
   const v1Transformations = v1Logic.filter(
-    bl => bl.type === 'data-transformation'
+    bl => bl.type === 'data-transformation',
   );
   const v2Transformations = v2Logic.filter(
-    bl => bl.type === 'data-transformation'
+    bl => bl.type === 'data-transformation',
   );
 
   expect(v2Transformations.length).toBeGreaterThanOrEqual(
-    v1Transformations.length
+    v1Transformations.length,
   );
 }
 
@@ -190,7 +190,7 @@ export function assertDataTransformationsPreserved(
  */
 export function assertValidationLogicPreserved(
   v1Logic: BusinessLogicDefinition[],
-  v2Logic: BusinessLogicDefinition[]
+  v2Logic: BusinessLogicDefinition[],
 ): void {
   const v1Validation = v1Logic.filter(bl => bl.type === 'validation');
   const v2Validation = v2Logic.filter(bl => bl.type === 'validation');
@@ -203,7 +203,7 @@ export function assertValidationLogicPreserved(
  */
 export function assertApiLogicPreserved(
   v1Logic: BusinessLogicDefinition[],
-  v2Logic: BusinessLogicDefinition[]
+  v2Logic: BusinessLogicDefinition[],
 ): void {
   const v1Api = v1Logic.filter(bl => bl.type === 'api-integration');
   const v2Api = v2Logic.filter(bl => bl.type === 'api-integration');
@@ -216,7 +216,7 @@ export function assertApiLogicPreserved(
  */
 export function assertStateManagementPreserved(
   v1Logic: BusinessLogicDefinition[],
-  v2Logic: BusinessLogicDefinition[]
+  v2Logic: BusinessLogicDefinition[],
 ): void {
   const v1State = v1Logic.filter(bl => bl.type === 'state-management');
   const v2State = v2Logic.filter(bl => bl.type === 'state-management');
@@ -229,7 +229,7 @@ export function assertStateManagementPreserved(
  */
 export function assertComputedValuesPreserved(
   v1Logic: BusinessLogicDefinition[],
-  v2Logic: BusinessLogicDefinition[]
+  v2Logic: BusinessLogicDefinition[],
 ): void {
   const v1Computed = v1Logic.filter(bl => bl.type === 'computed-value');
   const v2Computed = v2Logic.filter(bl => bl.type === 'computed-value');
@@ -242,7 +242,7 @@ export function assertComputedValuesPreserved(
  */
 export function assertCompleteBusinessLogicPreservation(
   v1Component: ComponentDefinition,
-  v2Component: ComponentDefinition
+  v2Component: ComponentDefinition,
 ): void {
   // Assert business logic functions preserved
   assertBusinessLogicPreserved(v1Component, v2Component);
@@ -256,24 +256,24 @@ export function assertCompleteBusinessLogicPreservation(
   // Assert specific business logic types
   assertEventHandlersPreserved(
     v1Component.businessLogic,
-    v2Component.businessLogic
+    v2Component.businessLogic,
   );
   assertDataTransformationsPreserved(
     v1Component.businessLogic,
-    v2Component.businessLogic
+    v2Component.businessLogic,
   );
   assertValidationLogicPreserved(
     v1Component.businessLogic,
-    v2Component.businessLogic
+    v2Component.businessLogic,
   );
   assertApiLogicPreserved(v1Component.businessLogic, v2Component.businessLogic);
   assertStateManagementPreserved(
     v1Component.businessLogic,
-    v2Component.businessLogic
+    v2Component.businessLogic,
   );
   assertComputedValuesPreserved(
     v1Component.businessLogic,
-    v2Component.businessLogic
+    v2Component.businessLogic,
   );
 }
 
@@ -282,7 +282,7 @@ export function assertCompleteBusinessLogicPreservation(
  */
 export function assertComponentTypeCompatible(
   v1Component: ComponentDefinition,
-  v2Component: ComponentDefinition
+  v2Component: ComponentDefinition,
 ): void {
   // Both should be functional or both should be class-based
   // Or v2 can be functional if v1 was class-based (modernization)
@@ -298,7 +298,7 @@ export function assertComponentTypeCompatible(
  */
 export function assertComplexityReasonable(
   v1Component: ComponentDefinition,
-  v2Component: ComponentDefinition
+  v2Component: ComponentDefinition,
 ): void {
   // v2 complexity should be same or one level higher max
   const complexityLevels = ['simple', 'moderate', 'complex', 'critical'];

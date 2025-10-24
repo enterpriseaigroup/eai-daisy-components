@@ -315,7 +315,7 @@ export function formatDuration(milliseconds: number): string {
 export function formatPercentage(
   value: number,
   total: number,
-  decimals: number = 1
+  decimals: number = 1,
 ): string {
   if (total === 0) {
     return '0%';
@@ -462,7 +462,7 @@ export function isEmptyObject(obj: Record<string, unknown>): boolean {
  */
 export function pick<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
-  keys: K[]
+  keys: K[],
 ): Pick<T, K> {
   const result = {} as Pick<T, K>;
 
@@ -484,7 +484,7 @@ export function pick<T extends Record<string, unknown>, K extends keyof T>(
  */
 export function omit<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
-  keys: K[]
+  keys: K[],
 ): Omit<T, K> {
   const result = { ...obj };
 

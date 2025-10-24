@@ -85,7 +85,7 @@ afterEach(() => {
 expect.extend({
   toBeTypeOf(
     received: unknown,
-    expectedType: string
+    expectedType: string,
   ): jest.CustomMatcherResult {
     const actualType = typeof received;
     const pass = actualType === expectedType;
@@ -122,7 +122,7 @@ export const createMockComponent = (name: string) => {
 };
 
 export const createMockFunction = <T extends (...args: any[]) => any>(
-  returnValue?: ReturnType<T>
+  returnValue?: ReturnType<T>,
 ) => {
   return jest.fn().mockReturnValue(returnValue);
 };

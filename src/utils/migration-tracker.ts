@@ -290,7 +290,7 @@ export class MigrationTracker {
    */
   public startMigration(
     component: ComponentDefinition,
-    sessionId?: string
+    sessionId?: string,
   ): string {
     const sid = sessionId || this.currentSessionId;
     if (!sid) {
@@ -334,7 +334,7 @@ export class MigrationTracker {
   public updateStatus(
     componentId: string,
     status: MigrationStatus,
-    sessionId?: string
+    sessionId?: string,
   ): void {
     const record = this.getRecord(componentId, sessionId);
     const session = this.getSession(sessionId);
@@ -370,14 +370,14 @@ export class MigrationTracker {
   public recordError(
     componentId: string,
     error: Error,
-    sessionId?: string
+    sessionId?: string,
   ): void {
     const record = this.getRecord(componentId, sessionId);
     record.errors.push(error);
 
     this.logger.error(
       `Migration error recorded: ${record.componentName}`,
-      error
+      error,
     );
   }
 
@@ -387,7 +387,7 @@ export class MigrationTracker {
   public recordWarning(
     componentId: string,
     warning: string,
-    sessionId?: string
+    sessionId?: string,
   ): void {
     const record = this.getRecord(componentId, sessionId);
     record.warnings.push(warning);
@@ -401,7 +401,7 @@ export class MigrationTracker {
   public setTargetComponent(
     componentId: string,
     targetComponent: ComponentDefinition,
-    sessionId?: string
+    sessionId?: string,
   ): void {
     const record = this.getRecord(componentId, sessionId);
     record.targetComponent = targetComponent;
@@ -413,7 +413,7 @@ export class MigrationTracker {
   public setValidationResults(
     componentId: string,
     results: ValidationResults,
-    sessionId?: string
+    sessionId?: string,
   ): void {
     const record = this.getRecord(componentId, sessionId);
     record.validationResults = results;
@@ -429,7 +429,7 @@ export class MigrationTracker {
   public setEquivalencyResults(
     componentId: string,
     results: EquivalencyResults,
-    sessionId?: string
+    sessionId?: string,
   ): void {
     const record = this.getRecord(componentId, sessionId);
     record.equivalencyResults = results;
@@ -445,7 +445,7 @@ export class MigrationTracker {
   public updateMetadata(
     componentId: string,
     metadata: Partial<MigrationMetadata>,
-    sessionId?: string
+    sessionId?: string,
   ): void {
     const record = this.getRecord(componentId, sessionId);
     record.metadata = { ...record.metadata, ...metadata };
@@ -538,7 +538,7 @@ export class MigrationTracker {
       } catch (error) {
         this.logger.error(
           `Failed to generate ${format} report`,
-          error as Error
+          error as Error,
         );
       }
     }
@@ -565,7 +565,7 @@ export class MigrationTracker {
 
     const reportPath = join(
       session.config.outputDirectory,
-      `migration-report-${session.id}.json`
+      `migration-report-${session.id}.json`,
     );
 
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
@@ -577,7 +577,7 @@ export class MigrationTracker {
    * Generate Markdown report
    */
   private async generateMarkdownReport(
-    session: MigrationSession
+    session: MigrationSession,
   ): Promise<void> {
     const summary = this.getSessionSummary(session.id);
     const records = Array.from(session.records.values());
@@ -608,7 +608,7 @@ export class MigrationTracker {
 
     const reportPath = join(
       session.config.outputDirectory,
-      `migration-report-${session.id}.md`
+      `migration-report-${session.id}.md`,
     );
 
     await fs.writeFile(reportPath, markdown);
@@ -630,7 +630,7 @@ export class MigrationTracker {
 
     const reportPath = join(
       session.config.outputDirectory,
-      `migration-report-${session.id}.csv`
+      `migration-report-${session.id}.csv`,
     );
 
     await fs.writeFile(reportPath, csv);
@@ -695,7 +695,7 @@ export class MigrationTracker {
 
     const reportPath = join(
       session.config.outputDirectory,
-      `migration-report-${session.id}.html`
+      `migration-report-${session.id}.html`,
     );
 
     await fs.writeFile(reportPath, html);

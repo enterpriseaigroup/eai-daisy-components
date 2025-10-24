@@ -171,7 +171,7 @@ describe('BusinessLogicTransformer', () => {
 
       const result = await transformer.transformComponent(
         sampleComponent,
-        options
+        options,
       );
 
       expect(result.success).toBe(true);
@@ -185,12 +185,12 @@ describe('BusinessLogicTransformer', () => {
 
       const result = await transformer.transformComponent(
         sampleComponent,
-        options
+        options,
       );
 
       expect(result.code).toContain('Configurator');
       expect(result.transformations.some(t => t.type === 'structure')).toBe(
-        true
+        true,
       );
     });
 
@@ -265,7 +265,7 @@ describe('BusinessLogicTransformer', () => {
 
       expect(result.component.metadata.lastModified).toBeInstanceOf(Date);
       expect(
-        result.component.metadata.lastModified.getTime()
+        result.component.metadata.lastModified.getTime(),
       ).toBeGreaterThanOrEqual(sampleComponent.metadata.lastModified.getTime());
     });
   });
@@ -351,7 +351,7 @@ describe('BusinessLogicTransformer', () => {
 
       const lines = result.code.split('\n');
       const hasIndentation = lines.some(
-        line => line.startsWith('  ') && line.trim().length > 0
+        line => line.startsWith('  ') && line.trim().length > 0,
       );
       expect(hasIndentation).toBe(true);
     });
@@ -393,11 +393,11 @@ describe('BusinessLogicTransformer', () => {
       };
 
       const result = await transformer.transformComponent(
-        componentWithDaisyImports
+        componentWithDaisyImports,
       );
 
       const importTransformations = result.transformations.filter(
-        t => t.type === 'api'
+        t => t.type === 'api',
       );
       expect(importTransformations.length).toBeGreaterThan(0);
     });
@@ -406,7 +406,7 @@ describe('BusinessLogicTransformer', () => {
       const result = await transformer.transformComponent(sampleComponent);
 
       const hookTransformations = result.transformations.filter(
-        t => t.type === 'hook'
+        t => t.type === 'hook',
       );
       expect(hookTransformations.length).toBeGreaterThan(0);
     });

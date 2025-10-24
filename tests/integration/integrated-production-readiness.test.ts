@@ -28,19 +28,19 @@ describe('Integrated Production Readiness Validation', () => {
     it('should validate that migrated component files exist', async () => {
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       expect(result.checks.fileExists).toBe(true);
       console.log(
-        `File exists check: ${result.checks.fileExists ? '✅' : '❌'}`
+        `File exists check: ${result.checks.fileExists ? '✅' : '❌'}`,
       );
     });
 
     it('should validate component is parseable using real pipeline parser', async () => {
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       expect(result.checks.parseable).toBe(true);
@@ -49,7 +49,7 @@ describe('Integrated Production Readiness Validation', () => {
       if (!result.checks.parseable) {
         console.log(
           'Parse errors:',
-          result.errors.filter(e => e.type === 'parse')
+          result.errors.filter(e => e.type === 'parse'),
         );
       }
     }, 30000); // 30s timeout for parsing
@@ -57,7 +57,7 @@ describe('Integrated Production Readiness Validation', () => {
     it('should validate component compiles without errors', async () => {
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       expect(result.checks.compiles).toBe(true);
@@ -66,10 +66,10 @@ describe('Integrated Production Readiness Validation', () => {
       if (result.parseResult) {
         console.log(`Component type: ${result.parseResult.componentType}`);
         console.log(
-          `Props found: ${result.parseResult.structure?.props.length || 0}`
+          `Props found: ${result.parseResult.structure?.props.length || 0}`,
         );
         console.log(
-          `Hooks found: ${result.parseResult.structure?.hooks.length || 0}`
+          `Hooks found: ${result.parseResult.structure?.hooks.length || 0}`,
         );
       }
     }, 30000);
@@ -85,7 +85,7 @@ describe('Integrated Production Readiness Validation', () => {
       for (const component of components) {
         const result = await migrationValidator.validateMigration(
           component.v2,
-          component.v1
+          component.v1,
         );
 
         results.push({
@@ -113,7 +113,7 @@ describe('Integrated Production Readiness Validation', () => {
         console.log(`    - Compiles: ${r.checks.compiles ? '✅' : '❌'}`);
         console.log(`    - Parseable: ${r.checks.parseable ? '✅' : '❌'}`);
         console.log(
-          `    - Business Logic: ${r.checks.businessLogicPreserved ? '✅' : '❌'}`
+          `    - Business Logic: ${r.checks.businessLogicPreserved ? '✅' : '❌'}`,
         );
       });
 
@@ -126,12 +126,12 @@ describe('Integrated Production Readiness Validation', () => {
     it('should validate business logic is preserved using real analyzer', async () => {
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       console.log('\n=== Business Logic Preservation ===');
       console.log(
-        `Preserved: ${result.checks.businessLogicPreserved ? '✅' : '❌'}`
+        `Preserved: ${result.checks.businessLogicPreserved ? '✅' : '❌'}`,
       );
       console.log('Target: 100%');
 
@@ -152,11 +152,11 @@ describe('Integrated Production Readiness Validation', () => {
       // For our test fixtures, all functions should be present
       const result = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       const businessLogicErrors = result.errors.filter(
-        e => e.type === 'businessLogic'
+        e => e.type === 'businessLogic',
       );
 
       console.log('\n=== Function Preservation ===');
@@ -183,18 +183,18 @@ describe('Integrated Production Readiness Validation', () => {
       console.log('\n=== Throughput Measurement ===');
       console.log(`Total Duration: ${profile.totalDuration.toFixed(2)}ms`);
       console.log(
-        `Components Per Hour: ${profile.throughput.componentsPerHour.toFixed(1)}`
+        `Components Per Hour: ${profile.throughput.componentsPerHour.toFixed(1)}`,
       );
       console.log('Target: ≥10 components/hour');
       console.log(
-        `Status: ${profile.throughput.meetsTarget ? '✅ PASS' : '❌ FAIL'}`
+        `Status: ${profile.throughput.meetsTarget ? '✅ PASS' : '❌ FAIL'}`,
       );
 
       if (profile.phases.length > 0) {
         console.log('\nPhase Breakdown:');
         profile.phases.forEach(phase => {
           console.log(
-            `  ${phase.name}: ${phase.duration.toFixed(2)}ms (${phase.percentage.toFixed(1)}%)`
+            `  ${phase.name}: ${phase.duration.toFixed(2)}ms (${phase.percentage.toFixed(1)}%)`,
           );
         });
       }
@@ -202,10 +202,10 @@ describe('Integrated Production Readiness Validation', () => {
       if (profile.pipelineResult) {
         console.log('\nPipeline Results:');
         console.log(
-          `  Components Discovered: ${profile.pipelineResult.progress.stats.componentsDiscovered}`
+          `  Components Discovered: ${profile.pipelineResult.progress.stats.componentsDiscovered}`,
         );
         console.log(
-          `  Components Parsed: ${profile.pipelineResult.progress.stats.componentsParsed}`
+          `  Components Parsed: ${profile.pipelineResult.progress.stats.componentsParsed}`,
         );
         console.log(`  Errors: ${profile.pipelineResult.errors.length}`);
       }
@@ -224,20 +224,20 @@ describe('Integrated Production Readiness Validation', () => {
       console.log('Step 1: Validating migration...');
       const validationResult = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       console.log(
-        `  File Exists: ${validationResult.checks.fileExists ? '✅' : '❌'}`
+        `  File Exists: ${validationResult.checks.fileExists ? '✅' : '❌'}`,
       );
       console.log(
-        `  Compiles: ${validationResult.checks.compiles ? '✅' : '❌'}`
+        `  Compiles: ${validationResult.checks.compiles ? '✅' : '❌'}`,
       );
       console.log(
-        `  Parseable: ${validationResult.checks.parseable ? '✅' : '❌'}`
+        `  Parseable: ${validationResult.checks.parseable ? '✅' : '❌'}`,
       );
       console.log(
-        `  Business Logic: ${validationResult.checks.businessLogicPreserved ? '✅' : '❌'}`
+        `  Business Logic: ${validationResult.checks.businessLogicPreserved ? '✅' : '❌'}`,
       );
 
       // Step 2: Generate report
@@ -248,7 +248,7 @@ describe('Integrated Production Readiness Validation', () => {
       // Step 3: Check overall success
       console.log('\nStep 3: Overall validation result...');
       console.log(
-        `  Status: ${validationResult.success ? '✅ PASSED' : '❌ FAILED'}`
+        `  Status: ${validationResult.success ? '✅ PASSED' : '❌ FAILED'}`,
       );
       console.log(`  Total Errors: ${validationResult.errors.length}`);
       console.log(`  Total Warnings: ${validationResult.warnings.length}`);
@@ -274,7 +274,7 @@ describe('Integrated Production Readiness Validation', () => {
       // Validate migration
       const validation = await migrationValidator.validateMigration(
         v2ButtonPath,
-        v1ButtonPath
+        v1ButtonPath,
       );
 
       const successRate = validation.success ? 100 : 0;
@@ -283,10 +283,10 @@ describe('Integrated Production Readiness Validation', () => {
       console.log('| Metric                    | Target  | Actual | Status |');
       console.log('|---------------------------|---------|--------|--------|');
       console.log(
-        `| Migration Success Rate    | ≥95%    | ${successRate}%  | ${successRate >= 95 ? '✅' : '❌'}    |`
+        `| Migration Success Rate    | ≥95%    | ${successRate}%  | ${successRate >= 95 ? '✅' : '❌'}    |`,
       );
       console.log(
-        `| Business Logic Preserved  | 100%    | ${businessLogicPreserved ? '100%' : '0%'}   | ${businessLogicPreserved ? '✅' : '❌'}    |`
+        `| Business Logic Preserved  | 100%    | ${businessLogicPreserved ? '100%' : '0%'}   | ${businessLogicPreserved ? '✅' : '❌'}    |`,
       );
 
       console.log('\n========================================\n');
@@ -302,10 +302,10 @@ describe('Integrated Production Readiness Validation', () => {
         console.log(`  Methods: ${structure.methods.length}`);
         console.log(`  Hooks: ${structure.hooks.length}`);
         console.log(
-          `  Imports (External): ${structure.imports.external.length}`
+          `  Imports (External): ${structure.imports.external.length}`,
         );
         console.log(
-          `  Imports (Internal): ${structure.imports.internal.length}`
+          `  Imports (Internal): ${structure.imports.internal.length}`,
         );
       }
 
@@ -314,7 +314,7 @@ describe('Integrated Production Readiness Validation', () => {
 
       console.log('\n========================================');
       console.log(
-        `  OVERALL: ${allMetricsPassed ? '✅ PRODUCTION READY' : '❌ NOT READY'}`
+        `  OVERALL: ${allMetricsPassed ? '✅ PRODUCTION READY' : '❌ NOT READY'}`,
       );
       console.log('========================================\n');
 

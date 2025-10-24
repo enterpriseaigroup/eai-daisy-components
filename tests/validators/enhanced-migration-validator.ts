@@ -72,7 +72,7 @@ export class EnhancedMigrationValidator {
    */
   public async validateMigration(
     componentPath: string,
-    originalPath: string
+    originalPath: string,
   ): Promise<ValidationResult> {
     const componentName = path.basename(componentPath, '.tsx');
     const errors: ValidationError[] = [];
@@ -111,7 +111,7 @@ export class EnhancedMigrationValidator {
     const businessLogicPreserved = await this.validateBusinessLogic(
       componentPath,
       originalPath,
-      errors
+      errors,
     );
 
     return {
@@ -145,7 +145,7 @@ export class EnhancedMigrationValidator {
    */
   private async validateCompilation(
     componentPath: string,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): Promise<boolean> {
     try {
       // Read the component file
@@ -163,12 +163,12 @@ export class EnhancedMigrationValidator {
           const file = diagnostic.file;
           const message = ts.flattenDiagnosticMessageText(
             diagnostic.messageText,
-            '\n'
+            '\n',
           );
 
           if (file && diagnostic.start !== undefined) {
             const { line, character } = file.getLineAndCharacterOfPosition(
-              diagnostic.start
+              diagnostic.start,
             );
             errors.push({
               type: 'compilation',
@@ -201,7 +201,7 @@ export class EnhancedMigrationValidator {
    */
   private async validateTypes(
     componentPath: string,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): Promise<boolean> {
     try {
       // Use TypeScript compiler API to check types
@@ -244,14 +244,14 @@ export class EnhancedMigrationValidator {
           // Check function return types are explicit
           if (ts.isFunctionDeclaration(node) || ts.isArrowFunction(node)) {
             const signature = typeChecker.getSignatureFromDeclaration(
-              node as any
+              node as any,
             );
             if (signature) {
               const returnType =
                 typeChecker.getReturnTypeOfSignature(signature);
               if (!returnType || returnType.flags & ts.TypeFlags.Any) {
                 const { line } = sourceFile.getLineAndCharacterOfPosition(
-                  node.getStart()
+                  node.getStart(),
                 );
                 errors.push({
                   type: 'type',
@@ -286,7 +286,7 @@ export class EnhancedMigrationValidator {
    */
   private async runComponentTests(
     componentPath: string,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): Promise<boolean> {
     try {
       // Look for corresponding test file
@@ -304,7 +304,7 @@ export class EnhancedMigrationValidator {
       // Run the test
       const { stdout, stderr } = await execAsync(
         `npx jest ${testPath} --no-coverage --silent`,
-        { cwd: process.cwd() }
+        { cwd: process.cwd() },
       );
 
       // Parse test results
@@ -331,11 +331,11 @@ export class EnhancedMigrationValidator {
    */
   private async createBasicTest(
     componentPath: string,
-    testPath: string
+    testPath: string,
   ): Promise<void> {
     const componentName = path.basename(
       componentPath,
-      path.extname(componentPath)
+      path.extname(componentPath),
     );
 
     const testContent = `
@@ -382,7 +382,7 @@ describe('${componentName}', () => {
       const testPath = componentPath.replace(/\.tsx?$/, '.test.tsx');
       const { stdout } = await execAsync(
         `npx jest ${testPath} --json --no-coverage --silent`,
-        { cwd: process.cwd() }
+        { cwd: process.cwd() },
       );
 
       const results = JSON.parse(stdout);
@@ -464,7 +464,7 @@ module.exports = {
    */
   private async validateRuntime(
     componentPath: string,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): Promise<boolean> {
     try {
       // This would run the component in a headless browser
@@ -508,7 +508,7 @@ module.exports = {
   private async validateBusinessLogic(
     migratedPath: string,
     originalPath: string,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): Promise<boolean> {
     try {
       // Parse both files

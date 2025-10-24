@@ -16,7 +16,7 @@ import type { ComponentDefinition } from '@/types';
  */
 export async function generateStorybookStories(
   component: ComponentDefinition,
-  outputDir: string
+  outputDir: string,
 ): Promise<string> {
   const storyPath = join(outputDir, `${component.name}.stories.tsx`);
 

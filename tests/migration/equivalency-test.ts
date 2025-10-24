@@ -25,13 +25,13 @@ export interface EquivalencyTestCase {
 }
 
 export async function runEquivalencyTests(
-  test: ComponentEquivalencyTest
+  test: ComponentEquivalencyTest,
 ): Promise<void> {
   describe(`${test.name} - Equivalency Tests`, () => {
     it('should have equivalent props', async () => {
       const result = await testComponentEquivalency(
         test.v1Component,
-        test.v2Component
+        test.v2Component,
       );
 
       expect(result.details.propsMatch).toBe(true);
@@ -40,7 +40,7 @@ export async function runEquivalencyTests(
     it('should have equivalent behavior', async () => {
       const result = await testComponentEquivalency(
         test.v1Component,
-        test.v2Component
+        test.v2Component,
       );
 
       expect(result.details.behaviorMatch).toBe(true);
@@ -49,7 +49,7 @@ export async function runEquivalencyTests(
     it('should pass equivalency score threshold', async () => {
       const result = await testComponentEquivalency(
         test.v1Component,
-        test.v2Component
+        test.v2Component,
       );
 
       expect(result.score).toBeGreaterThanOrEqual(80);
@@ -62,7 +62,7 @@ export async function runEquivalencyTests(
         const result = await testComponentEquivalency(
           test.v1Component,
           test.v2Component,
-          testCase.props
+          testCase.props,
         );
 
         expect(result.equivalent).toBe(true);
@@ -75,7 +75,7 @@ export function createEquivalencyTest(
   name: string,
   v1Component: ComponentDefinition,
   v2Component: ComponentDefinition,
-  testCases: EquivalencyTestCase[] = []
+  testCases: EquivalencyTestCase[] = [],
 ): ComponentEquivalencyTest {
   return {
     name,

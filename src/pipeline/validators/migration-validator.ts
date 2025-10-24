@@ -33,7 +33,7 @@ export class MigrationValidator {
   public validate(
     component: ComponentDefinition,
     transformation: TransformationResult,
-    generation: GenerationResult
+    generation: GenerationResult,
   ): Promise<MigrationValidationResult> {
     return Promise.resolve().then(() => {
       this.logger.debug(`Validating migration: ${component.name}`);
@@ -63,7 +63,7 @@ export class MigrationValidator {
         transformation,
         generation,
         errors,
-        warnings
+        warnings,
       );
 
       return {
@@ -83,7 +83,7 @@ export class MigrationValidator {
     transformation: TransformationResult,
     _generation: GenerationResult,
     errors: ValidationResult['errors'],
-    warnings: ValidationResult['warnings']
+    warnings: ValidationResult['warnings'],
   ): number {
     let score = 100;
 
@@ -103,7 +103,7 @@ export class MigrationValidator {
 }
 
 export function createMigrationValidator(
-  config: ExtractionConfig
+  config: ExtractionConfig,
 ): MigrationValidator {
   return new MigrationValidator(config);
 }

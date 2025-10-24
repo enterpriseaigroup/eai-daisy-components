@@ -108,7 +108,7 @@ describe('Type Definitions', () => {
 
       hookPatterns.forEach(pattern => {
         expect(pattern.startsWith('use') || pattern.includes('hook')).toBe(
-          true
+          true,
         );
       });
     });

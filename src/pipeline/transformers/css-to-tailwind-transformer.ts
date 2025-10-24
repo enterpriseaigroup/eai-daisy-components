@@ -83,7 +83,7 @@ export class CSSToTailwindTransformer {
    */
   public async transform(
     componentCode: string,
-    componentPath: string
+    componentPath: string,
   ): Promise<CSSToTailwindResult> {
     this.logger.info(`Transforming CSS to Tailwind for: ${componentPath}`);
 
@@ -115,7 +115,7 @@ export class CSSToTailwindTransformer {
       if (cssAnalysis.length < cssImports.length) {
         result.success = false;
         result.warnings.push(
-          `Failed to process ${cssImports.length - cssAnalysis.length} CSS file(s)`
+          `Failed to process ${cssImports.length - cssAnalysis.length} CSS file(s)`,
         );
         return result;
       }
@@ -127,7 +127,7 @@ export class CSSToTailwindTransformer {
       let transformedCode = componentCode;
       transformedCode = this.replaceClassNames(
         transformedCode,
-        classNameMappings
+        classNameMappings,
       );
 
       // Step 5: Remove CSS imports
@@ -142,13 +142,13 @@ export class CSSToTailwindTransformer {
       result.success = true;
 
       this.logger.info(
-        `Successfully transformed ${cssImports.length} CSS imports to Tailwind`
+        `Successfully transformed ${cssImports.length} CSS imports to Tailwind`,
       );
     } catch (error) {
       const errorObj = error instanceof Error ? error : undefined;
       this.logger.error('CSS to Tailwind transformation failed', errorObj);
       result.warnings.push(
-        `Transformation failed: ${error instanceof Error ? error.message : String(error)}`
+        `Transformation failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
@@ -216,7 +216,7 @@ export class CSSToTailwindTransformer {
    */
   private async analyzeCSSFiles(
     imports: CSSImport[],
-    componentPath: string
+    componentPath: string,
   ): Promise<CSSFileAnalysis[]> {
     const analyses: CSSFileAnalysis[] = [];
 
@@ -228,7 +228,7 @@ export class CSSToTailwindTransformer {
         const analysis = this.analyzeCSSContent(
           cssContent,
           cssPath,
-          cssImport.type
+          cssImport.type,
         );
         analyses.push(analysis);
       } catch (error) {
@@ -245,7 +245,7 @@ export class CSSToTailwindTransformer {
   private analyzeCSSContent(
     cssContent: string,
     filePath: string,
-    importType: 'direct' | 'module' | 'named'
+    importType: 'direct' | 'module' | 'named',
   ): CSSFileAnalysis {
     const conversions: CSSConversion[] = [];
 
@@ -308,7 +308,7 @@ export class CSSToTailwindTransformer {
    */
   private mapCSSPropertyToTailwind(
     property: string,
-    value: string
+    value: string,
   ): string | null {
     // Common mappings
     const mappings: Record<string, (val: string) => string | null> = {
@@ -517,7 +517,7 @@ export class CSSToTailwindTransformer {
    * Build className mappings from CSS analysis
    */
   private buildClassNameMappings(
-    analyses: CSSFileAnalysis[]
+    analyses: CSSFileAnalysis[],
   ): Record<string, string> {
     const mappings: Record<string, string> = {};
 
@@ -535,7 +535,7 @@ export class CSSToTailwindTransformer {
    */
   private replaceClassNames(
     code: string,
-    mappings: Record<string, string>
+    mappings: Record<string, string>,
   ): string {
     let result = code;
 
@@ -554,12 +554,12 @@ export class CSSToTailwindTransformer {
         {
           pattern: new RegExp(
             `className=["']([^"']*\\s)?${escapedClass}(\\s[^"']*)?["']`,
-            'g'
+            'g',
           ),
           replacement: (
             _match: string,
             before: string = '',
-            after: string = ''
+            after: string = '',
           ) => {
             const before_trimmed = before.trim();
             const after_trimmed = after.trim();
@@ -580,7 +580,7 @@ export class CSSToTailwindTransformer {
         {
           pattern: new RegExp(
             'className=\\{`' + escapedClass + '([\\s\\$][^`]*)?`\\}',
-            'g'
+            'g',
           ),
           replacement: (_match: string, after: string = '') => {
             if (after && after.trim()) {
@@ -593,7 +593,7 @@ export class CSSToTailwindTransformer {
         {
           pattern: new RegExp(
             `className=\\{styles\\['${escapedClass}'\\]\\}`,
-            'g'
+            'g',
           ),
           replacement: `className="${tailwindClasses}"`,
         },
@@ -601,7 +601,7 @@ export class CSSToTailwindTransformer {
         {
           pattern: new RegExp(
             `className=\\{styles\\.${escapedCamelCase}\\}`,
-            'g'
+            'g',
           ),
           replacement: `className="${tailwindClasses}"`,
         },
@@ -609,7 +609,7 @@ export class CSSToTailwindTransformer {
         {
           pattern: new RegExp(
             'className=\\{`\\$\\{styles\\.' + escapedCamelCase + '\\}`\\}',
-            'g'
+            'g',
           ),
           replacement: `className="${tailwindClasses}"`,
         },
@@ -619,12 +619,12 @@ export class CSSToTailwindTransformer {
             'className=\\{`([^`]*\\s)?\\$\\{styles\\.' +
               escapedCamelCase +
               '\\}(\\s[^`]*)?`\\}',
-            'g'
+            'g',
           ),
           replacement: (
             _match: string,
             before: string = '',
-            after: string = ''
+            after: string = '',
           ) => {
             const before_trimmed = before.trim();
             const after_trimmed = after.trim();
@@ -642,7 +642,7 @@ export class CSSToTailwindTransformer {
         if (typeof replacement === 'function') {
           result = result.replace(
             pattern,
-            replacement as (...args: string[]) => string
+            replacement as (...args: string[]) => string,
           );
         } else {
           result = result.replace(pattern, replacement);
@@ -663,7 +663,7 @@ export class CSSToTailwindTransformer {
       // Remove the entire import line
       result = result.replace(
         new RegExp(`^.*${this.escapeRegex(cssImport.statement)}.*$`, 'gm'),
-        ''
+        '',
       );
     }
 
@@ -699,7 +699,7 @@ export class CSSToTailwindTransformer {
    */
   private calculateConfidence(
     cssRules: string,
-    tailwindClasses: string
+    tailwindClasses: string,
   ): number {
     const ruleCount = cssRules.split(';').filter(r => r.trim()).length;
     const classCount = tailwindClasses.split(' ').filter(c => c.trim()).length;
@@ -746,7 +746,7 @@ interface CSSFileAnalysis {
  */
 export function createCSSToTailwindTransformer(
   options?: Partial<CSSToTailwindOptions>,
-  logger?: Logger
+  logger?: Logger,
 ): CSSToTailwindTransformer {
   return new CSSToTailwindTransformer(options, logger);
 }

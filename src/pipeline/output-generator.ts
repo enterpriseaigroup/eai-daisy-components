@@ -341,7 +341,7 @@ export class OutputGenerator {
       additionalFiles: { [key: string]: string };
       metadata: any; // @any-allowed: flexible metadata structure
     }>,
-    config: OutputGenerationConfig
+    config: OutputGenerationConfig,
   ): Promise<OutputGenerationResult> {
     const startTime = Date.now();
 
@@ -372,7 +372,7 @@ export class OutputGenerator {
               error instanceof Error ? error.message : 'Unknown error',
           });
           warnings.push(
-            `Failed to process ${result.component.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+            `Failed to process ${result.component.name}: ${error instanceof Error ? error.message : 'Unknown error'}`,
           );
         }
       }
@@ -381,7 +381,7 @@ export class OutputGenerator {
       if (config.generateIndexFiles) {
         const indexFiles = await this.generateIndexFiles(
           generatedFiles,
-          config
+          config,
         );
         generatedFiles.push(...indexFiles);
       }
@@ -397,7 +397,7 @@ export class OutputGenerator {
         transformationResults.length,
         successCount,
         generatedFiles,
-        startTime
+        startTime,
       );
 
       const result: OutputGenerationResult = {
@@ -435,7 +435,7 @@ export class OutputGenerator {
       additionalFiles: { [key: string]: string };
       metadata: any; // @any-allowed: flexible metadata structure
     },
-    config: OutputGenerationConfig
+    config: OutputGenerationConfig,
   ): Promise<GeneratedFileInfo[]> {
     const generatedFiles: GeneratedFileInfo[] = [];
     const { component, transformedCode, additionalFiles, metadata } = result;
@@ -448,7 +448,7 @@ export class OutputGenerator {
       transformedCode,
       outputPaths.component,
       'component',
-      config
+      config,
     );
     generatedFiles.push(mainFile);
 
@@ -463,7 +463,7 @@ export class OutputGenerator {
           content,
           outputPath,
           fileType as any,
-          config
+          config,
         );
         generatedFiles.push(additionalFile);
       }
@@ -473,13 +473,13 @@ export class OutputGenerator {
     if (config.includeMetadata) {
       const metadataPath = join(
         dirname(outputPaths.component),
-        `${component.name}.meta.json`
+        `${component.name}.meta.json`,
       );
       const metadataFile = await this.generateFile(
         JSON.stringify(metadata, null, 2),
         metadataPath,
         'metadata',
-        config
+        config,
       );
       generatedFiles.push(metadataFile);
     }
@@ -494,7 +494,7 @@ export class OutputGenerator {
     content: string,
     outputPath: string,
     type: GeneratedFileInfo['type'],
-    config: OutputGenerationConfig
+    config: OutputGenerationConfig,
   ): Promise<GeneratedFileInfo> {
     // Ensure output directory exists
     await fs.mkdir(dirname(outputPath), { recursive: true });
@@ -522,7 +522,7 @@ export class OutputGenerator {
       sourceMapPath = await this.generateSourceMap(
         content,
         formattedContent,
-        outputPath
+        outputPath,
       );
     }
 
@@ -553,7 +553,7 @@ export class OutputGenerator {
    */
   private determineOutputPaths(
     component: ComponentDefinition,
-    config: OutputGenerationConfig
+    config: OutputGenerationConfig,
   ): {
     component: string;
     test: string;
@@ -563,7 +563,7 @@ export class OutputGenerator {
   } {
     const baseName = this.applyNamingStrategy(
       component.name,
-      config.namingStrategy
+      config.namingStrategy,
     );
     const baseDir =
       config.preserveStructure && component.sourcePath
@@ -584,7 +584,7 @@ export class OutputGenerator {
    */
   private applyNamingStrategy(
     name: string,
-    strategy: OutputGenerationConfig['namingStrategy']
+    strategy: OutputGenerationConfig['namingStrategy'],
   ): string {
     switch (strategy) {
       case 'kebab-case':
@@ -607,7 +607,7 @@ export class OutputGenerator {
    */
   private async formatContent(
     content: string,
-    extension: string
+    extension: string,
   ): Promise<string> {
     const formatter = this.formatters.get(extension);
     if (formatter) {
@@ -621,7 +621,7 @@ export class OutputGenerator {
    */
   private async validateOutput(
     generatedFiles: GeneratedFileInfo[],
-    config: OutputGenerationConfig
+    config: OutputGenerationConfig,
   ): Promise<ValidationResults> {
     if (config.validationLevel === 'none') {
       return this.createEmptyValidationResult();
@@ -680,7 +680,7 @@ export class OutputGenerator {
           content
             .replace(/;\s*}/g, ';\n}')
             .replace(/{\s*/g, '{\n  ')
-            .replace(/\s*}/g, '\n}')
+            .replace(/\s*}/g, '\n}'),
         );
       },
       validator: (_content: string) => {
@@ -745,7 +745,7 @@ export class OutputGenerator {
 
       if (content.match(/\bany\b/)) {
         syntaxErrors.push(
-          'Usage of "any" type detected - consider specific types'
+          'Usage of "any" type detected - consider specific types',
         );
       }
 
@@ -763,14 +763,14 @@ export class OutputGenerator {
 
   // Placeholder methods for future enhancement
   private async prepareOutputEnvironment(
-    _config: OutputGenerationConfig
+    _config: OutputGenerationConfig,
   ): Promise<void> {
     // Implementation placeholder
   }
 
   private generateIndexFiles(
     _files: GeneratedFileInfo[],
-    _config: OutputGenerationConfig
+    _config: OutputGenerationConfig,
   ): Promise<GeneratedFileInfo[]> {
     return Promise.resolve([]);
   }
@@ -782,7 +782,7 @@ export class OutputGenerator {
   private generateSourceMap(
     _original: string,
     _transformed: string,
-    _outputPath: string
+    _outputPath: string,
   ): Promise<string> {
     // Implementation placeholder
     return Promise.resolve('');
@@ -801,7 +801,7 @@ export class OutputGenerator {
 
   private compressFile(
     _filePath: string,
-    _compressionConfig: OutputGenerationConfig['compression']
+    _compressionConfig: OutputGenerationConfig['compression'],
   ): Promise<GeneratedFileInfo['compression']> {
     // Implementation placeholder
     return Promise.resolve({
@@ -814,7 +814,7 @@ export class OutputGenerator {
 
   private calculateMetrics(
     files: GeneratedFileInfo[],
-    startTime: number
+    startTime: number,
   ): OutputGenerationMetrics {
     const totalDuration = Date.now() - startTime;
     const totalOutputSize = files.reduce((sum, file) => sum + file.size, 0);
@@ -838,7 +838,7 @@ export class OutputGenerator {
     totalComponents: number,
     successCount: number,
     generatedFiles: GeneratedFileInfo[],
-    startTime: number
+    startTime: number,
   ): GenerationSummary {
     const endTime = new Date();
     const successRate =
@@ -864,7 +864,7 @@ export class OutputGenerator {
 
   private createErrorResult(
     startTime: number,
-    error: unknown
+    error: unknown,
   ): OutputGenerationResult {
     return {
       success: false,
@@ -932,7 +932,7 @@ export class OutputGenerator {
 
   private validateFile(
     _file: GeneratedFileInfo,
-    _level: OutputGenerationConfig['validationLevel']
+    _level: OutputGenerationConfig['validationLevel'],
   ): Promise<FileValidationResult> {
     // Implementation placeholder
     return Promise.resolve({
@@ -946,7 +946,7 @@ export class OutputGenerator {
   }
 
   private performCrossFileValidation(
-    _files: GeneratedFileInfo[]
+    _files: GeneratedFileInfo[],
   ): Promise<CrossFileValidationResult> {
     // Implementation placeholder
     return Promise.resolve({
@@ -959,7 +959,7 @@ export class OutputGenerator {
   }
 
   private validateDependencies(
-    _files: GeneratedFileInfo[]
+    _files: GeneratedFileInfo[],
   ): Promise<DependencyValidationResult> {
     // Implementation placeholder
     return Promise.resolve({
@@ -971,7 +971,7 @@ export class OutputGenerator {
   }
 
   private validateTypeSafety(
-    _files: GeneratedFileInfo[]
+    _files: GeneratedFileInfo[],
   ): Promise<TypeSafetyValidationResult> {
     // Implementation placeholder
     return Promise.resolve({

@@ -54,7 +54,7 @@ export class EquivalencyTester {
   public async testEquivalency(
     v1Component: ComponentDefinition,
     v2Component: ComponentDefinition,
-    testProps: Record<string, unknown>
+    testProps: Record<string, unknown>,
   ): Promise<EquivalencyTestResult> {
     const differences: Difference[] = [];
 
@@ -62,7 +62,7 @@ export class EquivalencyTester {
     const behaviorMatch = this.compareBehavior(
       v1Component,
       v2Component,
-      differences
+      differences,
     );
     const renderMatch = true;
     const stateMatch = true;
@@ -70,7 +70,7 @@ export class EquivalencyTester {
 
     const equivalent =
       differences.filter(
-        d => d.severity === 'critical' || d.severity === 'high'
+        d => d.severity === 'critical' || d.severity === 'high',
       ).length === 0;
     const score = this.calculateScore(differences);
 
@@ -91,7 +91,7 @@ export class EquivalencyTester {
   private compareProps(
     v1Component: ComponentDefinition,
     v2Component: ComponentDefinition,
-    differences: Difference[]
+    differences: Difference[],
   ): boolean {
     let match = true;
 
@@ -112,7 +112,7 @@ export class EquivalencyTester {
   private compareBehavior(
     v1Component: ComponentDefinition,
     v2Component: ComponentDefinition,
-    differences: Difference[]
+    differences: Difference[],
   ): boolean {
     let match = true;
 
@@ -155,7 +155,7 @@ export class EquivalencyTester {
 }
 
 export function createEquivalencyTester(
-  config?: EquivalencyTestConfig
+  config?: EquivalencyTestConfig,
 ): EquivalencyTester {
   return new EquivalencyTester(config);
 }
@@ -163,7 +163,7 @@ export function createEquivalencyTester(
 export async function testComponentEquivalency(
   v1Component: ComponentDefinition,
   v2Component: ComponentDefinition,
-  testProps: Record<string, unknown> = {}
+  testProps: Record<string, unknown> = {},
 ): Promise<EquivalencyTestResult> {
   const tester = createEquivalencyTester();
   return tester.testEquivalency(v1Component, v2Component, testProps);

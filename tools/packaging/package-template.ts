@@ -123,7 +123,7 @@ export class PackageTemplateGenerator {
    */
   public generateTemplate(
     component: ComponentDefinition,
-    options: Partial<PackageGenerationOptions> = {}
+    options: Partial<PackageGenerationOptions> = {},
   ): PackageTemplate {
     const opts = { ...this.defaultOptions, ...options };
     const packageName = this.generatePackageName(component, opts.scope);
@@ -160,7 +160,7 @@ export class PackageTemplateGenerator {
    */
   private generatePackageName(
     component: ComponentDefinition,
-    scope?: string
+    scope?: string,
   ): string {
     const baseName = component.name
       .replace(/([A-Z])/g, '-$1')
@@ -222,7 +222,7 @@ export class PackageTemplateGenerator {
    */
   private generateRepositoryInfo(
     component: ComponentDefinition,
-    repositoryUrl: string
+    repositoryUrl: string,
   ): RepositoryInfo {
     return {
       type: 'git',
@@ -236,7 +236,7 @@ export class PackageTemplateGenerator {
    */
   private generatePeerDependencies(
     component: ComponentDefinition,
-    options: Required<PackageGenerationOptions>
+    options: Required<PackageGenerationOptions>,
   ): Record<string, string> {
     const peerDeps: Record<string, string> = {
       react: '^18.0.0',
@@ -263,7 +263,7 @@ export class PackageTemplateGenerator {
    */
   private generateDependencies(
     component: ComponentDefinition,
-    options: Required<PackageGenerationOptions>
+    options: Required<PackageGenerationOptions>,
   ): Record<string, string> {
     const deps: Record<string, string> = {
       ...options.customDependencies,
@@ -311,7 +311,7 @@ export class PackageTemplateGenerator {
       bl =>
         bl.name.toLowerCase().includes('effect') ||
         bl.name.toLowerCase().includes('fetch') ||
-        bl.externalDependencies.length > 0
+        bl.externalDependencies.length > 0,
     );
 
     return hasSideEffects;
@@ -337,7 +337,7 @@ export class PackageTemplateGenerator {
    */
   public generatePackageJson(
     component: ComponentDefinition,
-    options: Partial<PackageGenerationOptions> = {}
+    options: Partial<PackageGenerationOptions> = {},
   ): string {
     const template = this.generateTemplate(component, options);
     return JSON.stringify(template, null, 2);
@@ -352,7 +352,7 @@ export class PackageTemplateGenerator {
  * Create package template generator
  */
 export function createPackageTemplateGenerator(
-  options?: PackageGenerationOptions
+  options?: PackageGenerationOptions,
 ): PackageTemplateGenerator {
   return new PackageTemplateGenerator(options);
 }
@@ -362,7 +362,7 @@ export function createPackageTemplateGenerator(
  */
 export function generatePackageTemplate(
   component: ComponentDefinition,
-  options?: PackageGenerationOptions
+  options?: PackageGenerationOptions,
 ): PackageTemplate {
   const generator = createPackageTemplateGenerator(options);
   return generator.generateTemplate(component);
@@ -373,7 +373,7 @@ export function generatePackageTemplate(
  */
 export function generatePackageJson(
   component: ComponentDefinition,
-  options?: PackageGenerationOptions
+  options?: PackageGenerationOptions,
 ): string {
   const generator = createPackageTemplateGenerator(options);
   return generator.generatePackageJson(component);

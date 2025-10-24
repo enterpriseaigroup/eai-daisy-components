@@ -190,7 +190,7 @@ export class FileSystemManager {
    */
   public async scanDirectory(
     directoryPath: string,
-    options: ScanOptions = {}
+    options: ScanOptions = {},
   ): Promise<DirectoryScanResult> {
     const startTime = Date.now();
     const resolvedPath = resolve(directoryPath);
@@ -270,7 +270,7 @@ export class FileSystemManager {
     } catch (error) {
       throw new FileSystemError(
         `Failed to scan directory: ${resolvedPath}`,
-        error as Error
+        error as Error,
       );
     }
   }
@@ -318,7 +318,7 @@ export class FileSystemManager {
     } catch (error) {
       throw new FileSystemError(
         `Failed to get file info for: ${filePath}`,
-        error as Error
+        error as Error,
       );
     }
   }
@@ -332,7 +332,7 @@ export class FileSystemManager {
    */
   public async readFile(
     filePath: string,
-    encoding: BufferEncoding = 'utf-8'
+    encoding: BufferEncoding = 'utf-8',
   ): Promise<string> {
     try {
       const resolvedPath = resolve(filePath);
@@ -341,7 +341,7 @@ export class FileSystemManager {
     } catch (error) {
       throw new FileSystemError(
         `Failed to read file: ${filePath}`,
-        error as Error
+        error as Error,
       );
     }
   }
@@ -356,7 +356,7 @@ export class FileSystemManager {
   public async writeFile(
     filePath: string,
     content: string,
-    options: FileOperationOptions = {}
+    options: FileOperationOptions = {},
   ): Promise<void> {
     try {
       const resolvedPath = resolve(filePath);
@@ -379,7 +379,7 @@ export class FileSystemManager {
           await fs.access(resolvedPath);
           throw new FileSystemError(
             `File already exists and overwrite is disabled: ${filePath}`,
-            new Error('File exists')
+            new Error('File exists'),
           );
         } catch (error) {
           if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -409,7 +409,7 @@ export class FileSystemManager {
     } catch (error) {
       throw new FileSystemError(
         `Failed to write file: ${filePath}`,
-        error as Error
+        error as Error,
       );
     }
   }
@@ -424,7 +424,7 @@ export class FileSystemManager {
   public async copyFile(
     sourcePath: string,
     destinationPath: string,
-    options: FileOperationOptions = {}
+    options: FileOperationOptions = {},
   ): Promise<void> {
     try {
       const resolvedSource = resolve(sourcePath);
@@ -442,7 +442,7 @@ export class FileSystemManager {
           await fs.access(resolvedDestination);
           throw new FileSystemError(
             `Destination file exists and overwrite is disabled: ${destinationPath}`,
-            new Error('File exists')
+            new Error('File exists'),
           );
         } catch (error) {
           if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -455,7 +455,7 @@ export class FileSystemManager {
     } catch (error) {
       throw new FileSystemError(
         `Failed to copy file from ${sourcePath} to ${destinationPath}`,
-        error as Error
+        error as Error,
       );
     }
   }
@@ -468,7 +468,7 @@ export class FileSystemManager {
    */
   public async createDirectory(
     directoryPath: string,
-    mode: number = 0o755
+    mode: number = 0o755,
   ): Promise<void> {
     try {
       const resolvedPath = resolve(directoryPath);
@@ -476,7 +476,7 @@ export class FileSystemManager {
     } catch (error) {
       throw new FileSystemError(
         `Failed to create directory: ${directoryPath}`,
-        error as Error
+        error as Error,
       );
     }
   }
@@ -503,7 +503,7 @@ export class FileSystemManager {
    * @returns Enhanced component file info
    */
   private async analyzeComponentFile(
-    fileInfo: FileInfo
+    fileInfo: FileInfo,
   ): Promise<ComponentFileInfo> {
     try {
       const content = await this.readFile(fileInfo.path);
@@ -601,7 +601,7 @@ export class FileSystemManager {
   private extractComponentName(fileName: string, content: string): string {
     // Try to extract from export statements
     const exportMatches = content.match(
-      /export\s+(?:default\s+)?(?:const|function|class)\s+([A-Z][a-zA-Z0-9]*)/
+      /export\s+(?:default\s+)?(?:const|function|class)\s+([A-Z][a-zA-Z0-9]*)/,
     );
     if (exportMatches?.[1]) {
       return exportMatches[1];
@@ -619,7 +619,7 @@ export class FileSystemManager {
    * @returns Estimated complexity level
    */
   private estimateComplexity(
-    content: string
+    content: string,
   ): 'simple' | 'moderate' | 'complex' {
     const lines = content.split('\n').length;
     const hooks = (content.match(/use[A-Z][a-zA-Z]*/g) || []).length;
@@ -663,7 +663,7 @@ export class FileSystemManager {
     } catch (error) {
       throw new FileSystemError(
         `Directory access validation failed: ${directoryPath}`,
-        error as Error
+        error as Error,
       );
     }
   }
@@ -676,14 +676,14 @@ export class FileSystemManager {
    */
   private async validateFileAccess(
     filePath: string,
-    mode: number
+    mode: number,
   ): Promise<void> {
     try {
       await fs.access(filePath, mode);
     } catch (error) {
       throw new FileSystemError(
         `File access validation failed: ${filePath}`,
-        error as Error
+        error as Error,
       );
     }
   }
@@ -736,7 +736,7 @@ export function createFileSystemManager(): FileSystemManager {
  * @returns Scan result
  */
 export async function quickScan(
-  directoryPath: string
+  directoryPath: string,
 ): Promise<DirectoryScanResult> {
   const manager = createFileSystemManager();
   return manager.scanDirectory(directoryPath);
@@ -751,7 +751,7 @@ export async function quickScan(
  */
 export async function findComponentFiles(
   directoryPath: string,
-  recursive: boolean = true
+  recursive: boolean = true,
 ): Promise<ComponentFileInfo[]> {
   const manager = createFileSystemManager();
   const result = await manager.scanDirectory(directoryPath, { recursive });

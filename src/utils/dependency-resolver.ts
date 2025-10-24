@@ -39,7 +39,7 @@ export class DependencyResolver {
    * Resolve component dependencies and return migration order
    */
   public resolve(
-    components: ComponentDefinition[]
+    components: ComponentDefinition[],
   ): DependencyResolutionResult {
     // Build dependency graph
     this.buildGraph(components);
@@ -237,7 +237,7 @@ export class DependencyResolver {
  * Resolve dependencies for a list of components
  */
 export function resolveDependencies(
-  components: ComponentDefinition[]
+  components: ComponentDefinition[],
 ): DependencyResolutionResult {
   const resolver = new DependencyResolver();
   return resolver.resolve(components);

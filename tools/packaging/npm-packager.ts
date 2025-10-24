@@ -98,7 +98,7 @@ export class NPMPackager {
    */
   public async generatePackage(
     component: ComponentDefinition,
-    sourceDir: string
+    sourceDir: string,
   ): Promise<PackageGenerationResult> {
     const startTime = Date.now();
     const errors: Error[] = [];
@@ -114,14 +114,14 @@ export class NPMPackager {
       // Generate package.json
       const packageJsonPath = await this.generatePackageJson(
         component,
-        packageDir
+        packageDir,
       );
       generatedFiles.push(packageJsonPath);
 
       // Copy component files
       const componentFiles = await this.copyComponentFiles(
         sourceDir,
-        packageDir
+        packageDir,
       );
       generatedFiles.push(...componentFiles);
 
@@ -144,7 +144,7 @@ export class NPMPackager {
           generatedFiles.push(typesPath);
         } catch (error) {
           warnings.push(
-            `Failed to generate types: ${(error as Error).message}`
+            `Failed to generate types: ${(error as Error).message}`,
           );
         }
       }
@@ -171,7 +171,7 @@ export class NPMPackager {
     } catch (error) {
       this.logger.error(
         `Package generation failed: ${component.name}`,
-        error as Error
+        error as Error,
       );
 
       return {
@@ -189,7 +189,7 @@ export class NPMPackager {
    * Create package directory
    */
   private async createPackageDirectory(
-    component: ComponentDefinition
+    component: ComponentDefinition,
   ): Promise<string> {
     const packageName = component.name
       .replace(/([A-Z])/g, '-$1')
@@ -199,7 +199,7 @@ export class NPMPackager {
     const packageDir = join(
       this.options.outputDir,
       'packages',
-      `daisy-${packageName}`
+      `daisy-${packageName}`,
     );
 
     await fs.mkdir(packageDir, { recursive: true });
@@ -214,7 +214,7 @@ export class NPMPackager {
    */
   private async generatePackageJson(
     component: ComponentDefinition,
-    packageDir: string
+    packageDir: string,
   ): Promise<string> {
     const packageTemplate = generatePackageTemplate(component, {
       scope: this.options.scope,
@@ -224,7 +224,7 @@ export class NPMPackager {
     const packageJsonPath = join(packageDir, 'package.json');
     await fs.writeFile(
       packageJsonPath,
-      JSON.stringify(packageTemplate, null, 2)
+      JSON.stringify(packageTemplate, null, 2),
     );
 
     return packageJsonPath;
@@ -235,7 +235,7 @@ export class NPMPackager {
    */
   private async copyComponentFiles(
     sourceDir: string,
-    packageDir: string
+    packageDir: string,
   ): Promise<string[]> {
     const copiedFiles: string[] = [];
 
@@ -282,7 +282,7 @@ export class NPMPackager {
    */
   private async generateReadme(
     component: ComponentDefinition,
-    packageDir: string
+    packageDir: string,
   ): Promise<string> {
     const packageTemplate = generatePackageTemplate(component, {
       scope: this.options.scope,
@@ -301,7 +301,7 @@ export class NPMPackager {
    */
   private createReadmeContent(
     component: ComponentDefinition,
-    packageTemplate: PackageTemplate
+    packageTemplate: PackageTemplate,
   ): string {
     return `# ${packageTemplate.name}
 
@@ -429,7 +429,7 @@ SOFTWARE.`;
    */
   private async generateTypes(
     component: ComponentDefinition,
-    packageDir: string
+    packageDir: string,
   ): Promise<string> {
     const typesPath = join(packageDir, 'src', 'index.d.ts');
 
@@ -476,7 +476,7 @@ export default ${component.name};
    */
   public async generatePackages(
     components: ComponentDefinition[],
-    sourceDirs: Map<string, string>
+    sourceDirs: Map<string, string>,
   ): Promise<PackageGenerationResult[]> {
     const results: PackageGenerationResult[] = [];
 
@@ -512,7 +512,7 @@ export function createNPMPackager(options: NPMPackageOptions): NPMPackager {
 export async function generateNPMPackage(
   component: ComponentDefinition,
   sourceDir: string,
-  options: NPMPackageOptions
+  options: NPMPackageOptions,
 ): Promise<PackageGenerationResult> {
   const packager = createNPMPackager(options);
   return packager.generatePackage(component, sourceDir);

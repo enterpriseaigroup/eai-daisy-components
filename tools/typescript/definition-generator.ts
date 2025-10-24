@@ -16,7 +16,7 @@ import type { ComponentDefinition } from '@/types';
  */
 export async function generateTypeDefinitions(
   component: ComponentDefinition,
-  outputDir: string
+  outputDir: string,
 ): Promise<string> {
   const defPath = join(outputDir, `${component.name}.d.ts`);
 
@@ -45,7 +45,7 @@ function generateImports(component: ComponentDefinition): string {
 
   if (component.dependencies.some(d => d.name.includes('Configurator'))) {
     imports.push(
-      "import type { ConfiguratorContext } from '@11x/configurator-sdk';"
+      "import type { ConfiguratorContext } from '@11x/configurator-sdk';",
     );
   }
 

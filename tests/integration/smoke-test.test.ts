@@ -10,11 +10,11 @@ describe('Test Infrastructure Smoke Test', () => {
   it('should have test fixtures created', async () => {
     const v1ButtonPath = path.join(
       __dirname,
-      '../fixtures/components/v1/Button.tsx'
+      '../fixtures/components/v1/Button.tsx',
     );
     const v2ButtonPath = path.join(
       __dirname,
-      '../fixtures/components/v2/Button.tsx'
+      '../fixtures/components/v2/Button.tsx',
     );
 
     const v1Exists = await fs
@@ -33,7 +33,7 @@ describe('Test Infrastructure Smoke Test', () => {
   it('should be able to read v1 Button component', async () => {
     const v1ButtonPath = path.join(
       __dirname,
-      '../fixtures/components/v1/Button.tsx'
+      '../fixtures/components/v1/Button.tsx',
     );
     const content = await fs.readFile(v1ButtonPath, 'utf-8');
 
@@ -45,7 +45,7 @@ describe('Test Infrastructure Smoke Test', () => {
   it('should be able to read v2 Button component', async () => {
     const v2ButtonPath = path.join(
       __dirname,
-      '../fixtures/components/v2/Button.tsx'
+      '../fixtures/components/v2/Button.tsx',
     );
     const content = await fs.readFile(v2ButtonPath, 'utf-8');
 

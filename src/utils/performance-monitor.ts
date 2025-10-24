@@ -29,7 +29,7 @@ export class PerformanceMonitor {
 
   public endMonitoring(
     componentName: string,
-    startTime: number
+    startTime: number,
   ): PerformanceMetrics {
     const endTime = Date.now();
     const duration = endTime - startTime;
