@@ -24,9 +24,14 @@ The flow is divided into two main phases:
 3. User clicks "Login" button in the browser
 4. App Service initiates OAuth flow with Entra (redirects user to Entra login)
 5. User sees Entra's login page and enters credentials (username and password)
-6. Upon successful authentication, Entra redirects back to App Service with auth code/token
-7. App Service processes the OAuth callback and establishes a user session
-8. App Service delivers the GetAddress page/component to the browser (with user session cookie/token)
+6. Upon successful authentication, Entra redirects to Public API callback with auth code
+7. Public API exchanges auth code with Entra for id_token, access_token, and refresh_token
+8. Public API authenticates with PayloadCMS and retrieves Payload user token
+9. Public API stores the Entra refresh_token on the user's profile in PayloadCMS
+10. Public API redirects browser back to App Service with both Entra token and Payload token
+11. App Service delivers the GetAddress page/component to the browser (with both tokens)
+
+**Token Refresh Flow**: When the Payload token expires, Public API uses the stored refresh_token to obtain a new Entra token from Entra, then generates a new Payload token, updating both in the user session.
 
 ### Phase 2: Authorization & Resource Access (Browser component directly calls Public API)
 
@@ -59,6 +64,8 @@ When the user interacts with the GetAddress component (e.g., enters an address):
 - **Encrypted credentials**: DPHI API credentials are stored encrypted in PayloadCMS
 - **Token-based authentication**: Short-lived bearer tokens prevent unauthorized access
 - **API key validation**: Additional layer of access control per tenant
+- **Secure token storage**: Entra refresh tokens are stored securely in PayloadCMS on user profiles
+- **Token refresh mechanism**: Automatic token refresh using stored refresh_token when Payload token expires
 
 ## Implementation Timeline
 
@@ -75,25 +82,45 @@ sequenceDiagram
 
   Note over Browser,AppService: PHASE 1: Authentication & Page Delivery
   Browser->>AppService: Navigate to app / Click "Login"
-  AppService->>Entra: 302 Redirect to /authorize (OAuth flow)
-  Browser->>Entra: GET /authorize (user sees login form)
+  AppService->>Browser: 302 Redirect to Entra /authorize
+  Browser->>Entra: GET /authorize (OAuth flow starts)
+  Note right of Entra: User sees login form
   Browser->>Entra: POST /login (username + password)
-  Entra-->>Browser: 302 Redirect to App Service callback
-  Browser->>AppService: GET /auth/callback?code=...
-  AppService->>Entra: POST /token (exchange code for tokens)
-  Entra-->>AppService: 200 OK (id_token, access_token)
-  AppService-->>Browser: 200 OK + Set session cookie + Deliver GetAddress page
+  Entra-->>Browser: 302 Redirect to Public API callback
+  Browser->>PublicAPI: GET /auth/callback?code=...
+
+  Note right of PublicAPI: Public API handles callback
+  PublicAPI->>Entra: POST /token (exchange code for tokens)
+  Entra-->>PublicAPI: 200 OK (id_token, access_token, refresh_token)
+
+  PublicAPI->>Payload: POST /auth/login (authenticate, get Payload token)
+  Payload-->>PublicAPI: 200 OK (payload_user_token)
+
+  Note right of PublicAPI: Store refresh_token on user profile
+  PublicAPI->>Payload: PATCH /users/{userId} (store refresh_token)
+  Payload-->>PublicAPI: 200 OK (refresh_token stored)
+
+  PublicAPI-->>Browser: 302 Redirect to App Service + tokens in query/cookie
+  Browser->>AppService: GET /dashboard?tokens=...
+  AppService-->>Browser: 200 OK + Deliver GetAddress page (with both tokens)
 
   Note over Browser,DPHI: PHASE 2: Component API Calls (App Service not involved)
   Browser->>PublicAPI: POST /request-dphi-creds
-    note right of Browser: GetAddress component makes direct call<br/>body: { address }<br/>headers: Authorization: Bearer <userToken>,<br/>X-API-Key: <hardcoded>
+    note right of Browser: GetAddress component makes direct call<br/>body: { address }<br/>headers: Authorization: Bearer <entraToken>,<br/>X-Payload-Token: <payloadToken>,<br/>X-API-Key: <hardcoded>
 
   Note right of PublicAPI: Step 1: validate user token with Entra
   PublicAPI->>Entra: Validate token / introspect
   Entra-->>PublicAPI: Token valid (claims) / or invalid
 
-  alt token invalid
-    PublicAPI-->>Browser: 401 Unauthorized
+  alt token invalid or expired
+    Note right of PublicAPI: Token refresh flow
+    PublicAPI->>Payload: GET /users/{userId} (retrieve refresh_token)
+    Payload-->>PublicAPI: 200 OK (refresh_token)
+    PublicAPI->>Entra: POST /token (refresh=true, refresh_token)
+    Entra-->>PublicAPI: 200 OK (new id_token, access_token)
+    PublicAPI->>Payload: POST /auth/refresh (get new Payload token)
+    Payload-->>PublicAPI: 200 OK (new payload_user_token)
+    PublicAPI-->>Browser: 401 + New tokens (client retries with new tokens)
   else token valid
     Note right of PublicAPI: Step 2: check tenant/API-key access in PayloadCMS
     PublicAPI->>Payload: GET /tenants/{tenantId}/access?apiKey=X-API-Key&user=<sub>
