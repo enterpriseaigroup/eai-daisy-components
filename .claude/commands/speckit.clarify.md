@@ -2,6 +2,21 @@
 description: Identify underspecified areas in the current feature spec by asking up to 5 highly targeted clarification questions and encoding answers back into the spec.
 ---
 
+## Markdown Linting
+
+All generated markdown files MUST comply with markdownlint rules. See [`.claude/MARKDOWN_LINT_RULES.md`](../MARKDOWN_LINT_RULES.md) for details.
+
+**Key requirements**:
+
+- Surround all lists with blank lines (MD032)
+- Use sequential numbering for ordered lists (MD029)
+- Ensure headings are unique (MD024)
+- Remove trailing spaces (MD009)
+- Don't end headings with punctuation (MD026)
+- Surround headings with blank lines (MD022)
+- Surround code blocks with blank lines (MD031)
+- Specify language for all code blocks (MD040)
+
 ## User Input
 
 ```text
@@ -106,9 +121,9 @@ Execution steps:
 
      | Option | Description                                  |
      | ------ | -------------------------------------------- | ------------------------------------------------------ |
-     | A      | <Option A description>                       |
-     | B      | <Option B description>                       |
-     | C      | <Option C description>                       | (add D/E as needed up to 5)                            |
+     | A      | [Option A description]                       |
+     | B      | [Option B description]                       |
+     | C      | [Option C description]                       | (add D/E as needed up to 5)                            |
      | Short  | Provide a different short answer (<=5 words) | (Include only if free-form alternative is appropriate) |
      - After the table, add: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
 

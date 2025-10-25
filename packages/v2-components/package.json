@@ -1,0 +1,39 @@
+{
+  "name": "@daisy/v2-components",
+  "version": "2.1.0",
+  "description": "DAISY V2 components for Configurator SDK v2.1.0+",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "generate:component": "tsx src/cli/generate-functional-component.ts",
+    "generate:from-baseline": "tsx src/cli/generate-functional-component.ts"
+  },
+  "peerDependencies": {
+    "@elevenlabs-ui/configurator-sdk": "^2.1.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.0.0",
+    "@radix-ui/react-dialog": "^1.0.0",
+    "@radix-ui/react-toast": "^1.0.0",
+    "ts-morph": "^21.0.1",
+    "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0"
+  },
+  "keywords": [
+    "daisy",
+    "v2",
+    "components",
+    "configurator",
+    "react"
+  ],
+  "author": "Enterprise AI Group",
+  "license": "MIT"
+}

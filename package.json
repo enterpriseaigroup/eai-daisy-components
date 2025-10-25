@@ -1,6 +1,6 @@
 {
   "name": "eai-daisy-components",
-  "version": "1.0.0",
+  "version": "2.2.0",
   "description": "Component extraction pipeline for migrating DAISY v1 components to Configurator v2 architecture with business logic preservation",
   "type": "module",
   "scripts": {
@@ -13,6 +13,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "migrate:v2": "tsx packages/v2-components/src/cli/migrate-v2.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "test:types": "tsc --noEmit --project tsconfig.test.json",
@@ -31,7 +32,9 @@
     "prepare": "husky install",
     "measure:baseline": "node scripts/measure-bundle-baseline.cjs",
     "migrate:component": "tsx src/cli/migrate-component.ts",
-    "migrate:all": "tsx src/cli/migrate-all.ts"
+    "migrate:all": "tsx src/cli/migrate-all.ts",
+    "generate:component": "npm run --prefix packages/v2-components generate:component",
+    "generate:react": "npm run --prefix packages/v2-components generate:from-baseline"
   },
   "engines": {
     "node": ">=18.0.0",

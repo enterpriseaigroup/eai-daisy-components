@@ -2,6 +2,21 @@
 description: Generate a custom checklist for the current feature based on user requirements.
 ---
 
+## Markdown Linting
+
+All generated markdown files MUST comply with markdownlint rules. See [`.claude/MARKDOWN_LINT_RULES.md`](../MARKDOWN_LINT_RULES.md) for details.
+
+**Key requirements**:
+
+- Surround all lists with blank lines (MD032)
+- Use sequential numbering for ordered lists (MD029)
+- Ensure headings are unique (MD024)
+- Remove trailing spaces (MD009)
+- Don't end headings with punctuation (MD026)
+- Surround headings with blank lines (MD022)
+- Surround code blocks with blank lines (MD031)
+- Specify language for all code blocks (MD040)
+
 ## Checklist Purpose: "Unit Tests for English"
 
 **CRITICAL CONCEPT**: Checklists are **UNIT TESTS FOR REQUIREMENTS WRITING** - they validate the quality, clarity, and completeness of requirements in a given domain.
