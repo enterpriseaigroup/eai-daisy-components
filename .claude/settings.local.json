@@ -20,7 +20,11 @@
       "Bash(npx ts-node:*)",
       "Bash(npx tsx:*)",
       "Bash(npm run lint:fix:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(npx markdownlint-cli2-fix:*)",
+      "Bash(npx markdownlint-cli2:*)",
+      "Read(//Users/douglaswross/Code/eai/eai-public-api/**)"
     ],
     "deny": [],
     "ask": []

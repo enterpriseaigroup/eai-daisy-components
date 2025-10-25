@@ -57,6 +57,64 @@ pnpm test
 pnpm run dev
 ```
 
+### V2 Component Generation
+
+Generate modern V2 components from DAISY v1 baselines with full business logic preservation:
+
+```bash
+# Generate a V2 component
+npm run migrate:v2 -- --component=GetAddressCard
+
+# Preview pseudo-code without creating files
+npm run migrate:v2 -- --component=GetAddressCard --dry-run
+
+# Generate with verbose logging
+npm run migrate:v2 -- --component=GetAddressCard --verbose
+
+# Generate to custom output directory
+npm run migrate:v2 -- --component=GetAddressCard --output=./custom/path
+```
+
+#### Recovery Commands
+
+If generation fails or needs to be reset:
+
+```bash
+# Resume failed components from previous run
+npm run migrate:v2 -- --resume
+
+# Clean up incomplete/orphaned directories
+npm run migrate:v2 -- --cleanup
+
+# Rollback all generated components
+npm run migrate:v2 -- --rollback
+
+# Regenerate a specific component
+npm run migrate:v2 -- --regenerate GetAddressCard
+```
+
+#### Generation Features
+
+- ✅ **Configurator SDK Integration**: Automatic SDK v2.1.0+ integration with state management
+- ✅ **shadcn/ui Components**: Modern UI components (Button, Card, Alert, Spinner)
+- ✅ **Business Logic Preservation**: Full pseudo-code documentation with 6 constitutional fields
+- ✅ **TypeScript Type Safety**: Strict mode with comprehensive type definitions
+- ✅ **Error Boundaries**: Automatic error handling and recovery patterns
+- ✅ **Accessibility**: WCAG 2.1 AA compliant components
+- ✅ **Atomic File Operations**: Safe file writes prevent corruption
+- ✅ **Path Validation**: Security against path traversal attacks
+- ✅ **Sensitive Data Redaction**: Automatic masking of API keys, tokens, PII in logs
+
+#### Exit Codes
+
+The V2 generation CLI uses specific exit codes for automation:
+
+- `0`: Success - Component generated successfully
+- `1`: Validation error - Invalid input or missing baseline
+- `2`: Compilation error - Generated code doesn't compile
+- `3`: Business logic incomplete - Missing required pseudo-code fields
+- `4`: Filesystem error - Permission denied or disk full
+
 ### Basic Usage
 
 ```typescript
@@ -77,7 +135,7 @@ const results = await extractor.extractBatch(['Component1', 'Component2']);
 
 ## Project Structure
 
-```
+```text
 eai-daisy-components/
 ├── src/                    # Source code
 │   ├── pipeline/          # Core extraction pipeline

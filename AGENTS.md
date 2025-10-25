@@ -475,6 +475,7 @@ module.exports = {
    ```
 
 4. **Use unknown instead of any for unknown types**
+
    ```typescript
    function processData(data: unknown): void {
      if (typeof data === 'string') {
@@ -520,6 +521,8 @@ module.exports = {
 
 Before completing any generation task, ensure:
 
+**TypeScript Requirements:**
+
 - [ ] All TypeScript files use `.ts` or `.tsx` extensions
 - [ ] No `any` types are used
 - [ ] All function parameters have explicit types
@@ -535,6 +538,196 @@ Before completing any generation task, ensure:
 - [ ] Generated markdown uses type-safe builders when programmatic
 - [ ] All imports/exports are properly typed
 
+**Markdown Linting Requirements:**
+
+- [ ] Blank lines before AND after all headings (MD022)
+- [ ] Blank lines before AND after all code blocks (MD031)
+- [ ] Blank lines before AND after all lists (MD032)
+- [ ] Language specified for all code blocks (MD040)
+- [ ] No trailing spaces except line breaks (MD009)
+- [ ] Sequential numbering in ordered lists (MD029)
+- [ ] No duplicate heading text in same document (MD024)
+
+**Code Linting Requirements:**
+
+- [ ] ESLint passes with zero errors
+- [ ] Prettier formatting applied
+- [ ] No TypeScript compilation errors
+- [ ] All linting rules from `.markdownlintrc` and `.eslintrc.cjs` followed
+
+## Linting Standards
+
+### Markdown Linting Rules
+
+**Configuration**: `.markdownlintrc` with `{"default": true, "MD013": false}`
+
+#### MD022: Blanks Around Headings
+
+Always add blank lines before AND after headings:
+
+```markdown
+<!-- ❌ BAD -->
+Some text
+## Heading
+More text
+
+<!-- ✅ GOOD -->
+Some text
+
+## Heading
+
+More text
+```
+
+#### MD031: Blanks Around Fences
+
+Always add blank lines before AND after code blocks:
+
+````markdown
+<!-- ❌ BAD -->
+Some text
+```typescript
+code
+```
+More text
+
+<!-- ✅ GOOD -->
+Some text
+
+```typescript
+code
+```
+
+More text
+````
+
+#### MD032: Blanks Around Lists
+
+Always add blank lines before AND after lists:
+
+```markdown
+<!-- ❌ BAD -->
+Some text
+- Item 1
+- Item 2
+More text
+
+<!-- ✅ GOOD -->
+Some text
+
+- Item 1
+- Item 2
+
+More text
+```
+
+#### MD040: Fenced Code Language
+
+Always specify language for code blocks:
+
+````markdown
+<!-- ❌ BAD -->
+```text
+code here
+```
+
+<!-- ✅ GOOD -->
+```typescript
+code here
+```
+````
+
+#### MD009: No Trailing Spaces
+
+Never leave trailing spaces at end of lines (unless exactly 2 for line breaks):
+
+```markdown
+<!-- ❌ BAD -->
+Line with trailing spaces    
+
+<!-- ✅ GOOD -->
+Line without trailing spaces
+```
+
+#### MD029: Ordered List Prefix
+
+Use sequential numbering (1, 2, 3) in ordered lists:
+
+```markdown
+<!-- ❌ BAD -->
+1. First
+1. Second
+1. Third
+
+<!-- ✅ GOOD -->
+1. First
+2. Second
+3. Third
+```
+
+#### MD024: No Duplicate Heading
+
+Avoid duplicate heading text in same document:
+
+```markdown
+<!-- ❌ BAD -->
+## Introduction
+Content...
+
+## Introduction
+More content...
+
+<!-- ✅ GOOD -->
+## Introduction
+Content...
+
+## Background
+More content...
+```
+
+### Pre-Generation Workflow
+
+Before generating ANY markdown or code content:
+
+1. **Identify File Type**: Markdown (.md), TypeScript (.ts/.tsx), JSON, etc.
+2. **Review Applicable Rules**: Markdown rules for .md, TypeScript rules for .ts/.tsx
+3. **Plan Structure**: Design content structure with linting rules in mind
+4. **Generate Content**: Follow rules during generation (don't fix later)
+5. **Mental Validation**: Check output against rules before returning to user
+
+### Common Violations to Avoid
+
+**Markdown:**
+
+- Missing blank lines around headings, code blocks, lists
+- Missing language specifiers on code blocks (use `typescript`, `bash`, `json`, etc.)
+- Trailing spaces at end of lines
+- Non-sequential numbering in ordered lists (1, 1, 1 instead of 1, 2, 3)
+- Duplicate heading text within same document
+
+**TypeScript:**
+
+- Using `any` type without explicit justification
+- Missing return type annotations on functions
+- Implicit types where explicit types are better
+- Missing interfaces for complex objects
+- Untyped event handlers in React components
+
+### Automated Validation
+
+Use project scripts to validate before committing:
+
+```bash
+# Lint and fix markdown
+npm run format
+
+# Lint TypeScript
+npm run lint
+
+# Fix auto-fixable issues
+npm run lint:fix
+```
+
 ## Resources
 
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
@@ -542,7 +735,9 @@ Before completing any generation task, ensure:
 - [TypeScript ESLint](https://typescript-eslint.io/)
 - [Zod - Runtime Validation](https://zod.dev/)
 - [Type Guards Documentation](https://www.typescriptlang.org/docs/handbook/2/narrowing.html)
+- [markdownlint Rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md)
 
 ## Version History
 
+- **v1.1.0** (2025-10-25): Added comprehensive linting compliance guidelines for markdown and TypeScript
 - **v1.0.0** (2025-01-22): Initial version with comprehensive TypeScript safety guidelines

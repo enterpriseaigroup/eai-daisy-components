@@ -1,0 +1,2 @@
+# Ignore command template files - they have frontmatter which violates MD041
+.claude/commands/*.md

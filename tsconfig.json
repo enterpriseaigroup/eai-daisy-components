@@ -61,6 +61,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
+  "references": [
+    { "path": "./packages/v2-components" }
+  ],
   "include": ["src/**/*", "tools/**/*", "docs/**/*", "vite.config.ts"],
   "exclude": [
     "node_modules",
